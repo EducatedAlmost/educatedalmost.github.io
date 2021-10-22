@@ -14,7 +14,7 @@
  MemoryAlpha !ma
  Pubmed, !pm
  arXiv, !arx
-  bang and Org-roam  bang    The code  (require 'org-roam)  (defun bang (prefix term) &#34;Using !">
+  bang and Org-roam  bang    What is missing from !">
 <meta name=author content>
 <link rel=canonical href=http://blog.almost.education/posts/bang-el/>
 <link crossorigin=anonymous href=/assets/css/stylesheet.min.59eee3e757258f0fe20ce07adbb2e8ad12ac4c3ef2051b72e4a88ba404dfb51a.css integrity="sha256-We7j51cljw/iDOB627LorRKsTD7yBRty5KiLpATftRo=" rel="preload stylesheet" as=style>
@@ -40,7 +40,7 @@
  MemoryAlpha !ma
  Pubmed, !pm
  arXiv, !arx
-  bang and Org-roam  bang    The code  (require 'org-roam)  (defun bang (prefix term) &#34;Using !">
+  bang and Org-roam  bang    What is missing from !">
 <meta property="og:type" content="article">
 <meta property="og:url" content="http://blog.almost.education/posts/bang-el/"><meta property="article:section" content="posts">
 <meta property="article:published_time" content="2021-10-22T18:15:13+01:00">
@@ -56,9 +56,9 @@
  MemoryAlpha !ma
  Pubmed, !pm
  arXiv, !arx
-  bang and Org-roam  bang    The code  (require 'org-roam)  (defun bang (prefix term) &#34;Using !">
+  bang and Org-roam  bang    What is missing from !">
 <script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":2,"name":"Posts","item":"http://blog.almost.education/posts/"},{"@type":"ListItem","position":3,"name":"bang.el","item":"http://blog.almost.education/posts/bang-el/"}]}</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"bang.el","name":"bang.el","description":"What is !Bang?   DuckDuckGo\n To learn more, try calling (bang \u0026#34;bang\u0026#34; \u0026#34;\u0026#34;)\n  With which websites can I use it?   How does it work?\n It makes the call to DuckDuckGo\n  Use cases   GitHub !gh\n Clojure !clj\n MemoryAlpha !ma\n Pubmed, !pm\n arXiv, !arx\n  bang and Org-roam  bang    The code  (require \u0026#39;org-roam)  (defun bang (prefix term) \u0026#34;Using !","keywords":[],"articleBody":" What is !Bang?   DuckDuckGo\n To learn more, try calling (bang \"bang\" \"\")\n  With which websites can I use it?   How does it work?\n It makes the call to DuckDuckGo\n  Use cases   GitHub !gh\n Clojure !clj\n MemoryAlpha !ma\n Pubmed, !pm\n arXiv, !arx\n  bang and Org-roam  bang    The code  (require 'org-roam)  (defun bang (prefix term) \"Using !Bang, search for TERM in website with corresponding PREFIX.\" (interactive (list (read-string \"Enter the !Bang prefix: \") (read-string \"Enter the term you wish to search: \" (when (use-region-p) (buffer-substring (region-beginning) (region-end)))))) (browse-url (concat \"https://duckduckgo.com/?q=!\" prefix \"+\" term)))   If there is an active region, it is used as the default TERM argument.\n(defun bang-find-prefix (website) \"Find the !Bang prefix for WEBSITE.\" (interactive \"sWebsite: \") (bang \"bang\" website))  (defun bang-roam (prefix) \"Use the node's title to search using the Bang PREFIX.\" (interactive \"sEnter the bang prefix: \") (condition-case nil (bang prefix (org-roam-node-title (org-roam-node-at-point))) (error (message \"Error: not inside an org-roam node.\"))))  (defun bang-roam-wiki () \"Use the node's title to find the corresponding Wikipedia entry.\" (interactive) (bang-roam \"w\"))  (provide 'bang)    Using the region as a default argument   Previously, the bang function took no notice of whether a region was active or not.\n(defun bang (prefix term) \"Using !Bang, search for TERM in website with corresponding PREFIX.\" (interactive \"sEnter the Bang prefix: sEnter the term you wish to search:\") (browse-url (concat \"https://duckduckgo.com/?q=!\" prefix \" \" term)))   This could be frustrating, as it might require one to carefully retype something that is already present in ones buffer. With thanks to Prof Hugo Nobrega, this function has been rewritten so that if there is an active region it will be displayed in the minibuffer when one is prompted for the term argument, allowing one to either confirm it, or enter something different.\n(interactive (list (read-string \"Enter the !Bang prefix: \") (read-string \"Enter the term you wish to search: \" (when (use-region-p) (buffer-substring (region-beginning) (region-end))))))   This also demonstrates the comprehensive form of interactive that allows one to form a generic list that is that passed as the arguments of the function.\n buffer-substring copies text from the buffer between two marks, being region-beginning and region-end.\n  What is missing from !Bang?    illegal\n  explicit\n  overly niche\n  violate ToS\n    The code   ","wordCount":"364","inLanguage":"en","datePublished":"2021-10-22T18:15:13+01:00","dateModified":"2021-10-22T18:15:13+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://blog.almost.education/posts/bang-el/"},"publisher":{"@type":"Organization","name":"AlmostEducated","logo":{"@type":"ImageObject","url":"http://blog.almost.education/favicon.ico"}}}</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"bang.el","name":"bang.el","description":"What is !Bang?   DuckDuckGo\n To learn more, try calling (bang \u0026#34;bang\u0026#34; \u0026#34;\u0026#34;)\n  With which websites can I use it?   How does it work?\n It makes the call to DuckDuckGo\n  Use cases   GitHub !gh\n Clojure !clj\n MemoryAlpha !ma\n Pubmed, !pm\n arXiv, !arx\n  bang and Org-roam  bang    What is missing from !","keywords":[],"articleBody":" What is !Bang?   DuckDuckGo\n To learn more, try calling (bang \"bang\" \"\")\n  With which websites can I use it?   How does it work?\n It makes the call to DuckDuckGo\n  Use cases   GitHub !gh\n Clojure !clj\n MemoryAlpha !ma\n Pubmed, !pm\n arXiv, !arx\n  bang and Org-roam  bang    What is missing from !Bang?    illegal\n  explicit\n  overly niche\n  violate ToS\n    The code  (require 'org-roam)  (defun bang (prefix term) \"Using !Bang, search for TERM in website with corresponding PREFIX.\" (interactive (list (read-string \"Enter the !Bang prefix: \") (read-string \"Enter the term you wish to search: \" (when (use-region-p) (buffer-substring (region-beginning) (region-end)))))) (browse-url (concat \"https://duckduckgo.com/?q=!\" prefix \"+\" term)))   If there is an active region, it is used as the default TERM argument.\n(defun bang-find-prefix (website) \"Find the !Bang prefix for WEBSITE.\" (interactive \"sWebsite: \") (bang \"bang\" website))  (defun bang-roam (prefix) \"Use the node's title to search using the Bang PREFIX.\" (interactive \"sEnter the bang prefix: \") (condition-case nil (bang prefix (org-roam-node-title (org-roam-node-at-point))) (error (message \"Error: not inside an org-roam node.\"))))  (defun bang-roam-wiki () \"Use the node's title to find the corresponding Wikipedia entry.\" (interactive) (bang-roam \"w\"))  (provide 'bang)    Using the region as a default argument   Previously, the bang function took no notice of whether a region was active or not.\n(defun bang (prefix term) \"Using !Bang, search for TERM in website with corresponding PREFIX.\" (interactive \"sEnter the Bang prefix: sEnter the term you wish to search:\") (browse-url (concat \"https://duckduckgo.com/?q=!\" prefix \" \" term)))   This could be frustrating, as it might require one to carefully retype something that is already present in ones buffer. With thanks to Prof Hugo Nobrega, this function has been rewritten so that if there is an active region it will be displayed in the minibuffer when one is prompted for the term argument, allowing one to either confirm it, or enter something different.\n(interactive (list (read-string \"Enter the !Bang prefix: \") (read-string \"Enter the term you wish to search: \" (when (use-region-p) (buffer-substring (region-beginning) (region-end))))))   This also demonstrates the comprehensive form of interactive that allows one to form a generic list that is that passed as the arguments of the function.\n buffer-substring copies text from the buffer between two marks, being region-beginning and region-end.\n  ","wordCount":"362","inLanguage":"en","datePublished":"2021-10-22T18:15:13+01:00","dateModified":"2021-10-22T18:15:13+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://blog.almost.education/posts/bang-el/"},"publisher":{"@type":"Organization","name":"AlmostEducated","logo":{"@type":"ImageObject","url":"http://blog.almost.education/favicon.ico"}}}</script>
 </head>
 <body class=dark id=top>
 <script>localStorage.getItem("pref-theme")==="light"&&document.body.classList.remove('dark')</script>
@@ -137,9 +137,30 @@ bang
 </div>
 <div id=outline-container-headline-5 class=outline-2>
 <h2 id=headline-5>
-The code
+What is missing from !Bang?
 </h2>
 <div id=outline-text-headline-5 class=outline-text-2>
+<ul>
+<li>
+<p>illegal</p>
+</li>
+<li>
+<p>explicit</p>
+</li>
+<li>
+<p>overly niche</p>
+</li>
+<li>
+<p>violate ToS</p>
+</li>
+</ul>
+</div>
+</div>
+<div id=outline-container-headline-6 class=outline-2>
+<h2 id=headline-6>
+The code
+</h2>
+<div id=outline-text-headline-6 class=outline-text-2>
 <div class="src src-elisp">
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-elisp data-lang=elisp>(require <span style=color:#e6db74>&#39;org-roam</span>)</code></pre></div>
 </div>
@@ -182,11 +203,11 @@ If there is an active region, it is used as the default TERM argument.</p>
 </div>
 </div>
 </div>
-<div id=outline-container-headline-6 class=outline-2>
-<h2 id=headline-6>
+<div id=outline-container-headline-7 class=outline-2>
+<h2 id=headline-7>
 Using the region as a default argument
 </h2>
-<div id=outline-text-headline-6 class=outline-text-2>
+<div id=outline-text-headline-7 class=outline-text-2>
 <p>
 Previously, the <code>bang</code> function took no notice of whether a region was active or not.</p>
 <div class="src src-elisp">
@@ -211,32 +232,6 @@ This also demonstrates the comprehensive form of <code>interactive</code> that a
 <p>
 <code>buffer-substring</code> copies text from the buffer between two marks, being <code>region-beginning</code> and <code>region-end</code>.</p>
 </div>
-</div>
-<div id=outline-container-headline-7 class=outline-2>
-<h2 id=headline-7>
-What is missing from !Bang?
-</h2>
-<div id=outline-text-headline-7 class=outline-text-2>
-<ul>
-<li>
-<p>illegal</p>
-</li>
-<li>
-<p>explicit</p>
-</li>
-<li>
-<p>overly niche</p>
-</li>
-<li>
-<p>violate ToS</p>
-</li>
-</ul>
-</div>
-</div>
-<div id=outline-container-headline-8 class=outline-2>
-<h2 id=headline-8>
-The code
-</h2>
 </div>
 </div>
 <footer class=post-footer>
