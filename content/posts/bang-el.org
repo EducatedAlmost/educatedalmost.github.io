@@ -1,0 +1,117 @@
+---
+title: "bang.el"
+date: 2021-10-22T18:15:13+01:00
+draft: false
+---
+
+* What is ~!Bang~?
+
+DuckDuckGo
+
+To learn more, try calling ~(bang "bang" "")~
+
+* With which websites can I use it?
+
+How does it work?
+
+It makes the call to DuckDuckGo
+
+* Use cases
+
+GitHub ~!gh~
+
+Clojure ~!clj~
+
+MemoryAlpha ~!ma~
+
+Pubmed, ~!pm~
+
+arXiv, ~!arx~
+
+* ~bang~ and Org-roam
+
+#+RESULTS:
+: bang
+
+* The code
+
+#+begin_src elisp
+(require 'org-roam)
+#+end_src
+
+#+begin_src elisp
+(defun bang (prefix term)
+  "Using !Bang, search for TERM in website with corresponding PREFIX."
+  (interactive
+   (list (read-string "Enter the !Bang prefix: ")
+         (read-string "Enter the term you wish to search: "
+                      (when (use-region-p)
+                        (buffer-substring (region-beginning) (region-end))))))
+  (browse-url (concat "https://duckduckgo.com/?q=!" prefix "+" term)))
+#+end_src
+
+If there is an active region, it is used as the default TERM argument.
+
+#+begin_src elisp
+(defun bang-find-prefix (website)
+  "Find the !Bang prefix for WEBSITE."
+  (interactive "sWebsite: ")
+  (bang "bang" website))
+#+end_src
+
+#+begin_src elisp
+(defun bang-roam (prefix)
+  "Use the node's title to search using the Bang PREFIX."
+  (interactive "sEnter the bang prefix: ")
+  (condition-case nil
+      (bang prefix
+            (org-roam-node-title
+             (org-roam-node-at-point)))
+    (error (message "Error: not inside an org-roam node."))))
+#+end_src
+
+#+begin_src elisp
+(defun bang-roam-wiki ()
+  "Use the node's title to find the corresponding Wikipedia entry."
+  (interactive)
+  (bang-roam "w"))
+#+end_src
+
+#+begin_src elisp
+(provide 'bang)
+#+end_src
+
+* Using the region as a default argument
+
+Previously, the ~bang~ function took no notice of whether a region was active or not.
+
+#+begin_src elisp
+(defun bang (prefix term)
+  "Using !Bang, search for TERM in website with corresponding PREFIX."
+  (interactive
+   "sEnter the Bang prefix:
+sEnter the term you wish to search:")
+  (browse-url (concat "https://duckduckgo.com/?q=!" prefix " " term)))
+#+end_src
+
+This could be frustrating, as it might require one to carefully retype something that is already present in ones buffer. With thanks to Prof Hugo Nobrega, this function has been rewritten so that if there is an active region it will be displayed in the minibuffer when one is prompted for the ~term~ argument, allowing one to either confirm it, or enter something different.
+
+#+begin_src elisp
+(interactive
+   (list (read-string "Enter the !Bang prefix: ")
+         (read-string "Enter the term you wish to search: "
+                      (when (use-region-p)
+                        (buffer-substring (region-beginning) (region-end))))))
+#+end_src
+
+This also demonstrates the comprehensive form of ~interactive~ that allows one to form a generic list that is that passed as the arguments of the function.
+
+~buffer-substring~ copies text from the buffer between two marks, being ~region-beginning~ and ~region-end~.
+
+* What is missing from !Bang?
+- illegal
+- explicit
+- overly niche
+- violate ToS
+
+* The code
