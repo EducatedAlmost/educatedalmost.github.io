@@ -33,6 +33,12 @@ arXiv, ~!arx~
 #+RESULTS:
 : bang
 
+* What is missing from !Bang?
+- illegal
+- explicit
+- overly niche
+- violate ToS
+
 * The code
 
 #+begin_src elisp
@@ -107,11 +113,3 @@ This could be frustrating, as it might require one to carefully retype something
 This also demonstrates the comprehensive form of ~interactive~ that allows one to form a generic list that is that passed as the arguments of the function.
 
 ~buffer-substring~ copies text from the buffer between two marks, being ~region-beginning~ and ~region-end~.
-
-* What is missing from !Bang?
-- illegal
-- explicit
-- overly niche
-- violate ToS
-
-* The code
