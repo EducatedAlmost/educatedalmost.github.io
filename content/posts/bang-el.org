@@ -4,6 +4,8 @@ date: 2021-10-22T18:15:13+01:00
 draft: false
 ---
 
+https://github.com/EducatedAlmost/bang.el
+
 * What is ~!Bang~?
 
 DuckDuckGo
@@ -30,8 +32,7 @@ arXiv, ~!arx~
 
 * ~bang~ and Org-roam
 
-#+RESULTS:
-: bang
+https://www.orgroam.com/
 
 * What is missing from !Bang?
 - illegal
