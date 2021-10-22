@@ -1,1 +1,10 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Posts on AlmostEducated</title><link>http://blog.almost.education/posts/</link><description>Recent content in Posts on AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Fri, 22 Oct 2021 12:27:50 +0100</lastBuildDate><atom:link href="http://blog.almost.education/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>My First Post</title><link>http://blog.almost.education/posts/my-first-post/</link><pubDate>Fri, 22 Oct 2021 12:27:50 +0100</pubDate><guid>http://blog.almost.education/posts/my-first-post/</guid><description>Hello, there.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Posts on AlmostEducated</title><link>http://blog.almost.education/posts/</link><description>Recent content in Posts on AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Fri, 22 Oct 2021 18:15:13 +0100</lastBuildDate><atom:link href="http://blog.almost.education/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>bang.el</title><link>http://blog.almost.education/posts/bang-el/</link><pubDate>Fri, 22 Oct 2021 18:15:13 +0100</pubDate><guid>http://blog.almost.education/posts/bang-el/</guid><description>What is !Bang? DuckDuckGo
+To learn more, try calling (bang &amp;#34;bang&amp;#34; &amp;#34;&amp;#34;)
+With which websites can I use it? How does it work?
+It makes the call to DuckDuckGo
+Use cases GitHub !gh
+Clojure !clj
+MemoryAlpha !ma
+Pubmed, !pm
+arXiv, !arx
+bang and Org-roam bang The code (require &amp;#39;org-roam) (defun bang (prefix term) &amp;#34;Using !</description></item><item><title>My First Post</title><link>http://blog.almost.education/posts/my-first-post/</link><pubDate>Fri, 22 Oct 2021 12:27:50 +0100</pubDate><guid>http://blog.almost.education/posts/my-first-post/</guid><description>Hello, there.</description></item></channel></rss>
