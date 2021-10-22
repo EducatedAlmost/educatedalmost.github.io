@@ -4,6 +4,7 @@ title = 'AlmostEducated'
 theme = 'PaperMod'
 
 [params]
+defaultTheme = "dark"
 
 [params.label]
 icon = "img/ae-logo-trans.png"
