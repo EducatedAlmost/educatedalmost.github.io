@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AlmostEducated</title><link>http://blog.almost.education/</link><description>Recent content on AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Fri, 22 Oct 2021 18:15:13 +0100</lastBuildDate><atom:link href="http://blog.almost.education/index.xml" rel="self" type="application/rss+xml"/><item><title>bang.el</title><link>http://blog.almost.education/posts/bang-el/</link><pubDate>Fri, 22 Oct 2021 18:15:13 +0100</pubDate><guid>http://blog.almost.education/posts/bang-el/</guid><description>What is !Bang? DuckDuckGo
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>AlmostEducated</title><link>http://blog.almost.education/</link><description>Recent content on AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Fri, 22 Oct 2021 18:15:13 +0100</lastBuildDate><atom:link href="http://blog.almost.education/index.xml" rel="self" type="application/rss+xml"/><item><title>bang.el</title><link>http://blog.almost.education/posts/bang-el/</link><pubDate>Fri, 22 Oct 2021 18:15:13 +0100</pubDate><guid>http://blog.almost.education/posts/bang-el/</guid><description>https://github.com/EducatedAlmost/bang.el
+What is !Bang? DuckDuckGo
 To learn more, try calling (bang &amp;#34;bang&amp;#34; &amp;#34;&amp;#34;)
 With which websites can I use it? How does it work?
 It makes the call to DuckDuckGo
@@ -7,4 +8,5 @@ Clojure !clj
 MemoryAlpha !ma
 Pubmed, !pm
 arXiv, !arx
-bang and Org-roam bang What is missing from !</description></item></channel></rss>
+bang and Org-roam https://www.orgroam.com/
+What is missing from !</description></item></channel></rss>
