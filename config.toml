@@ -1,0 +1,4 @@
+baseURL = 'http://blog.almost.education'
+languageCode = 'en-gb'
+title = 'AlmostEducated'
+theme = 'PaperMod'
