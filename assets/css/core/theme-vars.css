@@ -18,15 +18,15 @@
 }
 
 .dark {
-    --theme: rgb(30, 30, 40);
-    --entry: rgb(30, 30, 40);
-    --primary: rgb(250, 230, 250);
-    --secondary: rgb(250, 230, 250);
-    --tertiary: rgb(65, 66, 68);
-    --content: rgb(222, 190, 222);
-    --hljs-bg: rgb(46, 46, 51);
-    --code-bg: rgb(55, 56, 62);
-    --border: rgb(51, 51, 51);
+    --theme: rgb(30, 30, 40); /* bg */
+    --entry: rgb(33, 33, 43); /* menu item bg */
+    --primary: rgb(250, 230, 250); /* Titles and links */
+    --secondary: rgb(250, 230, 250); /* Date */
+    --tertiary: rgb(65, 66, 68); /* Up button */
+    --content: rgb(220, 190, 220); /* Body text */
+    --hljs-bg: rgb(40, 40, 55); /* src bg */
+    --code-bg: rgb(50, 50, 50); /* ~ bg */
+    --border: rgb(50, 50, 50); /* menu item border */
 }
 
 .list {
