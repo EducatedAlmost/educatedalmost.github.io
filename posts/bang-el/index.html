@@ -3,29 +3,17 @@
 <meta http-equiv=x-ua-compatible content="IE=edge">
 <meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
 <meta name=robots content="index, follow">
-<title>bang.el | AlmostEducated</title>
+<title>bang.el | blog.AlmostEducated</title>
 <meta name=keywords content>
-<meta name=description content="https://github.com/EducatedAlmost/bang.el
-What is !Bang?   DuckDuckGo
- To learn more, try calling (bang &#34;bang&#34; &#34;&#34;)
-  With which websites can I use it?   How does it work?
- It makes the call to DuckDuckGo
-  Use cases   GitHub !gh
- Clojure !clj
- MemoryAlpha !ma
- Pubmed, !pm
- arXiv, !arx
-  bang and Org-roam   https://www.orgroam.com/
-  What is missing from !">
-<meta name=author content>
+<meta name=description content="Use Bangs from the comfort of Emacs!">
+<meta name=author content="AlmostEducated">
 <link rel=canonical href=http://blog.almost.education/posts/bang-el/>
-<link crossorigin=anonymous href=/assets/css/stylesheet.min.59eee3e757258f0fe20ce07adbb2e8ad12ac4c3ef2051b72e4a88ba404dfb51a.css integrity="sha256-We7j51cljw/iDOB627LorRKsTD7yBRty5KiLpATftRo=" rel="preload stylesheet" as=style>
-<link rel=preload href=img/ae-logo-trans.png as=image>
-<script defer crossorigin=anonymous src=/assets/js/highlight.min.7680afc38aa6b15ddf158a4f3780b7b1f7dde7e91d26f073e6229bb7a0793c92.js integrity="sha256-doCvw4qmsV3fFYpPN4C3sffd5+kdJvBz5iKbt6B5PJI=" onload=hljs.initHighlightingOnLoad()></script>
-<link rel=icon href=http://blog.almost.education/favicon.ico>
+<link crossorigin=anonymous href=/assets/css/stylesheet.min.3a256f85e68a2406de869e0329dbed1e3d6c8eef73fe82acf6bf599fb460be77.css integrity="sha256-OiVvheaKJAbehp4DKdvtHj1sju9z/oKs9r9Zn7Rgvnc=" rel="preload stylesheet" as=style>
+<link rel=preload href=/img/ae-logo-trans.png as=image>
+<link rel=icon href=http://blog.almost.education/img/ae-logo-trans.png>
 <link rel=icon type=image/png sizes=16x16 href=http://blog.almost.education/favicon-16x16.png>
 <link rel=icon type=image/png sizes=32x32 href=http://blog.almost.education/favicon-32x32.png>
-<link rel=apple-touch-icon href=http://blog.almost.education/apple-touch-icon.png>
+<link rel=apple-touch-icon href=http://blog.almost.education/img/ae-logo-trans.png>
 <link rel=mask-icon href=http://blog.almost.education/safari-pinned-tab.svg>
 <meta name=theme-color content="#2e2e33">
 <meta name=msapplication-TileColor content="#2e2e33">
@@ -33,46 +21,24 @@ What is !Bang?   DuckDuckGo
 <noscript>
 <style>#theme-toggle,.top-link{display:none}</style>
 </noscript><meta property="og:title" content="bang.el">
-<meta property="og:description" content="https://github.com/EducatedAlmost/bang.el
-What is !Bang?   DuckDuckGo
- To learn more, try calling (bang &#34;bang&#34; &#34;&#34;)
-  With which websites can I use it?   How does it work?
- It makes the call to DuckDuckGo
-  Use cases   GitHub !gh
- Clojure !clj
- MemoryAlpha !ma
- Pubmed, !pm
- arXiv, !arx
-  bang and Org-roam   https://www.orgroam.com/
-  What is missing from !">
+<meta property="og:description" content="Use Bangs from the comfort of Emacs!">
 <meta property="og:type" content="article">
 <meta property="og:url" content="http://blog.almost.education/posts/bang-el/"><meta property="article:section" content="posts">
 <meta property="article:published_time" content="2021-10-22T18:15:13+01:00">
 <meta property="article:modified_time" content="2021-10-22T18:15:13+01:00">
 <meta name=twitter:card content="summary">
 <meta name=twitter:title content="bang.el">
-<meta name=twitter:description content="https://github.com/EducatedAlmost/bang.el
-What is !Bang?   DuckDuckGo
- To learn more, try calling (bang &#34;bang&#34; &#34;&#34;)
-  With which websites can I use it?   How does it work?
- It makes the call to DuckDuckGo
-  Use cases   GitHub !gh
- Clojure !clj
- MemoryAlpha !ma
- Pubmed, !pm
- arXiv, !arx
-  bang and Org-roam   https://www.orgroam.com/
-  What is missing from !">
+<meta name=twitter:description content="Use Bangs from the comfort of Emacs!">
 <script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":2,"name":"Posts","item":"http://blog.almost.education/posts/"},{"@type":"ListItem","position":3,"name":"bang.el","item":"http://blog.almost.education/posts/bang-el/"}]}</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"bang.el","name":"bang.el","description":"https://github.com/EducatedAlmost/bang.el\nWhat is !Bang?   DuckDuckGo\n To learn more, try calling (bang \u0026#34;bang\u0026#34; \u0026#34;\u0026#34;)\n  With which websites can I use it?   How does it work?\n It makes the call to DuckDuckGo\n  Use cases   GitHub !gh\n Clojure !clj\n MemoryAlpha !ma\n Pubmed, !pm\n arXiv, !arx\n  bang and Org-roam   https://www.orgroam.com/\n  What is missing from !","keywords":[],"articleBody":"  https://github.com/EducatedAlmost/bang.el\nWhat is !Bang?   DuckDuckGo\n To learn more, try calling (bang \"bang\" \"\")\n  With which websites can I use it?   How does it work?\n It makes the call to DuckDuckGo\n  Use cases   GitHub !gh\n Clojure !clj\n MemoryAlpha !ma\n Pubmed, !pm\n arXiv, !arx\n  bang and Org-roam   https://www.orgroam.com/\n  What is missing from !Bang?    illegal\n  explicit\n  overly niche\n  violate ToS\n    The code  (require 'org-roam)  (defun bang (prefix term) \"Using !Bang, search for TERM in website with corresponding PREFIX.\" (interactive (list (read-string \"Enter the !Bang prefix: \") (read-string \"Enter the term you wish to search: \" (when (use-region-p) (buffer-substring (region-beginning) (region-end)))))) (browse-url (concat \"https://duckduckgo.com/?q=!\" prefix \"+\" term)))   If there is an active region, it is used as the default TERM argument.\n(defun bang-find-prefix (website) \"Find the !Bang prefix for WEBSITE.\" (interactive \"sWebsite: \") (bang \"bang\" website))  (defun bang-roam (prefix) \"Use the node's title to search using the Bang PREFIX.\" (interactive \"sEnter the bang prefix: \") (condition-case nil (bang prefix (org-roam-node-title (org-roam-node-at-point))) (error (message \"Error: not inside an org-roam node.\"))))  (defun bang-roam-wiki () \"Use the node's title to find the corresponding Wikipedia entry.\" (interactive) (bang-roam \"w\"))  (provide 'bang)    Using the region as a default argument   Previously, the bang function took no notice of whether a region was active or not.\n(defun bang (prefix term) \"Using !Bang, search for TERM in website with corresponding PREFIX.\" (interactive \"sEnter the Bang prefix: sEnter the term you wish to search:\") (browse-url (concat \"https://duckduckgo.com/?q=!\" prefix \" \" term)))   This could be frustrating, as it might require one to carefully retype something that is already present in ones buffer. With thanks to Prof Hugo Nobrega, this function has been rewritten so that if there is an active region it will be displayed in the minibuffer when one is prompted for the term argument, allowing one to either confirm it, or enter something different.\n(interactive (list (read-string \"Enter the !Bang prefix: \") (read-string \"Enter the term you wish to search: \" (when (use-region-p) (buffer-substring (region-beginning) (region-end))))))   This also demonstrates the comprehensive form of interactive that allows one to form a generic list that is that passed as the arguments of the function.\n buffer-substring copies text from the buffer between two marks, being region-beginning and region-end.\n  ","wordCount":"363","inLanguage":"en","datePublished":"2021-10-22T18:15:13+01:00","dateModified":"2021-10-22T18:15:13+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://blog.almost.education/posts/bang-el/"},"publisher":{"@type":"Organization","name":"AlmostEducated","logo":{"@type":"ImageObject","url":"http://blog.almost.education/favicon.ico"}}}</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"bang.el","name":"bang.el","description":"Use Bangs from the comfort of Emacs!","keywords":[],"articleBody":"  https://github.com/EducatedAlmost/bang.el\n I use DuckDuckGo. Its become popular for PRIVACY, but honestly, I use it because it looks nicer. Search for something in Google (bang \"g\" \"foo\") and as well as the expected search results, one is shown 'people also ask', top news stories, video thumbnails from the Foo Fighters YouTube channel, and a summary of their latest tweets. When one expects a uniform list of simple search results, one is instead shown a noisy list of varying components. FOOTER NOTE\nBang   And yet I've ended up using DDG for something almost unrelated, Bang. If you search DDG for !x foo, it delegates that search to the website represented by the Bang prefix x and searches it for foo. For example, you might want to search for the bang.el GitHub page, !gh bang.el, or Wikipedia for Emacs, !w Emacs, see here for a list of prefixes. Instead of going to the website's homepage, and then searching, Bang takes you straight to the results page. If DDG is your browser's default search engine this becomes really fast.\n By my estimates, Bang shaves 10–30 seconds off every search, something that I do 10–100 times every day. By the reasoning of this classic xkcd comic, this is exactly the sort of task we should be making more efficient.\n  Over five years, 15 seconds saved 30 times every day nets us a total of 10 days! (bang \"wa\" \"15 seconds * 30 * 365 * 5\")\n Another key to greater productivity is cutting out what might disrupt ones flow. If I see the Wikipedia homepage, there's a 50% chance that three hours later I'll have 30 tabs open, and my previous work will be long forgotten. Bang takes me straight to the page I want, after which I can just close the browser.\n  Examples    !gh   GitHub repositories\n  !clj   ClojureDocs\n  !xiny   Learn X in Y minutes, a introduction to any programming language\n  !pm   PubMed, biomedical papers\n  !arx   arXiv, physics papers\n  !wa   WolframAlpha, computational knowledge engine\n  !ma   MemoryAlpha, the Star Trek Wiki\n  !awoiaf   A Wiki of Ice and Fire\n    What is missing from Bang?   There are four categories of sites that are disallowed from having a Bang: There are four types of Bangs that are disallowed:\n  those for illegal websites\n  those for websites with explicit content\n  those that would be overly niche\n  those that would violate the website's terms of service\n    bang.el   bang.el takes this a step further. Not only does one get to skip the process of going to the website, now one can use the Bang from Emacs itself.\n  bang.el and Org-roam   What is Org-roam?\n A plain-text knowledge management system.\n  Inspired by Roam Research, org-roam is the best tool for creating a personal wiki, knowledge store, or Zettelkasten. I've accumulated 8500 nodes after a year of use so I can attest to its brilliance. I originally started writing bang.el to quickly view the Wikipedia page of the subject I was writing about. For this reason, the initial name of the project was roam-to-wiki.el and the first function became bang-roam-wiki.el, which searches the current org-roam node in Wikipedia.\n I find this to often be the case. A small simple function … we grow scope. Introduce variable where there was none previously. roam-to-wiki.el became bang-roam.el and then, simply, bang.el. The bang-roam and bang-roam-wiki functions still exist, so you can easily search for a node's title, either in Wikipedia, or anywhere else.\n  Ideas   I have wondered if bang might be a good tool for improving the experience of searching for documentation whilst programming. I commonly find myself highlighting a symbol and calling (bang \"clj\" ...) to find its definition in in ClojureDocs. Perhaps a function called bang-docs which determined its prefix from whichever major mode was currently active, and the term defaulting to the symbol at point, would provide, regardless of the language used, an harmonious solution to documentation searching.\n There are tools like Zeal and Dash, but I have found them to be a pain as documentation is kept in an external application. Helm Dash might be a good alternative as it supposedly runs everything from inside Emacs, but I have yet to try it out.\n  The code  1  (require 'org-roam)    1 2 3 4 5 6 7 8  (defun bang (prefix term) \"Using Bang, search for TERM in website with corresponding PREFIX.\" (interactive (list (read-string \"Enter the Bang prefix: \") (read-string \"Enter the term you wish to search: \" (when (use-region-p) (buffer-substring (region-beginning) (region-end)))))) (browse-url (concat \"https://duckduckgo.com/?q=!\" prefix \"+\" term)))     If there is an active region, it is used as the default TERM argument.\n1 2 3 4  (defun bang-info () \"Visit the homepage for Bangs.\" (interactive) (bang \"bang\" \"\"))    1 2 3 4  (defun bang-find-prefix (website) \"Find the Bang prefix for WEBSITE.\" (interactive \"sWebsite: \") (bang \"bang\" website))    1 2 3 4 5 6 7 8  (defun bang-roam (prefix) \"Use the node's title to search using the Bang PREFIX.\" (interactive \"sEnter the bang prefix: \") (condition-case nil (bang prefix (org-roam-node-title (org-roam-node-at-point))) (error (message \"Error: not inside an org-roam node.\"))))    1 2 3 4  (defun bang-roam-wiki () \"Use the node's title to find the corresponding Wikipedia entry.\" (interactive) (bang-roam \"w\"))    1  (provide 'bang)      Using the region as a default argument   Previously, the bang function took no notice of whether a region was active or not.\n1 2 3 4 5 6  (defun bang (prefix term) \"Using Bang, search for TERM in website with corresponding PREFIX.\" (interactive \"sEnter the Bang prefix: sEnter the term you wish to search:\") (browse-url (concat \"https://duckduckgo.com/?q=!\" prefix \" \" term)))     This could be frustrating, as it might require one to carefully retype something that is already present in ones buffer. With thanks to Prof Hugo Nobrega, this function has been rewritten so that if there is an active region it will be displayed in the minibuffer when one is prompted for the term argument, allowing one to either confirm it, or enter something different.\n1 2 3 4 5  (interactive (list (read-string \"Enter the Bang prefix: \") (read-string \"Enter the term you wish to search: \" (when (use-region-p) (buffer-substring (region-beginning) (region-end))))))     This also demonstrates the comprehensive form of interactive that allows one to form a generic list that is that passed as the arguments of the function.\n buffer-substring copies text from the buffer between two marks, being region-beginning and region-end.\n  ","wordCount":"1048","inLanguage":"en","datePublished":"2021-10-22T18:15:13+01:00","dateModified":"2021-10-22T18:15:13+01:00","author":{"@type":"Person","name":"AlmostEducated"},"mainEntityOfPage":{"@type":"WebPage","@id":"http://blog.almost.education/posts/bang-el/"},"publisher":{"@type":"Organization","name":"blog.AlmostEducated","logo":{"@type":"ImageObject","url":"http://blog.almost.education/img/ae-logo-trans.png"}}}</script>
 </head>
 <body class=dark id=top>
 <script>localStorage.getItem("pref-theme")==="light"&&document.body.classList.remove('dark')</script>
 <header class=header>
 <nav class=nav>
 <div class=logo>
-<a href=http://blog.almost.education accesskey=h title="AlmostEducated (Alt + H)">
-<img src=img/ae-logo-trans.png alt=logo aria-label=logo height=" 30px">AlmostEducated</a>
+<a href=http://blog.almost.education accesskey=h title="blog.AlmostEducated (Alt + H)">
+<img src=/img/ae-logo-trans.png alt=logo aria-label=logo height=" 30px">blog.AlmostEducated</a>
 <span class=logo-switches>
 <button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
 </button>
@@ -88,151 +54,320 @@ What is !Bang?   DuckDuckGo
 <h1 class=post-title>
 bang.el
 </h1>
-<div class=post-meta>October 22, 2021
+<div class=post-meta>22nd October 2021&nbsp;·&nbsp;AlmostEducated
 </div>
 </header>
 <div class=post-content>
 <p>
-https://github.com/EducatedAlmost/bang.el</p>
+<a href=https://github.com/EducatedAlmost/bang.el>https://github.com/EducatedAlmost/bang.el</a></p>
+<p>
+I use <a href=https://duckduckgo.com/>DuckDuckGo</a>. Its become popular for PRIVACY, but honestly, I use it because it looks nicer. Search for something in Google <a href="https://duckduckgo.com/?q=!g foo"><code>(bang "g" "foo")</code></a> and as well as the expected search results, one is shown 'people also ask', top news stories, video thumbnails from the Foo Fighters YouTube channel, and a summary of their latest tweets. When one expects a uniform list of simple search results, one is instead shown a noisy list of varying components. FOOTER NOTE</p>
 <div id=outline-container-headline-1 class=outline-2>
 <h2 id=headline-1>
-What is <code>!Bang</code>?
+<em>Bang</em>
 </h2>
 <div id=outline-text-headline-1 class=outline-text-2>
 <p>
-DuckDuckGo</p>
+And yet I've ended up using DDG for something almost unrelated, <em>Bang</em>. If you search DDG for <code>!x foo</code>, it delegates that search to the website represented by the Bang prefix <code>x</code> and searches it for <code>foo</code>. For example, you might want to search for the <code>bang.el</code> GitHub page, <a href="https://duckduckgo.com/?q=!gh bang.el"><code>!gh bang.el</code></a>, or Wikipedia for Emacs, <a href="https://duckduckgo.com/?q=!w Emacs"><code>!w Emacs</code></a>, see <a href=https://duckduckgo.com/bang>here</a> for a list of prefixes. Instead of going to the website's homepage, and then searching, Bang takes you straight to the results page. If DDG is your browser's default search engine this becomes really fast.</p>
 <p>
-To learn more, try calling <code>(bang "bang" "")</code></p>
+By my estimates, Bang shaves 10–30 seconds off every search, something that I do 10–100 times every day. By the reasoning of this classic xkcd comic, this is exactly the sort of task we should be making more efficient.</p>
+<p>
+<img src=https://imgs.xkcd.com/comics/is_it_worth_the_time_2x.png alt=https://imgs.xkcd.com/comics/is_it_worth_the_time_2x.png title=https://imgs.xkcd.com/comics/is_it_worth_the_time_2x.png></p>
+<p>
+Over five years, 15 seconds saved 30 times every day nets us a total of <strong>10 days</strong>! <a href="https://duckduckgo.com/?q=!wa 15 seconds * 30 * 365 * 5"><code>(bang "wa" "15 seconds * 30 * 365 * 5")</code></a></p>
+<p>
+Another key to greater productivity is cutting out what might disrupt ones flow. If I see the Wikipedia homepage, there's a 50% chance that three hours later I'll have 30 tabs open, and my previous work will be long forgotten. Bang takes me straight to the page I want, after which I can just close the browser.</p>
 </div>
 </div>
 <div id=outline-container-headline-2 class=outline-2>
 <h2 id=headline-2>
-With which websites can I use it?
+Examples
 </h2>
 <div id=outline-text-headline-2 class=outline-text-2>
-<p>
-How does it work?</p>
-<p>
-It makes the call to DuckDuckGo</p>
+<dl>
+<dt>
+<code>!gh</code>
+</dt>
+<dd>
+<p>GitHub repositories</p>
+</dd>
+<dt>
+<code>!clj</code>
+</dt>
+<dd>
+<p>ClojureDocs</p>
+</dd>
+<dt>
+<code>!xiny</code>
+</dt>
+<dd>
+<p>Learn X in Y minutes, a introduction to any programming language</p>
+</dd>
+<dt>
+<code>!pm</code>
+</dt>
+<dd>
+<p>PubMed, biomedical papers</p>
+</dd>
+<dt>
+<code>!arx</code>
+</dt>
+<dd>
+<p>arXiv, physics papers</p>
+</dd>
+<dt>
+<code>!wa</code>
+</dt>
+<dd>
+<p>WolframAlpha, computational knowledge engine</p>
+</dd>
+<dt>
+<code>!ma</code>
+</dt>
+<dd>
+<p>MemoryAlpha, the Star Trek Wiki</p>
+</dd>
+<dt>
+<code>!awoiaf</code>
+</dt>
+<dd>
+<p>A Wiki of Ice and Fire</p>
+</dd>
+</dl>
 </div>
 </div>
 <div id=outline-container-headline-3 class=outline-2>
 <h2 id=headline-3>
-Use cases
+What is missing from Bang?
 </h2>
 <div id=outline-text-headline-3 class=outline-text-2>
 <p>
-GitHub <code>!gh</code></p>
-<p>
-Clojure <code>!clj</code></p>
-<p>
-MemoryAlpha <code>!ma</code></p>
-<p>
-Pubmed, <code>!pm</code></p>
-<p>
-arXiv, <code>!arx</code></p>
-</div>
-</div>
-<div id=outline-container-headline-4 class=outline-2>
-<h2 id=headline-4>
-<code>bang</code> and Org-roam
-</h2>
-<div id=outline-text-headline-4 class=outline-text-2>
-<p>
-https://www.orgroam.com/</p>
-</div>
-</div>
-<div id=outline-container-headline-5 class=outline-2>
-<h2 id=headline-5>
-What is missing from !Bang?
-</h2>
-<div id=outline-text-headline-5 class=outline-text-2>
+There are four categories of sites that are disallowed from having a Bang:
+There are four types of Bangs that are disallowed:</p>
 <ul>
 <li>
-<p>illegal</p>
+<p>those for <strong>illegal</strong> websites</p>
 </li>
 <li>
-<p>explicit</p>
+<p>those for websites with <strong>explicit content</strong></p>
 </li>
 <li>
-<p>overly niche</p>
+<p>those that would be <strong>overly niche</strong></p>
 </li>
 <li>
-<p>violate ToS</p>
+<p>those that would violate the website's <strong>terms of service</strong></p>
 </li>
 </ul>
 </div>
 </div>
+<div id=outline-container-headline-4 class=outline-2>
+<h2 id=headline-4>
+<code>bang.el</code>
+</h2>
+<div id=outline-text-headline-4 class=outline-text-2>
+<p>
+<code>bang.el</code> takes this a step further. Not only does one get to skip the process of going to the website, now one can use the Bang from Emacs itself.</p>
+</div>
+</div>
+<div id=outline-container-headline-5 class=outline-2>
+<h2 id=headline-5>
+<code>bang.el</code> and Org-roam
+</h2>
+<div id=outline-text-headline-5 class=outline-text-2>
+<p>
+What is <a href=https://www.orgroam.com/>Org-roam</a>?</p>
+<blockquote>
+<p>A plain-text knowledge management system.</p>
+</blockquote>
+<p>
+Inspired by <a href=https://roamresearch.com/>Roam Research</a>, org-roam is <em>the</em> best tool for creating a personal wiki, knowledge store, or <a href=https://en.wikipedia.org/wiki/Zettelkasten>Zettelkasten</a>. I've accumulated >8500 nodes after a year of use so I can attest to its brilliance. I originally started writing <code>bang.el</code> to quickly view the Wikipedia page of the subject I was writing about. For this reason, the initial name of the project was <code>roam-to-wiki.el</code> and the first function became <code>bang-roam-wiki.el</code>, which searches the current org-roam node in Wikipedia.</p>
+<p>
+I find this to often be the case. A small simple function … we grow scope. Introduce variable where there was none previously.
+<code>roam-to-wiki.el</code> became <code>bang-roam.el</code> and then, simply, <code>bang.el</code>. The <code>bang-roam</code> and <code>bang-roam-wiki</code> functions still exist, so you can easily search for a node's title, either in Wikipedia, or anywhere else.</p>
+</div>
+</div>
 <div id=outline-container-headline-6 class=outline-2>
 <h2 id=headline-6>
-The code
+Ideas
 </h2>
 <div id=outline-text-headline-6 class=outline-text-2>
-<div class="src src-elisp">
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-elisp data-lang=elisp>(require <span style=color:#e6db74>&#39;org-roam</span>)</code></pre></div>
-</div>
-<div class="src src-elisp">
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-elisp data-lang=elisp>(defun bang (prefix term)
-  <span style=color:#e6db74>&#34;Using !Bang, search for TERM in website with corresponding PREFIX.&#34;</span>
-  (interactive
-   (<span style=color:#a6e22e>list</span> (<span style=color:#a6e22e>read-string</span> <span style=color:#e6db74>&#34;Enter the !Bang prefix: &#34;</span>)
-         (<span style=color:#a6e22e>read-string</span> <span style=color:#e6db74>&#34;Enter the term you wish to search: &#34;</span>
-                      (when (use-region-p)
-                        (<span style=color:#a6e22e>buffer-substring</span> (<span style=color:#a6e22e>region-beginning</span>) (<span style=color:#a6e22e>region-end</span>))))))
-  (browse-url (<span style=color:#a6e22e>concat</span> <span style=color:#e6db74>&#34;https://duckduckgo.com/?q=!&#34;</span> prefix <span style=color:#e6db74>&#34;+&#34;</span> term)))</code></pre></div>
-</div>
 <p>
-If there is an active region, it is used as the default TERM argument.</p>
-<div class="src src-elisp">
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-elisp data-lang=elisp>(defun bang-find-prefix (website)
-  <span style=color:#e6db74>&#34;Find the !Bang prefix for WEBSITE.&#34;</span>
-  (interactive <span style=color:#e6db74>&#34;sWebsite: &#34;</span>)
-  (bang <span style=color:#e6db74>&#34;bang&#34;</span> website))</code></pre></div>
-</div>
-<div class="src src-elisp">
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-elisp data-lang=elisp>(defun bang-roam (prefix)
-  <span style=color:#e6db74>&#34;Use the node&#39;s title to search using the Bang PREFIX.&#34;</span>
-  (interactive <span style=color:#e6db74>&#34;sEnter the bang prefix: &#34;</span>)
-  (condition-case <span style=color:#66d9ef>nil</span>
-      (bang prefix
-            (org-roam-node-title
-             (org-roam-node-at-point)))
-    (<span style=color:#a6e22e>error</span> (<span style=color:#a6e22e>message</span> <span style=color:#e6db74>&#34;Error: not inside an org-roam node.&#34;</span>))))</code></pre></div>
-</div>
-<div class="src src-elisp">
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-elisp data-lang=elisp>(defun bang-roam-wiki ()
-  <span style=color:#e6db74>&#34;Use the node&#39;s title to find the corresponding Wikipedia entry.&#34;</span>
-  (interactive)
-  (bang-roam <span style=color:#e6db74>&#34;w&#34;</span>))</code></pre></div>
-</div>
-<div class="src src-elisp">
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-elisp data-lang=elisp>(provide <span style=color:#e6db74>&#39;bang</span>)</code></pre></div>
-</div>
+I have wondered if <code>bang</code> might be a good tool for improving the experience of searching for documentation whilst programming. I commonly find myself highlighting a symbol and calling <code>(bang "clj" ...)</code> to find its definition in in ClojureDocs. Perhaps a function called <code>bang-docs</code> which determined its prefix from whichever major mode was currently active, and the term defaulting to the symbol at point, would provide, regardless of the language used, an harmonious solution to documentation searching.</p>
+<p>
+There are tools like <a href=https://github.com/zealdocs/zeal>Zeal</a> and <a href=https://kapeli.com/dash>Dash</a>, but I have found them to be a pain as documentation is kept in an external application. <a href=https://github.com/dash-docs-el/helm-dash>Helm Dash</a> might be a good alternative as it supposedly runs everything from inside Emacs, but I have yet to try it out.</p>
 </div>
 </div>
 <div id=outline-container-headline-7 class=outline-2>
 <h2 id=headline-7>
-Using the region as a default argument
+The code
 </h2>
 <div id=outline-text-headline-7 class=outline-text-2>
+<div class="src src-elisp">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-elisp data-lang=elisp><span class=p>(</span><span class=nb>require</span> <span class=ss>&#39;org-roam</span><span class=p>)</span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<div class="src src-elisp">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-elisp data-lang=elisp><span class=p>(</span><span class=nb>defun</span> <span class=nv>bang</span> <span class=p>(</span><span class=nv>prefix</span> <span class=nv>term</span><span class=p>)</span>
+  <span class=s>&#34;Using Bang, search for TERM in website with corresponding PREFIX.&#34;</span>
+  <span class=p>(</span><span class=nb>interactive</span>
+   <span class=p>(</span><span class=nf>list</span> <span class=p>(</span><span class=nf>read-string</span> <span class=s>&#34;Enter the Bang prefix: &#34;</span><span class=p>)</span>
+         <span class=p>(</span><span class=nf>read-string</span> <span class=s>&#34;Enter the term you wish to search: &#34;</span>
+                      <span class=p>(</span><span class=nb>when</span> <span class=p>(</span><span class=nv>use-region-p</span><span class=p>)</span>
+                        <span class=p>(</span><span class=nf>buffer-substring</span> <span class=p>(</span><span class=nf>region-beginning</span><span class=p>)</span> <span class=p>(</span><span class=nf>region-end</span><span class=p>))))))</span>
+  <span class=p>(</span><span class=nv>browse-url</span> <span class=p>(</span><span class=nf>concat</span> <span class=s>&#34;https://duckduckgo.com/?q=!&#34;</span> <span class=nv>prefix</span> <span class=s>&#34;+&#34;</span> <span class=nv>term</span><span class=p>)))</span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<p>
+If there is an active region, it is used as the default TERM argument.</p>
+<div class="src src-elisp">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-elisp data-lang=elisp><span class=p>(</span><span class=nb>defun</span> <span class=nv>bang-info</span> <span class=p>()</span>
+  <span class=s>&#34;Visit the homepage for Bangs.&#34;</span>
+  <span class=p>(</span><span class=nb>interactive</span><span class=p>)</span>
+  <span class=p>(</span><span class=nv>bang</span> <span class=s>&#34;bang&#34;</span> <span class=s>&#34;&#34;</span><span class=p>))</span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<div class="src src-elisp">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-elisp data-lang=elisp><span class=p>(</span><span class=nb>defun</span> <span class=nv>bang-find-prefix</span> <span class=p>(</span><span class=nv>website</span><span class=p>)</span>
+  <span class=s>&#34;Find the Bang prefix for WEBSITE.&#34;</span>
+  <span class=p>(</span><span class=nb>interactive</span> <span class=s>&#34;sWebsite: &#34;</span><span class=p>)</span>
+  <span class=p>(</span><span class=nv>bang</span> <span class=s>&#34;bang&#34;</span> <span class=nv>website</span><span class=p>))</span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<div class="src src-elisp">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-elisp data-lang=elisp><span class=p>(</span><span class=nb>defun</span> <span class=nv>bang-roam</span> <span class=p>(</span><span class=nv>prefix</span><span class=p>)</span>
+  <span class=s>&#34;Use the node&#39;s title to search using the Bang PREFIX.&#34;</span>
+  <span class=p>(</span><span class=nb>interactive</span> <span class=s>&#34;sEnter the bang prefix: &#34;</span><span class=p>)</span>
+  <span class=p>(</span><span class=nb>condition-case</span> <span class=no>nil</span>
+      <span class=p>(</span><span class=nv>bang</span> <span class=nv>prefix</span>
+            <span class=p>(</span><span class=nv>org-roam-node-title</span>
+             <span class=p>(</span><span class=nv>org-roam-node-at-point</span><span class=p>)))</span>
+    <span class=p>(</span><span class=ne>error</span> <span class=p>(</span><span class=nf>message</span> <span class=s>&#34;Error: not inside an org-roam node.&#34;</span><span class=p>))))</span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<div class="src src-elisp">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-elisp data-lang=elisp><span class=p>(</span><span class=nb>defun</span> <span class=nv>bang-roam-wiki</span> <span class=p>()</span>
+  <span class=s>&#34;Use the node&#39;s title to find the corresponding Wikipedia entry.&#34;</span>
+  <span class=p>(</span><span class=nb>interactive</span><span class=p>)</span>
+  <span class=p>(</span><span class=nv>bang-roam</span> <span class=s>&#34;w&#34;</span><span class=p>))</span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<div class="src src-elisp">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-elisp data-lang=elisp><span class=p>(</span><span class=nb>provide</span> <span class=ss>&#39;bang</span><span class=p>)</span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id=outline-container-headline-8 class=outline-2>
+<h2 id=headline-8>
+Using the region as a default argument
+</h2>
+<div id=outline-text-headline-8 class=outline-text-2>
 <p>
 Previously, the <code>bang</code> function took no notice of whether a region was active or not.</p>
 <div class="src src-elisp">
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-elisp data-lang=elisp>(defun bang (prefix term)
-  <span style=color:#e6db74>&#34;Using !Bang, search for TERM in website with corresponding PREFIX.&#34;</span>
-  (interactive
-   <span style=color:#e6db74>&#34;sEnter the Bang prefix:
-</span><span style=color:#e6db74>sEnter the term you wish to search:&#34;</span>)
-  (browse-url (<span style=color:#a6e22e>concat</span> <span style=color:#e6db74>&#34;https://duckduckgo.com/?q=!&#34;</span> prefix <span style=color:#e6db74>&#34; &#34;</span> term)))</code></pre></div>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-elisp data-lang=elisp><span class=p>(</span><span class=nb>defun</span> <span class=nv>bang</span> <span class=p>(</span><span class=nv>prefix</span> <span class=nv>term</span><span class=p>)</span>
+  <span class=s>&#34;Using Bang, search for TERM in website with corresponding PREFIX.&#34;</span>
+  <span class=p>(</span><span class=nb>interactive</span>
+   <span class=s>&#34;sEnter the Bang prefix:
+</span><span class=s>sEnter the term you wish to search:&#34;</span><span class=p>)</span>
+  <span class=p>(</span><span class=nv>browse-url</span> <span class=p>(</span><span class=nf>concat</span> <span class=s>&#34;https://duckduckgo.com/?q=!&#34;</span> <span class=nv>prefix</span> <span class=s>&#34; &#34;</span> <span class=nv>term</span><span class=p>)))</span></code></pre></td></tr></table>
+</div>
+</div>
 </div>
 <p>
 This could be frustrating, as it might require one to carefully retype something that is already present in ones buffer. With thanks to Prof Hugo Nobrega, this function has been rewritten so that if there is an active region it will be displayed in the minibuffer when one is prompted for the <code>term</code> argument, allowing one to either confirm it, or enter something different.</p>
 <div class="src src-elisp">
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-elisp data-lang=elisp>(interactive
-   (<span style=color:#a6e22e>list</span> (<span style=color:#a6e22e>read-string</span> <span style=color:#e6db74>&#34;Enter the !Bang prefix: &#34;</span>)
-         (<span style=color:#a6e22e>read-string</span> <span style=color:#e6db74>&#34;Enter the term you wish to search: &#34;</span>
-                      (when (use-region-p)
-                        (<span style=color:#a6e22e>buffer-substring</span> (<span style=color:#a6e22e>region-beginning</span>) (<span style=color:#a6e22e>region-end</span>))))))</code></pre></div>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-elisp data-lang=elisp><span class=p>(</span><span class=nb>interactive</span>
+   <span class=p>(</span><span class=nf>list</span> <span class=p>(</span><span class=nf>read-string</span> <span class=s>&#34;Enter the Bang prefix: &#34;</span><span class=p>)</span>
+         <span class=p>(</span><span class=nf>read-string</span> <span class=s>&#34;Enter the term you wish to search: &#34;</span>
+                      <span class=p>(</span><span class=nb>when</span> <span class=p>(</span><span class=nv>use-region-p</span><span class=p>)</span>
+                        <span class=p>(</span><span class=nf>buffer-substring</span> <span class=p>(</span><span class=nf>region-beginning</span><span class=p>)</span> <span class=p>(</span><span class=nf>region-end</span><span class=p>))))))</span></code></pre></td></tr></table>
+</div>
+</div>
 </div>
 <p>
 This also demonstrates the comprehensive form of <code>interactive</code> that allows one to form a generic list that is that passed as the arguments of the function.</p>
@@ -246,7 +381,7 @@ This also demonstrates the comprehensive form of <code>interactive</code> that a
 </article>
 </main>
 <footer class=footer>
-<span>&copy; 2021 <a href=http://blog.almost.education>AlmostEducated</a></span>
+<span>&copy; 2021 <a href=http://blog.almost.education>blog.AlmostEducated</a></span>
 <span>
 Powered by
 <a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
