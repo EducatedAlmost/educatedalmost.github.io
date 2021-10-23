@@ -2,43 +2,67 @@
 title: "bang.el"
 date: 2021-10-22T18:15:13+01:00
 draft: false
+summary: Use Bangs from the comfort of Emacs!
 ---
 
-https://github.com/EducatedAlmost/bang.el
+[[https://github.com/EducatedAlmost/bang.el]]
 
-* What is ~!Bang~?
+I use [[https://duckduckgo.com/][DuckDuckGo]]. Its become popular for PRIVACY, but honestly, I use it because it looks nicer. Search for something in Google [[https://duckduckgo.com/?q=!g foo][~(bang "g" "foo")~]] and as well as the expected search results, one is shown 'people also ask', top news stories, video thumbnails from the Foo Fighters YouTube channel, and a summary of their latest tweets. When one expects a uniform list of simple search results, one is instead shown a noisy list of varying components. FOOTER NOTE
 
-DuckDuckGo
+* /Bang/
 
-To learn more, try calling ~(bang "bang" "")~
+And yet I've ended up using DDG for something almost unrelated, /Bang/. If you search DDG for ~!x foo~, it delegates that search to the website represented by the Bang prefix ~x~ and searches it for ~foo~. For example, you might want to search for the ~bang.el~ GitHub page, [[https://duckduckgo.com/?q=!gh bang.el][~!gh bang.el~]], or Wikipedia for Emacs, [[https://duckduckgo.com/?q=!w Emacs][~!w Emacs~]], see [[https://duckduckgo.com/bang][here]] for a list of prefixes. Instead of going to the website's homepage, and then searching, Bang takes you straight to the results page. If DDG is your browser's default search engine this becomes really fast.
 
-* With which websites can I use it?
+By my estimates, Bang shaves 10–30 seconds off every search, something that I do 10–100 times every day. By the reasoning of this classic xkcd comic, this is exactly the sort of task we should be making more efficient.
 
-How does it work?
+[[https://imgs.xkcd.com/comics/is_it_worth_the_time_2x.png]]
 
-It makes the call to DuckDuckGo
+Over five years, 15 seconds saved 30 times every day nets us a total of *10 days*! [[https://duckduckgo.com/?q=!wa 15 seconds * 30 * 365 * 5][~(bang "wa" "15 seconds * 30 * 365 * 5")~]]
 
-* Use cases
+Another key to greater productivity is cutting out what might disrupt ones flow. If I see the Wikipedia homepage, there's a 50% chance that three hours later I'll have 30 tabs open, and my previous work will be long forgotten. Bang takes me straight to the page I want, after which I can just close the browser.
 
-GitHub ~!gh~
+* Examples
 
-Clojure ~!clj~
+- ~!gh~ :: GitHub repositories
+- ~!clj~ :: ClojureDocs
+- ~!xiny~ :: Learn X in Y minutes, a introduction to any programming language
+- ~!pm~ :: PubMed, biomedical papers
+- ~!arx~ :: arXiv, physics papers
+- ~!wa~ :: WolframAlpha, computational knowledge engine
+- ~!ma~ :: MemoryAlpha, the Star Trek Wiki
+- ~!awoiaf~ :: A Wiki of Ice and Fire
 
-MemoryAlpha ~!ma~
+* What is missing from Bang?
 
-Pubmed, ~!pm~
+There are four categories of sites that are disallowed from having a Bang:
+There are four types of Bangs that are disallowed:
+- those for *illegal* websites
+- those for websites with *explicit content*
+- those that would be *overly niche*
+- those that would violate the website's *terms of service*
 
-arXiv, ~!arx~
+* ~bang.el~
 
-* ~bang~ and Org-roam
+~bang.el~ takes this a step further. Not only does one get to skip the process of going to the website, now one can use the Bang from Emacs itself.
 
-https://www.orgroam.com/
+* ~bang.el~ and Org-roam
 
-* What is missing from !Bang?
-- illegal
-- explicit
-- overly niche
-- violate ToS
+What is [[https://www.orgroam.com/][Org-roam]]?
+
+#+begin_quote
+A plain-text knowledge management system.
+#+end_quote
+
+Inspired by [[https://roamresearch.com/][Roam Research]], org-roam is /the/ best tool for creating a personal wiki, knowledge store, or [[https://en.wikipedia.org/wiki/Zettelkasten][Zettelkasten]]. I've accumulated >8500 nodes after a year of use so I can attest to its brilliance. I originally started writing ~bang.el~ to quickly view the Wikipedia page of the subject I was writing about. For this reason, the initial name of the project was ~roam-to-wiki.el~ and the first function became ~bang-roam-wiki.el~, which searches the current org-roam node in Wikipedia.
+
+I find this to often be the case. A small simple function ... we grow scope. Introduce variable where there was none previously.
+~roam-to-wiki.el~ became ~bang-roam.el~ and then, simply, ~bang.el~. The ~bang-roam~ and ~bang-roam-wiki~ functions still exist, so you can easily search for a node's title, either in Wikipedia, or anywhere else.
+
+* Ideas
+
+I have wondered if ~bang~ might be a good tool for improving the experience of searching for documentation whilst programming. I commonly find myself highlighting a symbol and calling ~(bang "clj" ...)~ to find its definition in in ClojureDocs. Perhaps a function called ~bang-docs~ which determined its prefix from whichever major mode was currently active, and the term defaulting to the symbol at point, would provide, regardless of the language used, an harmonious solution to documentation searching.
+
+There are tools like [[https://github.com/zealdocs/zeal][Zeal]] and [[https://kapeli.com/dash][Dash]], but I have found them to be a pain as documentation is kept in an external application. [[https://github.com/dash-docs-el/helm-dash][Helm Dash]] might be a good alternative as it supposedly runs everything from inside Emacs, but I have yet to try it out.
 
 * The code
 
@@ -48,9 +72,9 @@ https://www.orgroam.com/
 
 #+begin_src elisp
 (defun bang (prefix term)
-  "Using !Bang, search for TERM in website with corresponding PREFIX."
+  "Using Bang, search for TERM in website with corresponding PREFIX."
   (interactive
-   (list (read-string "Enter the !Bang prefix: ")
+   (list (read-string "Enter the Bang prefix: ")
          (read-string "Enter the term you wish to search: "
                       (when (use-region-p)
                         (buffer-substring (region-beginning) (region-end))))))
@@ -60,8 +84,15 @@ https://www.orgroam.com/
 If there is an active region, it is used as the default TERM argument.
 
 #+begin_src elisp
+(defun bang-info ()
+  "Visit the homepage for Bangs."
+  (interactive)
+  (bang "bang" ""))
+#+end_src
+
+#+begin_src elisp
 (defun bang-find-prefix (website)
-  "Find the !Bang prefix for WEBSITE."
+  "Find the Bang prefix for WEBSITE."
   (interactive "sWebsite: ")
   (bang "bang" website))
 #+end_src
@@ -94,7 +125,7 @@ Previously, the ~bang~ function took no notice of whether a region was active or
 
 #+begin_src elisp
 (defun bang (prefix term)
-  "Using !Bang, search for TERM in website with corresponding PREFIX."
+  "Using Bang, search for TERM in website with corresponding PREFIX."
   (interactive
    "sEnter the Bang prefix:
 sEnter the term you wish to search:")
@@ -105,7 +136,7 @@ This could be frustrating, as it might require one to carefully retype something
 
 #+begin_src elisp
 (interactive
-   (list (read-string "Enter the !Bang prefix: ")
+   (list (read-string "Enter the Bang prefix: ")
          (read-string "Enter the term you wish to search: "
                       (when (use-region-p)
                         (buffer-substring (region-beginning) (region-end))))))
