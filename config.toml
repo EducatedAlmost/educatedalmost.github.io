@@ -1,8 +1,0 @@
-baseURL = 'http://blog.almost.education'
-languageCode = 'en-gb'
-title = 'AlmostEducated'
-theme = 'PaperMod'
-
-[params]
-defaultTheme = "dark"
-label.icon = "/img/ae-logo-trans.png"

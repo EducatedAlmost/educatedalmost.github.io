@@ -1,0 +1,23 @@
+baseURL: 'http://blog.almost.education'
+languageCode: en-gb
+title: blog.AlmostEducated
+theme: PaperMod
+
+params:
+  author: AlmostEducated
+  assets:
+    apple_touch_icon: /img/ae-logo-trans.png
+    disableHLJS: true
+    favicon: /img/ae-logo-trans.png
+  DateFormat: 2nd January 2006
+  defaultTheme: dark
+  label:
+    icon: /img/ae-logo-trans.png
+
+markup:
+  highlight:
+    codeFences: true
+    guessSyntax: true
+    lineNos: true
+    style: paraiso-dark
+    noClasses: false
