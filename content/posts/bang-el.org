@@ -1,13 +1,15 @@
 ---
 title: "bang.el"
-date: 2021-10-22T18:15:13+01:00
+date: 2021-10-22T00:00:00+00:00
 draft: false
 summary: Use Bangs from the comfort of Emacs!
 ---
 
 [[https://github.com/EducatedAlmost/bang.el]]
 
-I use [[https://duckduckgo.com/][DuckDuckGo]]. Its become popular for PRIVACY, but honestly, I use it because it looks nicer. Search for something in Google [[https://duckduckgo.com/?q=!g foo][~(bang "g" "foo")~]] and as well as the expected search results, one is shown 'people also ask', top news stories, video thumbnails from the Foo Fighters YouTube channel, and a summary of their latest tweets. When one expects a uniform list of simple search results, one is instead shown a noisy list of varying components. FOOTER NOTE
+https://news.ycombinator.com/item?id=28976487
+
+I use [[https://duckduckgo.com/][DuckDuckGo]]. Its become popular for its emphasis on user privacy in contrast to the giant of the market, Google, who it seems every six months is implicated in [[https://news.ycombinator.com/item?id=28976487][unethical behaviour]]. But honestly, I use DuckDuckGo because it looks nicer. Search for something in Google [[https://duckduckgo.com/?q=!g foo][~(bang "g" "foo")~]] and as well as the expected search results, one is shown 'people also ask', top news stories, video thumbnails from the Foo Fighters YouTube channel, and a summary of their latest tweets. When one expects a uniform list of simple search results, one is instead shown a noisy list of varying components.
 
 * /Bang/
 
@@ -44,10 +46,21 @@ There are four types of Bangs that are disallowed:
 
 ~bang.el~ takes this a step further. Not only does one get to skip the process of going to the website, now one can use the Bang from Emacs itself.
 
-~bang~
-~bang-make-link~
-~bang-info~
-~bang-find-prefix~
+** ~browse-url~
+
+All ~bang.el~ functions ultimately call ~browse-url~. To choose which program is used by Emacs to open the link, one can edit the values of ~browse-url-browser-function~ and ~browse-url-generic-function~ as documented [[https://www.emacswiki.org/emacs/BrowseUrl][here]].
+
+** ~bang~
+
+The general purpose function, that accepts a prefix and the thing to be searched, and opens it with ~browse-url~.
+
+** ~bang-info~
+
+This no-argument function takes the caller to the Bang homepage where one can learn more about it.
+
+** ~bang-find-prefix~
+
+If one wishes to learn which prefix is needed for which website, this function can be called that uses Bang's own search to find it.
 
 * ~bang.el~ and Org-roam
 
@@ -62,8 +75,13 @@ Inspired by [[https://roamresearch.com/][Roam Research]], org-roam is /the/ best
 I find this to often be the case. A small simple function ... we grow scope. Introduce variable where there was none previously.
 ~roam-to-wiki.el~ became ~bang-roam.el~ and then, simply, ~bang.el~. The ~bang-roam~ and ~bang-roam-wiki~ functions still exist, so you can easily search for a node's title, either in Wikipedia, or anywhere else.
 
-~bang-roam~
-~bang-roam-wiki~
+** ~bang-roam~
+
+Calls ~bang~ with the caller's choice of prefix and the current org-roam node's title.
+
+** ~bang-roam-wiki~
+
+Calls ~bang~ with the ~"w"~ prefix and the current org-roam node's title.
 
 * Ideas
 
@@ -73,13 +91,13 @@ There are tools like [[https://github.com/zealdocs/zeal][Zeal]] and [[https://ka
 
 * The code
 
-#+begin_src elisp
+#+begin_src lisp
 (require 'org-roam)
 #+end_src
 
 Until I can work out how to make ~org-roam~ optional, it is required due to the ~bang-roam~ functions.
 
-#+begin_src elisp
+#+begin_src lisp
 (defun bang-make-link (prefix term)
   "Make the link that is used to search with Bangs, '!PREFIX TERM'."
   (concat "https://duckduckgo.com/?q=!" prefix "+" term))
@@ -100,7 +118,7 @@ Until I can work out how to make ~org-roam~ optional, it is required due to the 
 
 ~bang-info~ and ~bang-find-prefix~ just call the functions ~(bang "bang" "")~ and ~(bang "bang" WEBSITE)~, to access Bang's own information page.
 
-#+begin_src elisp
+#+begin_src lisp
 (defun bang-roam (prefix)
   "Use the node's title to search using the Bang PREFIX."
   (interactive "sEnter the bang prefix: ")
@@ -113,7 +131,7 @@ Until I can work out how to make ~org-roam~ optional, it is required due to the 
 
 ~condition-case~ is elisp's equivalent of a try-catch statement. It executes the bodyform, in this case a call to ~bang~ with a prefix and the node's title as its arguments, but in the case that one is not inside a org-roam node it throws an exception. After the bodyform, one can provide a number of handlers of the form ~(ERROR-TYPE body)~ which are executed if the throw exception matches the ~ERROR-TYPE~. In ~bang-roam~ it just informs the caller that the function cannot be called outside of a org-roam node.
 
-#+begin_src elisp
+#+begin_src lisp
 (provide 'bang)
 #+end_src
 
@@ -121,7 +139,7 @@ Until I can work out how to make ~org-roam~ optional, it is required due to the 
 
 Previously, the ~bang~ function took no notice of whether a region was active or not.
 
-#+begin_src elisp
+#+begin_src lisp
 (defun bang (prefix term)
   "Using Bang, search for TERM in website with corresponding PREFIX."
   (interactive
@@ -132,7 +150,7 @@ sEnter the term you wish to search:")
 
 This could be frustrating, as it might require one to carefully retype something that is already present in ones buffer. With thanks to Prof Hugo Nobrega, I've rewritten this function so that if there is an active region it will be displayed in the minibuffer when one is prompted for the ~term~ argument, allowing one to either confirm it or enter something different.
 
-#+begin_src elisp
+#+begin_src lisp
 (interactive
    (list (read-string "Enter the Bang prefix: ")
          (read-string "Enter the term you wish to search: "
@@ -140,6 +158,14 @@ This could be frustrating, as it might require one to carefully retype something
                         (buffer-substring (region-beginning) (region-end))))))
 #+end_src
 
-This also demonstrates the comprehensive form of ~interactive~ that allows one to form a generic list that is that passed as the arguments of the function.
+This also demonstrates the comprehensive form of ~interactive~ that allows one to form a generic list that is that passed as the arguments of the function. ~buffer-substring~ copies text from the buffer between two marks, being ~region-beginning~ and ~region-end~.
 
-~buffer-substring~ copies text from the buffer between two marks, being ~region-beginning~ and ~region-end~.
+* Conclusions
+
+Emacs's extensibility is fantastic — no other editor makes it so easy to write new functions, leveraging existing Emacs functions and those of all install packages. One can just write a tiny elisp file, whereas something like Visual Studio Code requires one to create a new Node.js package. The development experience is also great, being able to define and evaluate in the running editor, the feedback cycle is almost instant.
+
+Adaptability of elisp's ~interactive~ forms. Nice UI / UX. Quickly frustrated with the interactive short forms "s" and "r", glad to find out that the longer form is not unwieldy.
+
+Streamline those processes that you spend the most total time on. Some of these things are basically invisible. This extends to avoiding distractions.
+
+One function can snowball into a whole project, this can be good or bad. What's the pay-off? Too much abstraction or generalisation, like a layer to abstract over all databases whether they be SQL, document, or graph.

@@ -7,7 +7,7 @@ params:
   author: AlmostEducated
   assets:
     apple_touch_icon: /img/ae-logo-trans.png
-    disableHLJS: true
+    disableHLJS: false
     favicon: /img/ae-logo-trans.png
   DateFormat: 2nd January 2006
   defaultTheme: dark
