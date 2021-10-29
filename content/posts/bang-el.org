@@ -2,12 +2,10 @@
 title: "bang.el"
 date: 2021-10-22T00:00:00+00:00
 draft: false
-summary: Use Bangs from the comfort of Emacs!
+summary: Use DuckDuckGo's Bangs from the comfort of Emacs!
 ---
 
 [[https://github.com/EducatedAlmost/bang.el]]
-
-https://news.ycombinator.com/item?id=28976487
 
 I use [[https://duckduckgo.com/][DuckDuckGo]]. Its become popular for its emphasis on user privacy in contrast to the giant of the market, Google, who it seems every six months is implicated in [[https://news.ycombinator.com/item?id=28976487][unethical behaviour]]. But honestly, I use DuckDuckGo because it looks nicer. Search for something in Google [[https://duckduckgo.com/?q=!g foo][~(bang "g" "foo")~]] and as well as the expected search results, one is shown 'people also ask', top news stories, video thumbnails from the Foo Fighters YouTube channel, and a summary of their latest tweets. When one expects a uniform list of simple search results, one is instead shown a noisy list of varying components.
 
@@ -112,7 +110,7 @@ Until I can work out how to make ~org-roam~ optional, it is required due to the 
   (browse-url (bang-make-link prefix term)))
 #+end_src
 
-~bang~ is the central function of the package. If there is an active region, it is used as the default TERM argument. See the section on [[*Using the region as a default argument][default arguments]] for an explanation of how this works.
+~bang~ is the central function of the package. If there is an active region, it is used as the default ~TERM~ argument. See the section on [[*Using the region as a default argument][default arguments]] for an explanation of how this works.
 
 ~bang-make-link~ demonstrates a good habit of extracting sections of code into pure functions.
 
@@ -162,10 +160,10 @@ This also demonstrates the comprehensive form of ~interactive~ that allows one t
 
 * Conclusions
 
-Emacs's extensibility is fantastic — no other editor makes it so easy to write new functions, leveraging existing Emacs functions and those of all install packages. One can just write a tiny elisp file, whereas something like Visual Studio Code requires one to create a new Node.js package. The development experience is also great, being able to define and evaluate in the running editor, the feedback cycle is almost instant.
+Emacs's extensibility is fantastic — no other editor makes it so easy to write new functions, leveraging existing functions and those of all install packages. One can just write a tiny elisp file, whereas something like Visual Studio Code requires one to create a new Node.js package. The development experience is also great, being able to define and evaluate in the running editor, the feedback cycle is almost instant.
 
-Adaptability of elisp's ~interactive~ forms. Nice UI / UX. Quickly frustrated with the interactive short forms "s" and "r", glad to find out that the longer form is not unwieldy.
+Elisp's ~interactive~ forms are adaptable, and let us create a nice UI / UX. I was quickly frustrated with the interactive short forms ~s~ and ~r~, but glad to find out that the longer form where one must create the argument list is not unwieldy.
 
-Streamline those processes that you spend the most total time on. Some of these things are basically invisible. This extends to avoiding distractions.
+One should streamline those processes that one spends the most total time on. Some of these tasks are so small that they are basically invisible, but with the frequency with which we do them, they add up to a large total time. A similar approach can be taken to reducing distractions.
 
-One function can snowball into a whole project, this can be good or bad. What's the pay-off? Too much abstraction or generalisation, like a layer to abstract over all databases whether they be SQL, document, or graph.
+One function can snowball into a whole project, this can be good or bad. Will it lead to a piece of work that will be useful to yourself and others? Or will it never be finished, with nothing learnt? What's the pay-off? I've seen mistakes made like this, particularly when one aims for too much abstraction or generalisation, like a layer to abstract over all databases whether they be SQL, document, or graph.
