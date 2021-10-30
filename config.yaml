@@ -3,7 +3,10 @@ languageCode: en-gb
 title: blog.AlmostEducated
 theme: PaperMod
 
+googleAnalytics: 'G-15THDLZMKJ'
+
 params:
+  env: production
   author: AlmostEducated
   assets:
     apple_touch_icon: /img/ae-logo-trans.png
