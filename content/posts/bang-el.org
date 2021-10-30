@@ -11,7 +11,7 @@ I use [[https://duckduckgo.com/][DuckDuckGo]]. Its become popular for its emphas
 
 * /Bang/
 
-And yet I've ended up using DDG for something almost unrelated, /Bang/. If you search DDG for ~!x foo~, it delegates that search to the website represented by the Bang prefix ~x~ and searches it for ~foo~. For example, you might want to search for the ~bang.el~ GitHub page, [[https://duckduckgo.com/?q=!gh bang.el][~!gh bang.el~]], or Wikipedia for Emacs, [[https://duckduckgo.com/?q=!w Emacs][~!w Emacs~]], see [[https://duckduckgo.com/bang][here]] for a list of prefixes. Instead of going to the website's homepage, and then searching, Bang takes you straight to the results page. If DDG is your browser's default search engine this becomes really fast.
+And yet I've ended up using DDG for something almost unrelated, /Bang/. If you search DDG for ~!x foo~, it delegates that search to the website represented by the Bang prefix ~x~ and searches it for ~foo~. For example, you might want to search for the ~bang.el~ GitHub page, [[https://duckduckgo.com/?q=!gh bang.el][~!gh bang.el~]], or Wikipedia for Emacs, [[https://duckduckgo.com/?q=!w Emacs][~!w Emacs~]], see [[https://duckduckgo.com/bang][here]] for a list of prefixes. Instead of going to the website's homepage, and then searching, Bang takes you straight to the results page. Called without a term, the Bang will usually take you to the homepage. Without a prefix, it takes you to DGG's first result. If DDG is your browser's default search engine this becomes really fast.
 
 By my estimates, Bang shaves 10–30 seconds off every search, something that I do 10–100 times every day. By the reasoning of this classic xkcd comic, this is exactly the sort of task we should be making more efficient.
 
@@ -68,7 +68,7 @@ What is [[https://www.orgroam.com/][Org-roam]]?
 A plain-text knowledge management system.
 #+end_quote
 
-Inspired by [[https://roamresearch.com/][Roam Research]], org-roam is /the/ best tool for creating a personal wiki, knowledge store, or [[https://en.wikipedia.org/wiki/Zettelkasten][Zettelkasten]]. I've accumulated >8500 nodes after a year of use so I can attest to its brilliance. I originally started writing ~bang.el~ to quickly view the Wikipedia page of the subject I was writing about. For this reason, the initial name of the project was ~roam-to-wiki.el~ and the first function became ~bang-roam-wiki.el~, which searches the current org-roam node in Wikipedia.
+Inspired by [[https://roamresearch.com/][Roam Research]], org-roam is /the/ best tool for creating a personal wiki, knowledge store, or [[https://en.wikipedia.org/wiki/Zettelkasten][Zettelkasten]]. I've accumulated >8500 nodes after a year of use [[https://www.wolframalpha.com/input/?i=8500%2F365][~!wa 8500/365~]] so I can attest to its brilliance. I originally started writing ~bang.el~ to quickly view the Wikipedia page of the subject I was writing about. For this reason, the initial name of the project was ~roam-to-wiki.el~ and the first function became ~bang-roam-wiki.el~, which searches the current org-roam node in Wikipedia.
 
 I find this to often be the case. A small simple function ... we grow scope. Introduce variable where there was none previously.
 ~roam-to-wiki.el~ became ~bang-roam.el~ and then, simply, ~bang.el~. The ~bang-roam~ and ~bang-roam-wiki~ functions still exist, so you can easily search for a node's title, either in Wikipedia, or anywhere else.
@@ -110,7 +110,7 @@ Until I can work out how to make ~org-roam~ optional, it is required due to the 
   (browse-url (bang-make-link prefix term)))
 #+end_src
 
-~bang~ is the central function of the package. If there is an active region, it is used as the default ~TERM~ argument. See the section on [[*Using the region as a default argument][default arguments]] for an explanation of how this works.
+~bang~ is the central function of the package. If there is an active region, it is used as the default ~TERM~ argument. See the section on [[*Using the region as a default argument][default arguments]] for an explanation of how this works, and [[http://www.ergoemacs.org/emacs/elisp_interactive_form.html][here]] for more information on elisp's interactive forms.
 
 ~bang-make-link~ demonstrates a good habit of extracting sections of code into pure functions.
 
@@ -160,10 +160,10 @@ This also demonstrates the comprehensive form of ~interactive~ that allows one t
 
 * Conclusions
 
-Emacs's extensibility is fantastic — no other editor makes it so easy to write new functions, leveraging existing functions and those of all install packages. One can just write a tiny elisp file, whereas something like Visual Studio Code requires one to create a new Node.js package. The development experience is also great, being able to define and evaluate in the running editor, the feedback cycle is almost instant.
+Emacs's extensibility is fantastic — no other editor makes it so easy to write new functions, leveraging existing functions and those of all installed packages. One can just write a tiny elisp file, whereas something like Visual Studio Code requires one to create a new Node.js package. The development experience is also great, being able to define and evaluate in the running editor, the feedback cycle is almost instant. It is vanishingly rare for developers to write their own editor plugins or extensions and yet for Emacs users it is a right of passage from when one first writes ones own ~init.el~.
 
 Elisp's ~interactive~ forms are adaptable, and let us create a nice UI / UX. I was quickly frustrated with the interactive short forms ~s~ and ~r~, but glad to find out that the longer form where one must create the argument list is not unwieldy.
 
 One should streamline those processes that one spends the most total time on. Some of these tasks are so small that they are basically invisible, but with the frequency with which we do them, they add up to a large total time. A similar approach can be taken to reducing distractions.
 
-One function can snowball into a whole project, this can be good or bad. Will it lead to a piece of work that will be useful to yourself and others? Or will it never be finished, with nothing learnt? What's the pay-off? I've seen mistakes made like this, particularly when one aims for too much abstraction or generalisation, like a layer to abstract over all databases whether they be SQL, document, or graph.
+One function can snowball into a whole project, this can be good or bad. Will it lead to a piece of work that will be useful to yourself and others? Or will it never be finished, with nothing learnt? What's the pay-off? I've seen mistakes made like this, particularly when one aims for too much abstraction or generalisation, like a layer to abstract over all databases whether they be SQL, document, or graph. But then the opposite is true for something like Git which grew out Linus Torvald's need for a source control system when developing Linux.
