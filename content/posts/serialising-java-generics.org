@@ -1,0 +1,183 @@
+---
+title: "Serialising with Java generics"
+date: 2021-10-27T00:00:00+00:00
+draft: false
+summary: Serialising and deserialising with Java generics and TypeReferences.
+---
+
+I think it's fair to say that developers are divided on the issue of strong type systems. A [[https://www.tiobe.com/tiobe-index/][list]] of the most popular programming languages contains a balance of those with (Java, C++) and without it (Python, Javascript). After two years of working almost exclusively with dynamic typing, I am occasionally tempted back to the dark side and for some time I have some fun until I stumble upon one of the edge cases where type systems get messy.
+
+* Naïveté
+
+I needed to create a repository that could persist objects in JSON form. A repository has two public methods, ~get~ and ~save~. Imagine, we only wanted to be able to store ~ints~ in our repository, and reference them with a ~String~ key:
+
+#+BEGIN_SRC java
+public interface Repository {
+    void save (String key, int value);
+    int get (String key);
+}
+
+public class IntRepository implements Repository {
+
+    void save (String key, int value) {
+        return;
+    }
+
+    public int get (String key) {
+        return 3;
+    }
+}
+#+END_SRC
+
+Obviously, this class isn't doing a useful job — it's left to the reader to actually save these values and then retrieve them. What's interesting is how we can make this Repository generic. If we wanted a Repository that could store ~bytes~, or ~Strings~, or any other type, we would need to create a new class for each. However, using Java's generics, we can create one class that's able to act as a ~Repository~ for all objects, while a single instance of the repository will store only a single type, and guarantee a strong type when retrieving things from the repository.
+
+* Generics
+
+#+BEGIN_SRC java
+public interface Repository <T> {
+    void save (String key, T value);
+    // T get (String key);
+}
+
+public class RepositoryImpl <T> implements Repository <T> {
+
+    public void save (String key, T value) {
+        return;
+    }
+
+    // public T get (String key) {
+    //     return;
+    // }
+}
+#+END_SRC
+
+I've commented out our get method as this won't currently compile. We need to find a way to return something of type ~T~. It turns out that we can just cast.
+
+#+BEGIN_SRC java
+public T get (String key) {
+    return (T) "Hello, world";
+}
+#+END_SRC
+
+But this fails if ~T~  is something that our result cannot be casted to. In my case, I was storing my objects in JSON form in a Postgres database. Using Jackson's object mapper, any Java object can be converted into JSON.
+
+#+BEGIN_SRC java
+public class RepositoryImpl <T>
+    implements Repository <T> {
+
+    private ObjectMapper mapper;
+
+    public RepositoryImpl () {
+        this.mapper = new ObjectMapper();
+    }
+
+    public void save (String key, T value) {
+        String jsonAsString = mapper.writeValueAsString(value);
+        // persist the String
+        return;
+    }
+
+    public T get (String key) {
+        // retreive the string
+        String jsonAsString;
+        return (T) mapper.readValue(jsonAsString, T.class);
+    }
+}
+#+END_SRC
+
+This looks like it's going to be perfect... until you compile.
+
+#+BEGIN_SRC sh
+cannot select from a type variable
+#+END_SRC
+
+It seems that ~T.class~ is a problem. It looks ugly but for the time being we can pass the ~Class~ into the object within the constructor. I've added exception handling but this is not necessarily how you would like to do it. You probably want the methods to throw exceptions, but because the exception throw declarations would need to be added to the interface's methods, it's might be best to define a custom exception type, like ~RepositorySavingException~, so that the interface doesn't contain a reference to the implementation's ~JsonProcessingException~. This leaves the interface free of any details of the implementation so that it is reusable for any other implementation that wants to use it.
+
+#+BEGIN_SRC java
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import java.io.IOException;
+
+public class RepositoryImpl <T> implements Repository <T> {
+
+    private ObjectMapper mapper;
+    private Class clazz;
+
+    public RepositoryImpl (Class clazz) {
+        this.clazz = clazz;
+        this.mapper = new ObjectMapper();
+    }
+
+    public void save (String key, T value) {
+        try {
+            String jsonAsString = mapper.writeValueAsString(value);
+            // persist the String
+        } catch (JsonProcessingException jpe) {}
+        return;
+    }
+
+    public T get (String key) {
+        // retreive the string
+        String jsonAsString = "";
+        try {
+            return (T) mapper.readValue(jsonAsString, clazz);
+        } catch (IOException ioe) {
+            return null;
+        }
+    }
+}
+#+END_SRC
+
+This is looking pretty good, but will only let us specify the class. What if we want a repository of ~List<String>~? The repo will store ~Lists~, and return ~Lists~, with no guarantee that those ~Lists~ contain ~Strings~. Thankfully, ~TypeReferences~ give us a deeper understanding than ~Classes~. Casting to ~T~ is now superfluous.
+
+* ~TypeReference~
+
+#+BEGIN_SRC java
+import com.fasterxml.jackson.core.type.TypeReference;
+
+private ObjectMapper mapper;
+private TypeReference type;
+
+public RepositoryImpl (TypeReference type) {
+    this.type = new TypeReference<T>(){};
+    this.mapper = new ObjectMapper();
+}
+
+public T get (String key) {
+    // retreive the string
+    String jsonAsString = "";
+    try {
+        return mapper.readValue(jsonAsString, type);
+    } catch (IOException ioe) {
+        return null;
+    }
+}
+#+END_SRC
+
+And this is how we can use it.
+
+#+BEGIN_SRC java
+TypeReference<String> type = new TypeReference<String>(){};
+Repository<String> repo = new RepositoryImpl<String>(type);
+
+repo.save("3", "three");
+String str = repo.get("3");
+#+END_SRC
+
+It's not nice that we have to specify the type twice. We can remove this by generating the ~TypeReference~ inside the constructor.
+
+#+BEGIN_SRC java
+public RepositoryImpl () {
+    this.type = new TypeReference<T>(){};
+    this.mapper = new ObjectMapper();
+}
+
+Repository<String> repo = new RepositoryImpl<String>();
+
+repo.save("3", "three");
+String str = repo.get("3");
+#+END_SRC
+
+* An exercise for the reader
+
+In this article, I have shown how to genericise the objects that are stored within the repository, but we are still bound to using =Strings= as our keys. Try introducing a second generic variable to act as the key of our =Repository=.
