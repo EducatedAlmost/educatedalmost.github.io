@@ -1,5 +1,5 @@
 ---
-title: "bang.el"
+title: "æ/bang.el"
 date: 2021-10-22T00:00:00+00:00
 draft: false
 summary: Use DuckDuckGo's Bangs from the comfort of Emacs!
