@@ -2,7 +2,7 @@
 title: "Testing the Baader–Meinhof phenomenon"
 date: 2021-10-24T00:00:00+00:00
 draft: false
-summary: Foo
+summary: Why do I keep seeing a specific thing again and again?
 ---
 
 * [[https://en.wikipedia.org/wiki/Red_Army_Faction][The Baader–Meinhof group]]
