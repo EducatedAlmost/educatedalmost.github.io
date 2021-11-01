@@ -12,7 +12,7 @@ params:
     apple_touch_icon: /img/ae-logo-trans.png
     disableHLJS: false
     favicon: /img/ae-logo-trans.png
-  DateFormat: 2nd January 2006
+  DateFormat: 2006—01—02
   defaultTheme: dark
   label:
     icon: /img/ae-logo-trans.png
