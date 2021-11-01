@@ -1,0 +1,57 @@
+---
+title: "Testing the Baader–Meinhof phenomenon"
+date: 2021-10-24T00:00:00+00:00
+draft: false
+summary: Foo
+---
+
+* [[https://en.wikipedia.org/wiki/Red_Army_Faction][The Baader–Meinhof group]]
+
+The Baader–Meinhof Group, also known as the Red Army Faction, or /Rote Armee Fraktion/ in German, was a West German far-left militant organisation active from the 1970s until the end of the century. The Faction were widely considered to be a terrorist organisation and received funding from the East German /[[https://en.wikipedia.org/wiki/Stasi][Stasi]]/ and other Warsaw Pact countries, yet it sided with China in the /[[https://en.wikipedia.org/wiki/Sino-Soviet_split][Sino–Soviet split]]/.
+
+Whilst they were better known as the RAF, the name /Baader–Meinhof/ comes from the names of two of its most important members, /[[https://en.wikipedia.org/wiki/Andreas_Baader][Andreas Baader]]/ and /[[https://en.wikipedia.org/wiki/Ulrike_Meinhof][Ulrike Meinhof]]/.
+
+
+* [[https://en.wikipedia.org/wiki/Frequency_illusion][The Baader–Meinhof phenomenon]]
+
+Also known as the /frequency illusion/. After noticing something for the first time, there is a tendency to notice it more often leading someone to believe it has a high frequency.
+
+- [[https://en.wikipedia.org/wiki/Attentional_bias][Attention bias]], noticing things that are salient to us
+- [[https://en.wikipedia.org/wiki/Confirmation_bias][Confirmation bias]], looking for things that confirm our beliefs and disregarding the rest
+
+Confirmation bias, when capitalism does fall, which one day it must, communists around the world will be ready to say "SEEEE!!! Karl Marx  was right!!!", regardless of the failure of Marxism to explain any economic behaviour in the 150 years since its birth. When one fails to make any specific prediction, one can never be wrong.
+
+* Putting it to the test
+
+I used Wikipedia's random article function to select the foci of the test.
+
+- [[https://en.wikipedia.org/wiki/Hampton_Court_Palace][Hampton Court Palace]]
+- [[https://en.wikipedia.org/wiki/Robbie_Williams][Robbie Williams]]
+- [[https://en.wikipedia.org/wiki/James_Hartle][James B Hartle]]
+- [[https://en.wikipedia.org/wiki/Catholic_Church_in_China][Catholic Church in China]]
+- [[https://en.wikipedia.org/wiki/Royal_Artillery][Royal Artillery]]
+
+They already seem strangely salient to me. Three items are British (I'm British), one is a physicist (I was once a physicist), and the other is the Catholic Church in China (I was raised Catholic and am learning Chinese). Is this due to the selection criteria? Is this a tautology?
+
+If I found an item that was too specific, I might choose a parent of that item. For example, it was actually a particular regiment of the Royal Artillery that I was sent.
+
+* Poisson distribution
+
+How can we analyse this mathematically?
+
+What are the characteristics of something that is described by a [[https://en.wikipedia.org/wiki/Poisson_distribution][Poisson distribution]]?
+- Multiple entities
+- Each independent
+- Each with a time-independent chance of experiencing /an event/
+
+Where \(X\) is the number of events in a given interval, \(\lambda\) is the mean number of events in the interval, and \(P(X=x)\) is the probability of \(X\) events in the interval:
+
+\begin{equation}
+P(X=x) = e^{-\lambda} \frac{\lambda^x}{x!}
+\end{equation}
+
+* Next time
+
+I will be keeping track of the occurrence of these five topics, after which which we can estimate things like \(\lambda\), and writing about them in a [[{{< ref "baader-meinhof-2.org" >}}][follow up post]].
+
+#  LocalWords:  Hartle Armee Fraktion
