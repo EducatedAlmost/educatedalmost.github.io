@@ -12,10 +12,15 @@ params:
     apple_touch_icon: /img/ae-logo-trans.png
     disableHLJS: false
     favicon: /img/ae-logo-trans.png
-  DateFormat: 2006—01—02
+  DateFormat: 2006—01—02 Mon
   defaultTheme: dark
   label:
     icon: /img/ae-logo-trans.png
+  disableSpecial1stPost: true
+
+buildFuture: true
+
+paginate: 50
 
 markup:
   highlight:
