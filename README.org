@@ -1,0 +1,5 @@
+* æ/blog.almost.education
+
+This is my [[https://blog.almost.education][personal blog]], created using [[https://gohugo.io/][Hugo]] and hosted on [[https://pages.github.com/][GitHub Pages]].
+
+** Todo
