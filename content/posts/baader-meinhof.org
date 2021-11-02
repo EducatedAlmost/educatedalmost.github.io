@@ -1,6 +1,6 @@
 ---
 title: "Testing the Baader–Meinhof phenomenon"
-date: 2021-10-24T00:00:00+00:00
+date: 2021-10-23T00:00:00+00:00
 draft: false
 summary: Why do I keep seeing certain things again and again?
 ---
@@ -10,7 +10,6 @@ summary: Why do I keep seeing certain things again and again?
 The Baader–Meinhof Group, also known as the Red Army Faction, or /Rote Armee Fraktion/ in German, was a West German far-left militant organisation active from the 1970s until the end of the century. The Faction were widely considered to be a terrorist organisation and received funding from the East German /[[https://en.wikipedia.org/wiki/Stasi][Stasi]]/ and other Warsaw Pact countries, yet it sided with China in the /[[https://en.wikipedia.org/wiki/Sino-Soviet_split][Sino–Soviet split]]/.
 
 Whilst they were better known as the RAF, the name /Baader–Meinhof/ comes from the names of two of its most important members, /[[https://en.wikipedia.org/wiki/Andreas_Baader][Andreas Baader]]/ and /[[https://en.wikipedia.org/wiki/Ulrike_Meinhof][Ulrike Meinhof]]/.
-
 
 * [[https://en.wikipedia.org/wiki/Frequency_illusion][The Baader–Meinhof phenomenon]]
 

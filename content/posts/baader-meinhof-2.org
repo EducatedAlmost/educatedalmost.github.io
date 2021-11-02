@@ -1,6 +1,6 @@
 ---
 title: "Revisiting the Baader–Meinhof phenomenon"
-date: 2021-11-01T16:45:16Z
+date: 2021-10-30T16:45:16Z
 draft: false
 ---
 
@@ -10,7 +10,7 @@ In a [[{{< ref "baader-meinhof.org" >}}][previous post]], I explained how I set 
 
 * Events
 
-<2021-10-24 Sun 22:05> — Looking for more topics to extend the group to 10 or 15, the first I found that I had heard of already was... [[https://en.wikipedia.org/wiki/Take_the_Crown#/random][a Robbie Williams album]]. What on Earth... This happened just hours after Robbie Williams had been selected as one of the five original topics.
+<2021-10-23 Sat 22:05> — Looking for more topics to extend the group to 10 or 15, the first I found that I had heard of already was... [[https://en.wikipedia.org/wiki/Take_the_Crown#/random][a Robbie Williams album]]. What on Earth... This happened just hours after Robbie Williams had been selected as one of the five original topics.
 
 <2021-11-01 Mon 16:42> — I heard Robbie Williams again whilst watching [[https://en.wikipedia.org/wiki/Mid_Morning_Matters_with_Alan_Partridge][Mid Morning Matters]] S02E05 or E06?
 
