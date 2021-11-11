@@ -9,11 +9,18 @@ tags: [ "psychology" ]
 
 In a [[{{< ref "baader-meinhof.org" >}}][previous post]], I explained how I set out to test the /Baader–Meinhof phenomenon/ using a randomly chosen set of five topics which I would look out for to determine an average time until they were seen again.
 
+Subconscious seeking?
+
 * Events
 
 <2021-10-23 Sat 22:05> — Looking for more topics to extend the group to 10 or 15, the first I found that I had heard of already was... [[https://en.wikipedia.org/wiki/Take_the_Crown#/random][a Robbie Williams album]]. What on Earth... This happened just hours after Robbie Williams had been selected as one of the five original topics.
 
 <2021-11-01 Mon 16:42> — I heard Robbie Williams again whilst watching [[https://en.wikipedia.org/wiki/Mid_Morning_Matters_with_Alan_Partridge][Mid Morning Matters]] S02E05 or E06?
+
+<2021-11-04 Thu 21:30> — Hampton Court Palace, /Wolf Hall/
+
+<2021-11-05 Fri 14:14> — https://en.wikipedia.org/wiki/Royal_Field_Artillery
+Looking for ancestors, I found one who died during World War I fighting in the Royal Field Artillery.
 
 * Other
 
