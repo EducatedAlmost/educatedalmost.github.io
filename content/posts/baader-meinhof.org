@@ -3,6 +3,7 @@ title: "Testing the Baader–Meinhof phenomenon"
 date: 2021-10-23T00:00:00+00:00
 draft: false
 summary: Why do I keep seeing certain things again and again?
+tags: [ "psychology" ]
 ---
 
 * [[https://en.wikipedia.org/wiki/Red_Army_Faction][The Baader–Meinhof group]]

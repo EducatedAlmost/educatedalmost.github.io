@@ -3,6 +3,7 @@ title: "Serialising with Java generics"
 date: 2021-10-27T00:00:00+00:00
 draft: false
 summary: Serialising and deserialising with Java generics and TypeReferences.
+tags: [ "programming", "java", "type systems" ]
 ---
 
 I think it's fair to say that developers are divided on the issue of strong type systems. A [[https://www.tiobe.com/tiobe-index/][list]] of the most popular programming languages contains a balance of those with (Java, C++) and without it (Python, Javascript). After two years of working almost exclusively with dynamic typing, I am occasionally tempted back to the dark side and for some time I have some fun until I stumble upon one of the edge cases where type systems get messy.

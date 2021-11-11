@@ -1,7 +1,8 @@
 ---
-date: 2021-10-22T20:51:28+01:00
 title: "æ/Demesne"
+date: 2021-11-06T00:00:00+00:00
 draft: true
-summary: DDD
+summary: You don't understand a pattern until you can implement it — domain-driven design, CQRS, event sourcing.
+tags: [ "programming", "clojure", "event sourcing", "cqrs", "domain-driven design" ]
 ---
 
