@@ -1,0 +1,153 @@
+---
+title: "Creating private org directories"
+date: 2021-11-10T00:00:00+00:00
+draft: false
+summary: Org directories made private.
+tags: [ "org-mode", "git" ]
+---
+
+I've used Emacs for five years now. Before that I was in Vim, but moved to Emacs with Evil, then Spacemacs, and now Doom Emacs. I made the switch initially /for Org/ and I know that if ever I was to move to another editor I could replicate everything except for Emac's Org-mode integration.
+
+I love to use it for everything — when I remember that the logs needs chopping, when I find a recipe I'd like to cook, when at work I find a bug that needs fixing — it all goes into org-mode. It's fair to say that I wouldn't want it to fall into the wrong hands, whether that be a criminal, my employer, my clients, or anyone.
+
+* The basic setup
+
+The most common setup for org-mode is to have a single directory, ~org-directory~ say ~~/org~, and keep this information in files like:
+- ~~/org/garden.org~
+- ~~/org/recipes.org~
+- ~~/org/work.org~
+
+The ~org-directory~ can then be placed under version control (or using ~rsync~, Dropbox, or similar) kept up to date with ones org files elsewhere.
+
+* What's the problem?
+
+All's good? The problem comes from having ones personal files mixed with another's. Through the course of a sprint you will hopefully be accumulating details to raise in the sprint retrospective. Whilst working on stories, you'll likely want to make notes on what you learn without leaving your editor. These, and a bunch of other activities will lead to your org repository becoming tainted with information which you technically don't own, or could get you into trouble if it leaked. For this reason, a client or employer might object to the information you put into ~work.org~ leaving their machines.
+
+The reverse problem also exists. If one is looking for a new job, one might not want ones current employer to know the details of any offers one has received. If you take on a new client, you will not want to allow them access to all your information on your other client.
+
+And yet this is all information you want to keep inside Org. It's a key insight of David Allen's /GTD/ that one must have a single store lest one be left thinking 'where did I put that...' or 'I could swear I had something to do tomorrow...' and be unsure of where that information lives — in an email, a scrap of paper, or nowhere.
+
+The solution is to keep this confidential information in a separate repository. Now this would seem to contradict my previous statement, but it doesn't have to. Done this way it almost works by default.
+
+* First steps
+
+One will keep ones org files in a few different directories:
+- ~~/org/private~ :: for ones personal files
+- ~~/org/client-acme~ :: for org files related to the client Acme
+- ~~/org/client-newco~ :: for org files related to the client NewCo
+
+The files that are neither private to oneself nor anyone else can be kept in ~~/org~ just like before. The one caveat is that one might want to create a new git repo if one has previously committed confidential information, or one can just [[https://myopswork.com/how-remove-files-completely-from-git-repository-history-47ed3e0c4c35][remove the offending files]] from the git repo's history.
+
+** .gitignore and submodules
+
+Initially, I added the child directories to ~~/org/.gitignore~.
+
+#+NAME: .gitignore
+#+begin_src
+# .gitignore
+
+private
+client
+client-*
+#+end_src
+
+This works fine, but one can also use [[https://git-scm.com/book/en/v2/Git-Tools-Submodules][git submodules]]. They allow one to have nested git repositories without files being tracked by both repositories with the added bonus that one can easily update all submodules from their remotes, and create them automatically when the parent is cloned.
+
+This makes use of the ~--git-dir~ and ~--work-tree~ [[https://git-scm.com/docs/git#_options][options]] to run git commands in another repo. Change ~NEW_ORG_DIR~ to whatever you wish to name your new repository.
+
+#+begin_src bash
+cd ~/org
+NEW_ORG_DIR=client-newco
+
+# Make the new git repo
+mkdir $NEW_ORG_DIR
+git --git-dir=$NEW_ORG_DIR/.git init
+
+# We must make a commit before it can be added as a submodule
+touch $NEW_ORG_DIR/foo.org
+git --git-dir=$NEW_ORG_DIR/.git --work-tree=$NEW_ORG_DIR add foo.org
+git --git-dir=$NEW_ORG_DIR/.git --work-tree=$NEW_ORG_DIR commit -m "$(echo $NEW_ORG_DIR) initial commit."
+
+# Add the submodule, and commit to the parent repo
+git submodule add ./$NEW_ORG_DIR
+git commit -m "Add $(echo $NEW_ORG_DIR) as a submodule."
+#+end_src
+
+In the case that you are doing this for an existing repository that already has commits, one just has to remove the directory from ~.gitignore~ and run the last two commands, ~git submodule add~ and ~git commit~.
+
+From this point on, one can treat the two as separate repos, except for the fact that git allows one to update all the submodules from the parent with ~git submodule update~, and the submodules can be fetched when the parent is cloned with ~git clone --recurse-submodules <url>~.
+
+* What doesn't work?
+
+** Agenda
+
+Org-mode builds an agenda from the files in the top level of whichever directories are provided. Our new files won't be under ~~/org~, but ~~/org/private~ ~~/org/client~, so we need to add them to the ~org-agenda-files~ list.
+
+#+begin_src lisp
+(setq org-private-directory "~/org/private")
+(setq org-client-directory "~/org/client")
+(setq org-agenda-files (list org-directory
+                             org-private-directory
+                             org-client-directory)
+#+end_src
+
+In the case that you have many clients or prefer to not specify the names of your client in your dotfiles (like me, because my [[https://github.com/EducatedAlmost/.dotfiles][dotfiles are open source]]) you can use a regular expression to find the directories that match and add them to ~org-agenda-files~.
+
+#+begin_src lisp
+(setq org-private-directory "~/org/private")
+(setq org-agenda-files
+      (append (list org-directory
+                    org-private-directory)
+              (directory-files org-directory 'full (rx "client-"))))
+#+end_src
+
+Other setups can be used by adding directories more ~directory-files~ forms to the list. For simpler setups, it is possible to use ~org-agenda-file-regexp~, but the necessary regular expression will quickly become extremely complex for even mildly complicated setups, such as nested directories.
+
+** Capture
+
+Roughly half of the information I keep in org enters through org-capture. On calling ~org-capture~, the user is asked to choose a template and then store some piece of information in that template. The entered information will be stored in an org file.
+
+I have found it to be invaluable in my pursuit of not being distracted. It ameliorates the feeling that if I don't read this article know, I won't ever. Or that this brilliant idea will be lost if I don't indulge it now. Capture gives me an out, lets me revisit it later, at which point there's only a 50% it will seem like a good idea anyway. This encourages a continuity of concentration, the previous task is still within ones short-term memory. There is no need to go back and refresh oneself having spent ten minutes reading the article.
+
+Most users will just have a single file as the target of org-capture, but that might not work for you. If one wants to capture confidential information, one does not want that to be stored in a target file that is kept outside of the confidential directory we just set up.
+
+#+begin_src lisp
+(setq org-capture-templates
+      `(("c" "Capture" entry
+         (file ,org-default-notes-file)
+         "* REFILE %?")))
+#+end_src
+
+~REFILE~ is one of my todo states, it shows that an item needs to be moved, scheduled, and possibly have more information added.
+
+We can change the target by changing the fourth element of the list. As well as ~(file ...)~ there are a number of other possible capture target, the three most useful being:
+
+#+begin_src lisp
+(file "path/to/file")
+    Text will be placed at the beginning or end of that file
+
+(id "id of existing Org entry")
+    File as child of this entry, or in the body of the entry
+
+(file+headline "path/to/file" "node headline")
+    Fast configuration if the target heading is unique in the file
+#+end_src
+
+For more information see the org-mode documentation on [[https://orgmode.org/manual/Template-elements.html][template elements]]. We can thus add additional templates, and when capturing something one must just be sure to pick the correct template. Trying to record the note on a machine without the private repository will fail, as it should.
+
+#+begin_src lisp
+(setq org-capture-templates
+      `(("c" "Capture" entry
+         (file ,org-default-notes-file)
+         "* REFILE %?")
+        ("n" "NewCo capture" entry
+         (file "~/org/client-newco/refile.org")
+         "* REFILE %?")
+        ("a" "Client-A capture" entry
+         (file+headline "~/org/client-a/work.org" "Refile")
+         "* REFILE %?")))
+#+end_src
+
+* Closing thoughts
+
+The use of git to synchronise org on multiple machines can be awkward. With the amount of information that enters and exits an org system, there is no hope of having meaningful commits or commit messages. It is exceedingly rare that you would use some of git's features like branching unless one uses separate branches for each machine. But there are also some things in its favour, file history occasionally comes in handy, and it's easily installable on just about any system. Otherwise, one can use Dropbox, [[https://en.wikipedia.org/wiki/WebDAV][WebDAV]], [[https://syncthing.net/][Syncthing]], or whatever tool you have at hand.
