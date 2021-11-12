@@ -15,7 +15,7 @@ The first time I saw this variable set in another person's ~init.el~ I thought i
 (setq dired-listing-switches "-aBGhl --group-directories-first")
 #+end_src
 
-The trick is, and I would have realised this if I knew how to look up the documentation of Emacs functions, that these are flags that are passed to ~ls~. It makes sense that Emacs would delegate to another tool, it's part of the UNIX philosophy[fn:unix-philosophy] to trust tasks to other tools rather than do them oneself.
+The trick is, and I would have realised this if I knew how to look up the documentation of Emacs functions, that these are flags that are passed to [[https://www.man7.org/linux/man-pages/man1/ls.1.html][~ls~]]. It makes sense that Emacs would delegate to another tool, it's part of the UNIX philosophy[fn:unix-philosophy] to trust tasks to other tools rather than do them oneself.
 
 What flags does ~ls~ take? A lot. ~ls --help~ has 120 lines; these are the options you're most likely to want to try:
 
