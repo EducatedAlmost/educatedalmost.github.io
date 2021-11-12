@@ -1,0 +1,52 @@
+---
+title: "dired-listing-switches and ls"
+date: 2021-11-13T19:35:28Z
+draft: false
+tags: [ "emacs", "linux"]
+---
+
+Have you ever been unsatisfied with the way that [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][dired]][fn:dired] lists your files? Ever wished it wouldn't show you the group and owner for every file despite them all being exactly the same? Want to get those directories out of the way of your files?
+
+... enter ~dired-listing-switches~.
+
+The first time I saw this variable set in another person's ~init.el~ I thought it must be a kind of magic. Mine looks like this:
+
+#+begin_src lisp
+(setq dired-listing-switches "-aBGhl --group-directories-first")
+#+end_src
+
+The trick is, and I would have realised this if I knew how to look up the documentation of Emacs functions, that these are flags that are passed to ~ls~. It makes sense that Emacs would delegate to another tool, it's part of the UNIX philosophy[fn:unix-philosophy] to trust tasks to other tools rather than do them oneself.
+
+What flags does ~ls~ take? A lot. ~ls --help~ has 120 lines; these are the options you're most likely to want to try:
+
+~-l~ *is the only flag that is required*. It prints a number of details for each file in a list, instead of the default of ~ls~, a grid.
+
+- ~-a, --all~ :: show all files, don't ignore files starting with ~.~
+- ~-A, --almost-all~ :: like ~-a~, but it does ignore the files ~.~ and ~..~
+- ~-B, --ignore-backups~ :: show all files, don't ignore files starting with ~.~
+- ~-G, --no-group~ :: don't print group names
+- ~--group-directories-first~ :: directories are listed first
+- ~-h, --human-readable~ :: present sizes of files like 1K, 4M, 12G
+- ~-I, --ignore=PATTERN~ :: ignores ~PATTERN~, unless ~-a~ or ~-A~ is set
+- ~-r, --reverse~ :: list in reverse order
+- ~-S~ :: sort by file size
+- ~--sort=WORD~ :: sort by ~none~, ~size~, ~time~, ~version~, ~extension~
+- ~-t~ :: sort by time
+- ~--time=WORD~ :: the definition of time, ~access~, ~ctime~ (change), ~birth~
+- ~-U~ :: do not sort
+- ~-X~ :: sort alphabetically by file extension
+
+As well as these, there are a couple of other interesting switches which are either unusable or unhelpful for Emacs and dired, but might be useful when using ~ls~ elsewhere:
+
+- ~-R, --recursive~ :: list the directory and all subdirectories recursively
+- ~-x~ :: ~ls~ usually lists down and then across, this transposes that
+
+Add this to your ~init.el~, ~.spacemacs~, or ~config.el~:
+#+begin_src lisp
+(setq dired-listing-switches "-aBGhl --group-directories-first")
+#+end_src
+
+# Footnotes
+[fn:dired] ~dired~: directory editor
+
+[fn:unix-philosophy] [[https://en.wikipedia.org/wiki/Unix_philosophy][Wikipedia]] — an approach to software development that favours small modular components to monoliths; sometimes stated — 'do one thing and do it well'. Whether Emacs in general follows this philosophy is a matter of [[https://protesilaos.com/codelog/2021-09-22-live-stream-emacs-unix/][debate]].
