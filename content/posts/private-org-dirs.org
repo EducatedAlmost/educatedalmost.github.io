@@ -29,6 +29,8 @@ And yet this is all information you want to keep inside Org. It's a key insight 
 
 The solution is to keep this confidential information in a separate repository. Now this would seem to contradict my previous statement, but it doesn't have to. Done this way it almost works by default.
 
+*I must be clear that nothing in this article will, nor is it designed to, keep your files completely private. When using a machine that is not under ones complete control one must assume that all credentials have become accessible by another. And if they were to acquire your git credentials when accessing one repository, they will be able to acquire another.*
+
 * First steps
 
 One will keep ones org files in a few different directories:
@@ -75,7 +77,7 @@ git commit -m "Add $(echo $NEW_ORG_DIR) as a submodule."
 
 In the case that you are doing this for an existing repository that already has commits, one just has to remove the directory from ~.gitignore~ and run the last two commands, ~git submodule add~ and ~git commit~.
 
-From this point on, one can treat the two as separate repos, except for the fact that git allows one to update all the submodules from the parent with ~git submodule update~, and the submodules can be fetched when the parent is cloned with ~git clone --recurse-submodules <url>~.
+From this point on, one can treat the two as separate repos, except for the fact that git allows one to update all the submodules from the parent with ~git submodule update~, and the submodules can be fetched when the parent is cloned with ~git clone --recurse-submodules <url>~. Recursing submodules should be avoided if one doesn't want to download private repositories to an untrusted machine. Instead, specific submodules can be retrieved using ~git submodule init~ and then ~git submodule update~.
 
 * What doesn't work?
 
