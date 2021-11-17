@@ -1,0 +1,135 @@
+<!doctype html><html lang=en dir=auto>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
+<meta name=robots content="index, follow">
+<title>æ/read-time.el | blog.AlmostEducated</title>
+<meta name=keywords content="programming,elisp,emacs">
+<meta name=description content="Foo">
+<meta name=author content="AlmostEducated">
+<link rel=canonical href=http://blog.almost.education/posts/read-time-el/>
+<link crossorigin=anonymous href=/assets/css/stylesheet.min.6d808efd6d6f240af88963a6bac7418b1aac88ef547c645281bfea83ab666ae7.css integrity="sha256-bYCO/W1vJAr4iWOmusdBixqsiO9UfGRSgb/qg6tmauc=" rel="preload stylesheet" as=style>
+<link rel=preload href=/img/ae-logo-trans.png as=image>
+<script defer crossorigin=anonymous src=/assets/js/highlight.min.f5a1b978a132c6aeb40625c357309394e91f4bd93496f86730204de5630b035b.js integrity="sha256-9aG5eKEyxq60BiXDVzCTlOkfS9k0lvhnMCBN5WMLA1s=" onload=hljs.initHighlightingOnLoad()></script>
+<link rel=icon href=http://blog.almost.education/img/ae-logo-trans.png>
+<link rel=icon type=image/png sizes=16x16 href=http://blog.almost.education/favicon-16x16.png>
+<link rel=icon type=image/png sizes=32x32 href=http://blog.almost.education/favicon-32x32.png>
+<link rel=apple-touch-icon href=http://blog.almost.education/img/ae-logo-trans.png>
+<link rel=mask-icon href=http://blog.almost.education/safari-pinned-tab.svg>
+<meta name=theme-color content="#2e2e33">
+<meta name=msapplication-TileColor content="#2e2e33">
+<meta name=generator content="Hugo 0.89.3">
+<noscript>
+<style>#theme-toggle,.top-link{display:none}</style>
+</noscript>
+<script type=text/javascript async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=default"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-15THDLZMKJ"></script>
+<script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-15THDLZMKJ',{anonymize_ip:!1})}</script>
+<meta property="og:title" content="æ/read-time.el">
+<meta property="og:description" content="Foo">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.almost.education/posts/read-time-el/"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2021-11-16T00:00:00+00:00">
+<meta property="article:modified_time" content="2021-11-16T00:00:00+00:00">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="æ/read-time.el">
+<meta name=twitter:description content="Foo">
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":2,"name":"Posts","item":"http://blog.almost.education/posts/"},{"@type":"ListItem","position":3,"name":"æ/read-time.el","item":"http://blog.almost.education/posts/read-time-el/"}]}</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"æ/read-time.el","name":"æ\/read-time.el","description":"Foo","keywords":["programming","elisp","emacs"],"articleBody":" https://github.com/EducatedAlmost/read-time.el\n For a short while I was recording educational videos and audiobooks from scripts written in Emacs. A key piece of information I needed but didn't have access to was the time it would take to read these when recording. Emacs does provide the useful count-words function, but there was no read-time.\n Reading speeds average around 5 words per second, dropping to 3 for careful speech, and rising above ten for speed readers. For small word counts one may easily divide the word count by ones speed to find the reading time, but it is not easy for larger word counts.\n read-time does it for you. Called interactively, it returns the time to read the whole buffer or the region.\n1 2  (read-time (point min) (point max)) ;; = 14 seconds     And one may specify a reading speed by setting read-time-words-per-sec, or by providing a third argument.\n1 2  (read-time (point min) (point max) 10) ;; = 24 minutes 10 seconds     I hope you find the package useful!\n","wordCount":"168","inLanguage":"en","datePublished":"2021-11-16T00:00:00Z","dateModified":"2021-11-16T00:00:00Z","author":{"@type":"Person","name":"AlmostEducated"},"mainEntityOfPage":{"@type":"WebPage","@id":"http://blog.almost.education/posts/read-time-el/"},"publisher":{"@type":"Organization","name":"blog.AlmostEducated","logo":{"@type":"ImageObject","url":"http://blog.almost.education/img/ae-logo-trans.png"}}}</script>
+</head>
+<body class=dark id=top>
+<script>localStorage.getItem("pref-theme")==="light"&&document.body.classList.remove('dark')</script>
+<header class=header>
+<nav class=nav>
+<div class=logo>
+<a href=http://blog.almost.education accesskey=h title="blog.AlmostEducated (Alt + H)">
+<img src=/img/ae-logo-trans.png alt=logo aria-label=logo height=" 30px">blog.AlmostEducated</a>
+<span class=logo-switches>
+<button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</button>
+</span>
+</div>
+<ul id=menu>
+<li>
+<a href=http://blog.almost.education/tags/ title=tags>
+<span>tags</span>
+</a>
+</li>
+</ul>
+</nav>
+</header>
+<main class=main>
+<article class=post-single>
+<header class=post-header>
+<h1 class=post-title>
+æ/read-time.el
+</h1>
+<div class=post-meta>2021—11—16 Tue&nbsp;·&nbsp;AlmostEducated
+</div>
+<ul class=post-tags>
+<li><a href=http://blog.almost.education/tags/programming/>programming</a></li>
+<li><a href=http://blog.almost.education/tags/elisp/>elisp</a></li>
+<li><a href=http://blog.almost.education/tags/emacs/>emacs</a></li>
+</ul>
+</header>
+<div class=post-content><p>
+<a href=https://github.com/EducatedAlmost/read-time.el>https://github.com/EducatedAlmost/read-time.el</a></p>
+<p>
+For a short while I was recording educational videos and audiobooks from scripts written in Emacs. A key piece of information I needed but didn't have access to was the time it would take to read these when recording. Emacs does provide the useful <code>count-words</code> function, but there was no <code>read-time</code>.</p>
+<p>
+Reading speeds average around 5 words per second, dropping to 3 for careful speech, and rising above ten for speed readers. For small word counts one may easily divide the word count by ones speed to find the reading time, but it is not easy for larger word counts.</p>
+<p>
+<code>read-time</code> does it for you. Called interactively, it returns the time to read the whole buffer or the region.</p>
+<div class="src src-lisp">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-lisp data-lang=lisp><span class=p>(</span><span class=nv>read-time</span> <span class=p>(</span><span class=nv>point</span> <span class=nf>min</span><span class=p>)</span> <span class=p>(</span><span class=nv>point</span> <span class=nf>max</span><span class=p>))</span>
+<span class=c1>;; =&gt; 14 seconds</span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<p>
+And one may specify a reading speed by setting <code>read-time-words-per-sec</code>, or by providing a third argument.</p>
+<div class="src src-lisp">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-lisp data-lang=lisp><span class=p>(</span><span class=nv>read-time</span> <span class=p>(</span><span class=nv>point</span> <span class=nf>min</span><span class=p>)</span> <span class=p>(</span><span class=nv>point</span> <span class=nf>max</span><span class=p>)</span> <span class=mi>10</span><span class=p>)</span>
+<span class=c1>;; =&gt; 24 minutes 10 seconds</span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<p>
+I hope you find the package useful!</p>
+</div>
+<footer class=post-footer>
+<ul class=post-tags>
+<li><a href=http://blog.almost.education/tags/programming/>programming</a></li>
+<li><a href=http://blog.almost.education/tags/elisp/>elisp</a></li>
+<li><a href=http://blog.almost.education/tags/emacs/>emacs</a></li>
+</ul>
+</footer>
+</article>
+</main>
+<footer class=footer>
+<span>&copy; 2021 <a href=http://blog.almost.education>blog.AlmostEducated</a></span>
+<span>
+Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+        <a href=https://git.io/hugopapermod rel=noopener target=_blank>PaperMod</a>
+</span>
+</footer>
+<a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg>
+</a>
+<script>let menu=document.getElementById('menu');menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)},document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener("click",function(b){b.preventDefault();var a=this.getAttribute("href").substr(1);window.matchMedia('(prefers-reduced-motion: reduce)').matches?document.querySelector(`[id='${decodeURIComponent(a)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(a)}']`).scrollIntoView({behavior:"smooth"}),a==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${a}`)})})</script>
+<script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script>
+<script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove('dark'),localStorage.setItem("pref-theme",'light')):(document.body.classList.add('dark'),localStorage.setItem("pref-theme",'dark'))})</script>
+</body>
+</html>
