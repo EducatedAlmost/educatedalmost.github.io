@@ -1,7 +1,7 @@
 ---
 title: "æ/Rashomon"
-date: 2021-11-17T00:00:00+00:00
-draft: true
+date: 2021-11-20T00:00:00+00:00
+draft: false
 summary: See things from another perspective.
 tags: [ "programming", "clojure", "event sourcing", "film" ]
 ---
