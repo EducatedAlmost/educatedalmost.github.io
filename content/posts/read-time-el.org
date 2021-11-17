@@ -2,7 +2,7 @@
 title: "æ/read-time.el"
 date: 2021-11-16T00:00:00+00:00
 draft: false
-summary: Foo
+summary: An Emacs package that tells you how long it takes to read things.
 tags: [ "programming", "elisp", "emacs" ]
 ---
 
