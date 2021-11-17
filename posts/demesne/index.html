@@ -1,0 +1,181 @@
+<!doctype html><html lang=en dir=auto>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
+<meta name=robots content="index, follow">
+<title>æ/Demesne | blog.AlmostEducated</title>
+<meta name=keywords content="programming,clojure,event sourcing,cqrs,domain-driven design">
+<meta name=description content="You don't understand a pattern until you can implement it — domain-driven design, CQRS, event sourcing.">
+<meta name=author content="AlmostEducated">
+<link rel=canonical href=http://blog.almost.education/posts/demesne/>
+<link crossorigin=anonymous href=/assets/css/stylesheet.min.6d808efd6d6f240af88963a6bac7418b1aac88ef547c645281bfea83ab666ae7.css integrity="sha256-bYCO/W1vJAr4iWOmusdBixqsiO9UfGRSgb/qg6tmauc=" rel="preload stylesheet" as=style>
+<link rel=preload href=/img/ae-logo-trans.png as=image>
+<script defer crossorigin=anonymous src=/assets/js/highlight.min.f5a1b978a132c6aeb40625c357309394e91f4bd93496f86730204de5630b035b.js integrity="sha256-9aG5eKEyxq60BiXDVzCTlOkfS9k0lvhnMCBN5WMLA1s=" onload=hljs.initHighlightingOnLoad()></script>
+<link rel=icon href=http://blog.almost.education/img/ae-logo-trans.png>
+<link rel=icon type=image/png sizes=16x16 href=http://blog.almost.education/favicon-16x16.png>
+<link rel=icon type=image/png sizes=32x32 href=http://blog.almost.education/favicon-32x32.png>
+<link rel=apple-touch-icon href=http://blog.almost.education/img/ae-logo-trans.png>
+<link rel=mask-icon href=http://blog.almost.education/safari-pinned-tab.svg>
+<meta name=theme-color content="#2e2e33">
+<meta name=msapplication-TileColor content="#2e2e33">
+<meta name=generator content="Hugo 0.89.3">
+<noscript>
+<style>#theme-toggle,.top-link{display:none}</style>
+</noscript>
+<script type=text/javascript async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=default"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-15THDLZMKJ"></script>
+<script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-15THDLZMKJ',{anonymize_ip:!1})}</script>
+<meta property="og:title" content="æ/Demesne">
+<meta property="og:description" content="You don't understand a pattern until you can implement it — domain-driven design, CQRS, event sourcing.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.almost.education/posts/demesne/"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2021-11-17T00:00:00+00:00">
+<meta property="article:modified_time" content="2021-11-17T00:00:00+00:00">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="æ/Demesne">
+<meta name=twitter:description content="You don't understand a pattern until you can implement it — domain-driven design, CQRS, event sourcing.">
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":2,"name":"Posts","item":"http://blog.almost.education/posts/"},{"@type":"ListItem","position":3,"name":"æ/Demesne","item":"http://blog.almost.education/posts/demesne/"}]}</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"æ/Demesne","name":"æ\/Demesne","description":"You don\u0026#39;t understand a pattern until you can implement it — domain-driven design, CQRS, event sourcing.","keywords":["programming","clojure","event sourcing","cqrs","domain-driven design"],"articleBody":"  See also my post on event sourcing.\n There's a maxim1 within physics that something is not understood until it can be taught — I think a similar similar maxim holds in software development; one doesn't understand a pattern until one can implement it.\nDemesne   Under feudalism, a demesne /dɪˈmeɪn/ was all the land owned by the lord of the manor. The domain of domain-driven design is the larger context in which the software is run. Demesne imagines a warehouse of named item lines; which can be searched for, have instances checked in and out, be deactivated and reactivated, and be renamed.\n I'll be talking about domain-driven design, CQRS, and event sourcing. What do these mean?\n  CQRS   Command Query Responsibility Segregation divorces the model used for instructions to an application, commands, from that used in requests for information, queries. It derives from Command Query separation, the idea that commands should not act as queries, and queries should not change state, and contrasts clearly to a common pattern where to update the state of an entity, its state is provided.\n There are some benefits from taking this approach. Commands can mimic real-world actions of the domain. Those calling aggregate behaviours are decoupled from the aggregate implementation. And this gives us flexibility in how we choose to store our state.\n Demesne has yet to implement the query side of the application, but it will be a web UI that will display the state of its entities and allow actions to be taken. But crucially, when actions are taken this will send commands to the HTTP endpoint, not update the state directly.\n  Event sourcing   Event sourcing a datastructure is to not store its state, but an ordered collection of the events that have occurred to it either from a known former state or from its conception. It is useful in complex domains, especially those where will might be interested in an entity's history, something that would be hidden in logs, obscure database fields, or simply lost in a standard application.\n To rebuild an entity's current state, we load the entity's events, and progressively apply them culminating in the entity as it is. To see an example of this in Clojure, see my project Rashomon (GitHub).\n  Domain-driven design   Domain-driven design puts the language and lexicon at the centre of the development process. It tells us that to effectively develop software within a domain, it is required of us to understand the domain and its processes, with a particular emphasis on the creation of an ubiquitous language, a shared language between developer and business person, user, domain expert.\n This contrasts with a style of thinking which is common amongst developers. There is an idealism about creating things afresh, rather than working with what is there already. If we think that we can create a new and better lexicon, in isolated cases we might be right, but those who use this language every day will have a greater knowledge of it and the nuances it involves. Imagine the monstrosity that would be involved if we asked the marketing department to name our functions—why should we determine the language of the business side? The language within our programs has a habit of leaking out, APIs, requests of users, error messages — why should this conflict with the language they already know?\n Conway's law states that a team which designs a system will create one that matches the structure of the team. In the case of development, it means that the code mimics the development team. Let us be aware of this and consciously work to create a system that mimics the domain instead.\n  But do I know enough to implement it?   For two years I worked on a team that used CQRS, ES, and DDD. And yet my team lead wrote a library with abstracted many of the details and whilst I worked on every part of the system I have as yet never before created it from scratch. This project is a challenge to myself to prove that I know what I think I know, and it has been successful one.\n  Footnotes   1 The idea originates with Ernest Rutherford who is often quoted as saying that a scientific discovery has no merit until it can be explained to a barmaid.\n    ","wordCount":"713","inLanguage":"en","datePublished":"2021-11-17T00:00:00Z","dateModified":"2021-11-17T00:00:00Z","author":{"@type":"Person","name":"AlmostEducated"},"mainEntityOfPage":{"@type":"WebPage","@id":"http://blog.almost.education/posts/demesne/"},"publisher":{"@type":"Organization","name":"blog.AlmostEducated","logo":{"@type":"ImageObject","url":"http://blog.almost.education/img/ae-logo-trans.png"}}}</script>
+</head>
+<body class=dark id=top>
+<script>localStorage.getItem("pref-theme")==="light"&&document.body.classList.remove('dark')</script>
+<header class=header>
+<nav class=nav>
+<div class=logo>
+<a href=http://blog.almost.education accesskey=h title="blog.AlmostEducated (Alt + H)">
+<img src=/img/ae-logo-trans.png alt=logo aria-label=logo height=" 30px">blog.AlmostEducated</a>
+<span class=logo-switches>
+<button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</button>
+</span>
+</div>
+<ul id=menu>
+<li>
+<a href=http://blog.almost.education/tags/ title=tags>
+<span>tags</span>
+</a>
+</li>
+</ul>
+</nav>
+</header>
+<main class=main>
+<article class=post-single>
+<header class=post-header>
+<h1 class=post-title>
+æ/Demesne
+</h1>
+<div class=post-meta>2021—11—17 Wed&nbsp;·&nbsp;AlmostEducated
+</div>
+<ul class=post-tags>
+<li><a href=http://blog.almost.education/tags/programming/>programming</a></li>
+<li><a href=http://blog.almost.education/tags/clojure/>clojure</a></li>
+<li><a href=http://blog.almost.education/tags/event-sourcing/>event sourcing</a></li>
+<li><a href=http://blog.almost.education/tags/cqrs/>cqrs</a></li>
+<li><a href=http://blog.almost.education/tags/domain-driven-design/>domain-driven design</a></li>
+</ul>
+</header>
+<div class=post-content>
+<p>
+See also my post on <a href=http://blog.almost.education/posts/event-sourcing/>event sourcing</a>.</p>
+<p>
+There's a maxim<sup class=footnote-reference><a id=footnote-reference-1 href=#footnote-1>1</a></sup> within physics that something is not understood until it can be taught — I think a similar similar maxim holds in software development; one doesn't understand a pattern until one can implement it.</p>
+<div id=outline-container-headline-1 class=outline-2>
+<h2 id=headline-1>
+Demesne
+</h2>
+<div id=outline-text-headline-1 class=outline-text-2>
+<p>
+Under feudalism, a <a href=https://en.wikipedia.org/wiki/Demesne><em>demesne</em></a> <code>/dɪˈmeɪn/</code> was all the land owned by the lord of the manor. The <em>domain</em> of domain-driven design is the larger context in which the software is run. Demesne imagines a warehouse of named item lines; which can be searched for, have instances checked in and out, be deactivated and reactivated, and be renamed.</p>
+<p>
+I'll be talking about <em>domain-driven design</em>, <em>CQRS</em>, and <em>event sourcing</em>. What do these mean?</p>
+</div>
+</div>
+<div id=outline-container-headline-2 class=outline-2>
+<h2 id=headline-2>
+CQRS
+</h2>
+<div id=outline-text-headline-2 class=outline-text-2>
+<p>
+Command Query Responsibility Segregation divorces the model used for instructions to an application, commands, from that used in requests for information, queries. It derives from Command Query separation, the idea that commands should not act as queries, and queries should not change state, and contrasts clearly to a common pattern where to update the state of an entity, its state is provided.</p>
+<p>
+There are some benefits from taking this approach. Commands can mimic real-world actions of the domain. Those calling aggregate behaviours are decoupled from the aggregate implementation. And this gives us flexibility in how we choose to store our state.</p>
+<p>
+Demesne has yet to implement the query side of the application, but it will be a web UI that will display the state of its entities and allow actions to be taken. But crucially, when actions are taken this will send commands to the HTTP endpoint, not update the state directly.</p>
+</div>
+</div>
+<div id=outline-container-headline-3 class=outline-2>
+<h2 id=headline-3>
+Event sourcing
+</h2>
+<div id=outline-text-headline-3 class=outline-text-2>
+<p>
+Event sourcing a datastructure is to not store its state, but an ordered collection of the events that have occurred to it either from a known former state or from its conception. It is useful in complex domains, especially those where will might be interested in an entity's history, something that would be hidden in logs, obscure database fields, or simply lost in a standard application.</p>
+<p>
+To rebuild an entity's current state, we load the entity's events, and progressively apply them culminating in the entity as it is. To see an example of this in Clojure, see my project <a href=http://blog.almost.education/posts/rashomon/>Rashomon</a> (<a href=https://github.com/EducatedAlmost/rashomon>GitHub</a>).</p>
+</div>
+</div>
+<div id=outline-container-headline-4 class=outline-2>
+<h2 id=headline-4>
+Domain-driven design
+</h2>
+<div id=outline-text-headline-4 class=outline-text-2>
+<p>
+Domain-driven design puts the language and lexicon at the centre of the development process. It tells us that to effectively develop software within a domain, it is required of us to understand the domain and its processes, with a particular emphasis on the creation of an ubiquitous language, a shared language between developer and business person, user, domain expert.</p>
+<p>
+This contrasts with a style of thinking which is common amongst developers. There is an idealism about creating things afresh, rather than working with what is there already. If we think that we can create a new and better lexicon, in isolated cases we might be right, but those who use this language every day will have a greater knowledge of it and the nuances it involves. Imagine the monstrosity that would be involved if we asked the marketing department to name our functions—why should we determine the language of the business side? The language within our programs has a habit of leaking out, APIs, requests of users, error messages — why should this conflict with the language they already know?</p>
+<p>
+<a href=https://en.wikipedia.org/wiki/Conway%27s_law>Conway's law</a> states that a team which designs a system will create one that matches the structure of the team. In the case of development, it means that the code mimics the development team. Let us be aware of this and consciously work to create a system that mimics the domain instead.</p>
+</div>
+</div>
+<div id=outline-container-headline-5 class=outline-2>
+<h2 id=headline-5>
+But do I know enough to implement it?
+</h2>
+<div id=outline-text-headline-5 class=outline-text-2>
+<p>
+For two years I worked on a team that used CQRS, ES, and DDD. And yet my team lead wrote a library with abstracted many of the details and whilst I worked on every part of the system I have as yet never before created it from scratch. This project is a challenge to myself to prove that I know what I think I know, and it has been successful one.</p>
+</div>
+</div>
+<div id=outline-container-headline-6 class=outline-2>
+<h2 id=headline-6>
+Footnotes
+</h2>
+</div>
+<div class=footnotes>
+<hr class=footnotes-separatator>
+<div class=footnote-definitions>
+<div class=footnote-definition>
+<sup id=footnote-1><a href=#footnote-reference-1>1</a></sup>
+<div class=footnote-body>
+<p>The idea originates with <a href=https://en.wikipedia.org/wiki/Ernest_Rutherford>Ernest Rutherford</a> who is <a href=https://quoteinvestigator.com/2019/10/19/barmaid/>often quoted</a> as saying that a scientific discovery has no merit until it can be explained to a barmaid.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<footer class=post-footer>
+<ul class=post-tags>
+<li><a href=http://blog.almost.education/tags/programming/>programming</a></li>
+<li><a href=http://blog.almost.education/tags/clojure/>clojure</a></li>
+<li><a href=http://blog.almost.education/tags/event-sourcing/>event sourcing</a></li>
+<li><a href=http://blog.almost.education/tags/cqrs/>cqrs</a></li>
+<li><a href=http://blog.almost.education/tags/domain-driven-design/>domain-driven design</a></li>
+</ul>
+</footer>
+</article>
+</main>
+<footer class=footer>
+<span>&copy; 2021 <a href=http://blog.almost.education>blog.AlmostEducated</a></span>
+<span>
+Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+        <a href=https://git.io/hugopapermod rel=noopener target=_blank>PaperMod</a>
+</span>
+</footer>
+<a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg>
+</a>
+<script>let menu=document.getElementById('menu');menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)},document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener("click",function(b){b.preventDefault();var a=this.getAttribute("href").substr(1);window.matchMedia('(prefers-reduced-motion: reduce)').matches?document.querySelector(`[id='${decodeURIComponent(a)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(a)}']`).scrollIntoView({behavior:"smooth"}),a==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${a}`)})})</script>
+<script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script>
+<script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove('dark'),localStorage.setItem("pref-theme",'light')):(document.body.classList.add('dark'),localStorage.setItem("pref-theme",'dark'))})</script>
+</body>
+</html>
