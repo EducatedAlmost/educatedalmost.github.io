@@ -29,3 +29,10 @@ markup:
     lineNos: true
     style: paraiso-dark
     noClasses: false
+
+menu:
+  main:
+    - identifier: tags
+      name: tags
+      url: /tags/
+      weight: 10

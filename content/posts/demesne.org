@@ -1,8 +1,47 @@
 ---
 title: "æ/Demesne"
-date: 2021-11-06T00:00:00+00:00
-draft: true
+date: 2021-11-17T00:00:00+00:00
+draft: false
 summary: You don't understand a pattern until you can implement it — domain-driven design, CQRS, event sourcing.
 tags: [ "programming", "clojure", "event sourcing", "cqrs", "domain-driven design" ]
 ---
 
+See also my post on [[{{< ref "event-sourcing.org" >}}][event sourcing]].
+
+There's a maxim[fn:rutherford] within physics that something is not understood until it can be taught — I think a similar similar maxim holds in software development; one doesn't understand a pattern until one can implement it.
+
+* Demesne
+
+Under feudalism, a [[https://en.wikipedia.org/wiki/Demesne][/demesne/]] ~/dɪˈmeɪn/~ was all the land owned by the lord of the manor. The /domain/ of domain-driven design is the larger context in which the software is run. Demesne imagines a warehouse of named item lines; which can be searched for, have instances checked in and out, be deactivated and reactivated, and be renamed.
+
+ I'll be talking about /domain-driven design/, /CQRS/, and /event sourcing/. What do these mean?
+
+* CQRS
+
+Command Query Responsibility Segregation divorces the model used for instructions to an application, commands, from that used in requests for information, queries. It derives from Command Query separation, the idea that commands should not act as queries, and queries should not change state, and contrasts clearly to a common pattern where to update the state of an entity, its state is provided.
+
+There are some benefits from taking this approach. Commands can mimic real-world actions of the domain. Those calling aggregate behaviours are decoupled from the aggregate implementation. And this gives us flexibility in how we choose to store our state.
+
+Demesne has yet to implement the query side of the application, but it will be a web UI that will display the state of its entities and allow actions to be taken. But crucially, when actions are taken this will send commands to the HTTP endpoint, not update the state directly.
+
+* Event sourcing
+
+Event sourcing a datastructure is to not store its state, but an ordered collection of the events that have occurred to it either from a known former state or from its conception. It is useful in complex domains, especially those where will might be interested in an entity's history, something that would be hidden in logs, obscure database fields, or simply lost in a standard application.
+
+To rebuild an entity's current state, we load the entity's events, and progressively apply them culminating in the entity as it is. To see an example of this in Clojure, see my project [[{{< ref "rashomon.org" >}}][Rashomon]] ([[https://github.com/EducatedAlmost/rashomon][GitHub]]).
+
+* Domain-driven design
+
+Domain-driven design puts the language and lexicon at the centre of the development process. It tells us that to effectively develop software within a domain, it is required of us to understand the domain and its processes, with a particular emphasis on the creation of an ubiquitous language, a shared language between developer and business person, user, domain expert.
+
+This contrasts with a style of thinking which is common amongst developers. There is an idealism about creating things afresh, rather than working with what is there already. If we think that we can create a new and better lexicon, in isolated cases we might be right, but those who use this language every day will have a greater knowledge of it and the nuances it involves. Imagine the monstrosity that would be involved if we asked the marketing department to name our functions—why should we determine the language of the business side? The language within our programs has a habit of leaking out, APIs, requests of users, error messages — why should this conflict with the language they already know?
+
+[[https://en.wikipedia.org/wiki/Conway%27s_law][Conway's law]] states that a team which designs a system will create one that matches the structure of the team. In the case of development, it means that the code mimics the development team. Let us be aware of this and consciously work to create a system that mimics the domain instead.
+
+* But do I know enough to implement it?
+
+For two years I worked on a team that used CQRS, ES, and DDD. And yet my team lead wrote a library with abstracted many of the details and whilst I worked on every part of the system I have as yet never before created it from scratch. This project is a challenge to myself to prove that I know what I think I know, and it has been successful one.
+
+* Footnotes
+
+[fn:rutherford] The idea originates with [[https://en.wikipedia.org/wiki/Ernest_Rutherford][Ernest Rutherford]] who is [[https://quoteinvestigator.com/2019/10/19/barmaid/][often quoted]] as saying that a scientific discovery has no merit until it can be explained to a barmaid.
