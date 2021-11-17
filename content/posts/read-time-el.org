@@ -1,11 +1,29 @@
 ---
 title: "æ/read-time.el"
-date: 2021-11-17T00:00:00+00:00
-draft: true
+date: 2021-11-16T00:00:00+00:00
+draft: false
 summary: Foo
 tags: [ "programming", "elisp", "emacs" ]
 ---
 
+[[https://github.com/EducatedAlmost/read-time.el]]
+
 For a short while I was recording educational videos and audiobooks from scripts written in Emacs. A key piece of information I needed but didn't have access to was the time it would take to read these when recording. Emacs does provide the useful ~count-words~ function, but there was no ~read-time~.
 
-Reading speeds average around 5 words per second, dropping to 3 for careful speech, and rising above ten for speed readers.
+Reading speeds average around 5 words per second, dropping to 3 for careful speech, and rising above ten for speed readers. For small word counts one may easily divide the word count by ones speed to find the reading time, but it is not easy for larger word counts.
+
+~read-time~ does it for you. Called interactively, it returns the time to read the whole buffer or the region.
+
+#+begin_src lisp
+(read-time (point min) (point max))
+;; => 14 seconds
+#+end_src
+
+And one may specify a reading speed by setting ~read-time-words-per-sec~, or by providing a third argument.
+
+#+begin_src lisp
+(read-time (point min) (point max) 10)
+;; => 24 minutes 10 seconds
+#+end_src
+
+I hope you find the package useful!
