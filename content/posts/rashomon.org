@@ -1,0 +1,31 @@
+---
+title: "æ/Rashomon"
+date: 2021-11-17T00:00:00+00:00
+draft: true
+summary: See things from another perspective.
+tags: [ "programming", "clojure", "event sourcing", "film" ]
+---
+
+Rashomon
+
+Summary:
+dynamic reinterpretation
+
+Based on /In A Grove/.
+
+Tells the story of a man's death, and the the four conflicting interpretations at the subsequent trial.
+
+It was the first Japanese film to receive a substantial international audience.
+
+Analogy to the defeat of Japan in WWII.
+
+The witnesses caannot dispute certain events, but have differing perspectives that influence their later testimony.
+
+Fictionalism?
+
+Is this code as art
+
+The code
+
+Dynamic reinterpretation
+This is novel

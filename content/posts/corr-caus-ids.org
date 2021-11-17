@@ -1,0 +1,7 @@
+---
+title: "Correlation and causation ids"
+date: 2021-12-24T21:20:44Z
+draft: true
+tags: [ "programming", "software architecture", "event sourcing" ]
+---
+
