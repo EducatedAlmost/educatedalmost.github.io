@@ -6,15 +6,15 @@
     --header-height: 60px;
     --footer-height: 60px;
     --radius: 8px;
-    --theme: rgb(1, 0, 34);
+    --theme: rgb(240, 230, 240);
     --entry: rgb(1, 0, 34);
     --primary: rgb(30, 30, 30);
-    --secondary: rgb(108, 108, 108);
+    --secondary: rgb(68, 68, 68);
     --tertiary: rgb(214, 214, 214);
     --content: rgb(31, 31, 31);
     --hljs-bg: rgb(28, 29, 33);
     --code-bg: rgb(245, 245, 245);
-    --border: rgb(238, 238, 238);
+    --border: rgb(50, 50, 50);
 }
 
 .dark {
@@ -23,7 +23,7 @@
     --primary: rgb(250, 230, 250); /* Titles and links */
     --secondary: rgb(250, 230, 250); /* Date */
     --tertiary: rgb(65, 66, 68); /* Up button */
-    --content: rgb(220, 190, 220); /* Body text */
+    --content: rgb(230, 220, 230); /* Body text */
     --hljs-bg: rgb(40, 40, 55); /* src bg */
     --code-bg: rgb(50, 50, 50); /* ~ bg */
     --border: rgb(50, 50, 50); /* menu item border */
