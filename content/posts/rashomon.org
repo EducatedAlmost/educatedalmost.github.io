@@ -1,31 +1,35 @@
 ---
 title: "æ/Rashomon"
-date: 2021-11-20T00:00:00+00:00
+date: 2021-11-19T00:00:00+00:00
 draft: false
 summary: See things from another perspective.
 tags: [ "programming", "clojure", "event sourcing", "film" ]
 ---
 
-Rashomon
+/Rashomon/ is a 1950 psychological thriller film directed by Akira Kurosawa. Based on Ryunosuke Akutagawa's /In A Grove/, it tells the story of a samurai's death from the perspectives of: the bandit who killed him, his wife, the samurai himself, and finally a woodcutter, none of whom can agree at the subsequent trial.
 
-Summary:
-dynamic reinterpretation
+It was the first Japanese film to receive international acclaim, doing so after being panned by Japanese critics. From the film came the term /Rashomon effect/, used to describe the situation in which an event is given differing or contradictory interpretations by different observers.
 
-Based on /In A Grove/.
+I was inspired by the film when writing [[https://github.com/EducatedAlmost/rashomon][Rashomon]], a library for Clojure which rebuilds datastructures from events, with emphasis placed on the flexibility of /perspectives/, the functions that act for each event. In homage to its eponym it uses /testimony/ to refer to the datastructure being constructed.
 
-Tells the story of a man's death, and the the four conflicting interpretations at the subsequent trial.
+#+begin_src clojure
+(def bandit-perspectives
+  {:ae.rashomon.event.type/foo
+   ,   (fn [testimony event] (assoc testimony {:guilt? (not (:qux event))}))})
 
-It was the first Japanese film to receive a substantial international audience.
+(def samurai-perspectives
+  {:ae.rashomon.event.type/foo
+   ,   (fn [testimony event] (assoc testimony {:guilt? (:qux event)}))})
 
-Analogy to the defeat of Japan in WWII.
+(rashomon/apply-event
+ testimony
+ bandit-perspectives
+ {:ae.rashomon.event/type :ae.rashomon.event.type/foo
+  :qux :guilty})
 
-The witnesses caannot dispute certain events, but have differing perspectives that influence their later testimony.
+(rashomon/build samurai-perspectives events)
+   #+end_src
 
-Fictionalism?
+By changing the set of perspectives we use when applying the event, the testimony we produce can be completely different. This functionality makes it incredibly easy to change our interpretation of events, do A/B testing where different users have different interpretations, read perspectives from configuration.
 
-Is this code as art
-
-The code
-
-Dynamic reinterpretation
-This is novel
+I think this is quite novel and I'm excited to see what you can create with it.
