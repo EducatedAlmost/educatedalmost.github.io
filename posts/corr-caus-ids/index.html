@@ -1,0 +1,241 @@
+<!doctype html><html lang=en dir=auto>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
+<meta name=robots content="index, follow">
+<title>Correlation and causation IDs | blog.AlmostEducated</title>
+<meta name=keywords content="programming,software architecture,event sourcing">
+<meta name=description content="This is a very useful pattern that I see rarely used. When working with systems that pass messages, it can be difficult to later reconstruct a conversation or the sequence of events. It is second nature to us to assign entity IDs1 to messages, but two other IDs will help us to understand the structure of conversations.
+ One is a correlation ID. This is used to tie the conversation together.">
+<meta name=author content="AlmostEducated">
+<link rel=canonical href=http://blog.almost.education/posts/corr-caus-ids/>
+<link crossorigin=anonymous href=/assets/css/stylesheet.min.6d808efd6d6f240af88963a6bac7418b1aac88ef547c645281bfea83ab666ae7.css integrity="sha256-bYCO/W1vJAr4iWOmusdBixqsiO9UfGRSgb/qg6tmauc=" rel="preload stylesheet" as=style>
+<link rel=preload href=/img/ae-logo-trans.png as=image>
+<script defer crossorigin=anonymous src=/assets/js/highlight.min.f5a1b978a132c6aeb40625c357309394e91f4bd93496f86730204de5630b035b.js integrity="sha256-9aG5eKEyxq60BiXDVzCTlOkfS9k0lvhnMCBN5WMLA1s=" onload=hljs.initHighlightingOnLoad()></script>
+<link rel=icon href=http://blog.almost.education/img/ae-logo-trans.png>
+<link rel=icon type=image/png sizes=16x16 href=http://blog.almost.education/favicon-16x16.png>
+<link rel=icon type=image/png sizes=32x32 href=http://blog.almost.education/favicon-32x32.png>
+<link rel=apple-touch-icon href=http://blog.almost.education/img/ae-logo-trans.png>
+<link rel=mask-icon href=http://blog.almost.education/safari-pinned-tab.svg>
+<meta name=theme-color content="#2e2e33">
+<meta name=msapplication-TileColor content="#2e2e33">
+<meta name=generator content="Hugo 0.89.4">
+<noscript>
+<style>#theme-toggle,.top-link{display:none}</style>
+</noscript>
+<script type=text/javascript async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=default"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-15THDLZMKJ"></script>
+<script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-15THDLZMKJ',{anonymize_ip:!1})}</script>
+<meta property="og:title" content="Correlation and causation IDs">
+<meta property="og:description" content="This is a very useful pattern that I see rarely used. When working with systems that pass messages, it can be difficult to later reconstruct a conversation or the sequence of events. It is second nature to us to assign entity IDs1 to messages, but two other IDs will help us to understand the structure of conversations.
+ One is a correlation ID. This is used to tie the conversation together.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.almost.education/posts/corr-caus-ids/"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2021-11-18T00:00:00+00:00">
+<meta property="article:modified_time" content="2021-11-18T00:00:00+00:00">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="Correlation and causation IDs">
+<meta name=twitter:description content="This is a very useful pattern that I see rarely used. When working with systems that pass messages, it can be difficult to later reconstruct a conversation or the sequence of events. It is second nature to us to assign entity IDs1 to messages, but two other IDs will help us to understand the structure of conversations.
+ One is a correlation ID. This is used to tie the conversation together.">
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":2,"name":"Posts","item":"http://blog.almost.education/posts/"},{"@type":"ListItem","position":3,"name":"Correlation and causation IDs","item":"http://blog.almost.education/posts/corr-caus-ids/"}]}</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Correlation and causation IDs","name":"Correlation and causation IDs","description":"This is a very useful pattern that I see rarely used. When working with systems that pass messages, it can be difficult to later reconstruct a conversation or the sequence of events. It is second nature to us to assign entity IDs1 to messages, but two other IDs will help us to understand the structure of conversations.\n One is a correlation ID. This is used to tie the conversation together.","keywords":["programming","software architecture","event sourcing"],"articleBody":" This is a very useful pattern that I see rarely used. When working with systems that pass messages, it can be difficult to later reconstruct a conversation or the sequence of events. It is second nature to us to assign entity IDs1 to messages, but two other IDs will help us to understand the structure of conversations.\n One is a correlation ID. This is used to tie the conversation together. When initiating a conversation a correlation ID is created and any reply simply copies the correlation ID as its own.\n The other is a causation ID. This is used to record the immediate cause of the message, or which message this is a reply to. When replying, the original message's entity ID is copied as the reply's causation ID.\n Messages can be anything: commands, entity events, user input, user data, system events.\n I've displayed them in order and used integer IDs instead of UUIDs2 only for readability's sake. To retrieve the conversation we can query our database for all messages with the correlation ID 547, and sort them into a tree using their entity and causation IDs.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29  {::id/corr 547 ::id/caus nil ::id/entity 901 ::content \"Whose motorcycle is this?\"} {::id/corr 547 ::id/caus 901 ::id/entity 829 ::content \"It's a chopper, baby.\"} {::id/corr 547 ::id/caus 829 ::id/entity 489 ::content \"Whose chopper is this?\"} {::id/corr 547 ::id/caus 489 ::id/entity 122 ::content \"It's Zed's.\"} {::id/corr 547 ::id/caus 122 ::id/entity 004 ::content \"Who's Zed?\"} {::id/corr 547 ::id/caus 004 ::id/entity 675 ::content \"Zed's dead, baby. Zed's dead.\"}     This is useful because it allows us to find the causes of downstream issues. In a previous project I worked on, we were consuming data provided by third parties, which would occasionally contain mistakes. If we found that a user of ours had become a multi-billionaire overnight, we could check the causation ID of the responsible event which would direct us to the source file that contained the data.\n An advanced form of this pattern allows each message to have several correlation and causation IDs. An event's correlation IDs could point to not just the file that was the source of the data, but also the particular line of the CSV, and the import job. In a risk management service, the warning message can have as its causation IDs all the IDs of the offers that contribute to the risky position.\n1 2 3 4 5 6 7 8 9 10  {::id/correlations [#uuid \"15b797d2-7cbd-4295-89da-d2c94e49832a\" ;; the source file #uuid \"c991a43c-214e-4d77-b1b1-06cbe1bb51e9\" ;; the particular line #uuid \"75f65ec9-1441-4ac6-a909-eceb30f9cce1\" ;; the import job ] ::id/causations [#uuid \"67bdf0d6-4d5e-4c0d-a840-8732e94a78a8\" ;; the IDs of current positions #uuid \"bab99163-54e4-4350-9356-b7bd18ed9ed2\" #uuid \"2fe68d11-9434-470b-8caa-64b07ecb9d26\" #uuid \"b97bf998-dab6-45bb-8dde-163c947ad0d5\"]}     This necessarily complicates the process of finding immediate and ultimate causes of effects so is only recommended for situations where one is certain it will help.\n1 An entity ID might also be called a message ID.\n  2 A UUID is a universally unique identifier, meaning that it can be generated without fear that it might conflict with any already extant identifier. To use them in Clojure, I use the clj-uuid library.\n1 2  (require '[clj-uuid :as uuid]) (uuid/v4)        ","wordCount":"544","inLanguage":"en","datePublished":"2021-11-18T00:00:00Z","dateModified":"2021-11-18T00:00:00Z","author":{"@type":"Person","name":"AlmostEducated"},"mainEntityOfPage":{"@type":"WebPage","@id":"http://blog.almost.education/posts/corr-caus-ids/"},"publisher":{"@type":"Organization","name":"blog.AlmostEducated","logo":{"@type":"ImageObject","url":"http://blog.almost.education/img/ae-logo-trans.png"}}}</script>
+</head>
+<body class=dark id=top>
+<script>localStorage.getItem("pref-theme")==="light"&&document.body.classList.remove('dark')</script>
+<header class=header>
+<nav class=nav>
+<div class=logo>
+<a href=http://blog.almost.education accesskey=h title="blog.AlmostEducated (Alt + H)">
+<img src=/img/ae-logo-trans.png alt=logo aria-label=logo height=" 30px">blog.AlmostEducated</a>
+<span class=logo-switches>
+<button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</button>
+</span>
+</div>
+<ul id=menu>
+<li>
+<a href=http://blog.almost.education/tags/ title=tags>
+<span>tags</span>
+</a>
+</li>
+</ul>
+</nav>
+</header>
+<main class=main>
+<article class=post-single>
+<header class=post-header>
+<h1 class=post-title>
+Correlation and causation IDs
+</h1>
+<div class=post-meta>2021—11—18 Thu&nbsp;·&nbsp;AlmostEducated
+</div>
+<ul class=post-tags>
+<li><a href=http://blog.almost.education/tags/programming/>programming</a></li>
+<li><a href=http://blog.almost.education/tags/software-architecture/>software architecture</a></li>
+<li><a href=http://blog.almost.education/tags/event-sourcing/>event sourcing</a></li>
+</ul>
+</header>
+<div class=post-content><p>
+This is a very useful pattern that I see rarely used. When working with systems that pass messages, it can be difficult to later reconstruct a conversation or the sequence of events. It is second nature to us to assign entity IDs<sup class=footnote-reference><a id=footnote-reference-1 href=#footnote-1>1</a></sup> to messages, but two other IDs will help us to understand the structure of conversations.</p>
+<p>
+One is a <em>correlation ID</em>. This is used to tie the conversation together. When initiating a conversation a correlation ID is created and any reply simply copies the correlation ID as its own.</p>
+<p>
+The other is a <em>causation ID</em>. This is used to record the immediate cause of the message, or which message this is a reply to. When replying, the original message's entity ID is copied as the reply's causation ID.</p>
+<p>
+Messages can be anything: commands, entity events, user input, user data, system events.</p>
+<p>
+I've displayed them in order and used integer IDs instead of UUIDs<sup class=footnote-reference><a id=footnote-reference-2 href=#footnote-2>2</a></sup> only for readability's sake. To retrieve the conversation we can query our database for all messages with the correlation ID <code>547</code>, and sort them into a tree using their entity and causation IDs.</p>
+<div class="src src-clojure">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-clojure data-lang=clojure><span class=p>{</span><span class=ss>::id/corr</span> <span class=mi>547</span>
+ <span class=ss>::id/caus</span> <span class=nv>nil</span>
+ <span class=ss>::id/entity</span> <span class=mi>901</span>
+ <span class=ss>::content</span> <span class=s>&#34;Whose motorcycle is this?&#34;</span><span class=p>}</span>
+
+<span class=p>{</span><span class=ss>::id/corr</span> <span class=mi>547</span>
+ <span class=ss>::id/caus</span> <span class=mi>901</span>
+ <span class=ss>::id/entity</span> <span class=mi>829</span>
+ <span class=ss>::content</span> <span class=s>&#34;It&#39;s a chopper, baby.&#34;</span><span class=p>}</span>
+
+<span class=p>{</span><span class=ss>::id/corr</span> <span class=mi>547</span>
+ <span class=ss>::id/caus</span> <span class=mi>829</span>
+ <span class=ss>::id/entity</span> <span class=mi>489</span>
+ <span class=ss>::content</span> <span class=s>&#34;Whose chopper is this?&#34;</span><span class=p>}</span>
+
+<span class=p>{</span><span class=ss>::id/corr</span> <span class=mi>547</span>
+ <span class=ss>::id/caus</span> <span class=mi>489</span>
+ <span class=ss>::id/entity</span> <span class=mi>122</span>
+ <span class=ss>::content</span> <span class=s>&#34;It&#39;s Zed&#39;s.&#34;</span><span class=p>}</span>
+
+<span class=p>{</span><span class=ss>::id/corr</span> <span class=mi>547</span>
+ <span class=ss>::id/caus</span> <span class=mi>122</span>
+ <span class=ss>::id/entity</span> <span class=mi>004</span>
+ <span class=ss>::content</span> <span class=s>&#34;Who&#39;s Zed?&#34;</span><span class=p>}</span>
+
+<span class=p>{</span><span class=ss>::id/corr</span> <span class=mi>547</span>
+ <span class=ss>::id/caus</span> <span class=mi>004</span>
+ <span class=ss>::id/entity</span> <span class=mi>675</span>
+ <span class=ss>::content</span> <span class=s>&#34;Zed&#39;s dead, baby. Zed&#39;s dead.&#34;</span><span class=p>}</span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<p>
+This is useful because it allows us to find the causes of downstream issues. In a previous project I worked on, we were consuming data provided by third parties, which would occasionally contain mistakes. If we found that a user of ours had become a multi-billionaire overnight, we could check the causation ID of the responsible event which would direct us to the source file that contained the data.</p>
+<p>
+An advanced form of this pattern allows each message to have several correlation and causation IDs. An event's correlation IDs could point to not just the file that was the source of the data, but also the particular line of the CSV, and the import job. In a risk management service, the warning message can have as its causation IDs all the IDs of the offers that contribute to the risky position.</p>
+<div class="src src-clojure">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-clojure data-lang=clojure><span class=p>{</span><span class=ss>::id/correlations</span>
+ <span class=p>[</span><span class=o>#</span><span class=nv>uuid</span> <span class=s>&#34;15b797d2-7cbd-4295-89da-d2c94e49832a&#34;</span> <span class=c1>;; the source file</span>
+  <span class=o>#</span><span class=nv>uuid</span> <span class=s>&#34;c991a43c-214e-4d77-b1b1-06cbe1bb51e9&#34;</span> <span class=c1>;; the particular line</span>
+  <span class=o>#</span><span class=nv>uuid</span> <span class=s>&#34;75f65ec9-1441-4ac6-a909-eceb30f9cce1&#34;</span> <span class=c1>;; the import job</span>
+  <span class=p>]</span>
+ <span class=ss>::id/causations</span>
+ <span class=p>[</span><span class=o>#</span><span class=nv>uuid</span> <span class=s>&#34;67bdf0d6-4d5e-4c0d-a840-8732e94a78a8&#34;</span> <span class=c1>;; the IDs of current positions</span>
+  <span class=o>#</span><span class=nv>uuid</span> <span class=s>&#34;bab99163-54e4-4350-9356-b7bd18ed9ed2&#34;</span>
+  <span class=o>#</span><span class=nv>uuid</span> <span class=s>&#34;2fe68d11-9434-470b-8caa-64b07ecb9d26&#34;</span>
+  <span class=o>#</span><span class=nv>uuid</span> <span class=s>&#34;b97bf998-dab6-45bb-8dde-163c947ad0d5&#34;</span><span class=p>]}</span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<p>
+This necessarily complicates the process of finding immediate and ultimate causes of effects so is only recommended for situations where one is certain it will help.</p>
+<div class=footnotes>
+<hr class=footnotes-separatator>
+<div class=footnote-definitions>
+<div class=footnote-definition>
+<sup id=footnote-1><a href=#footnote-reference-1>1</a></sup>
+<div class=footnote-body>
+<p>An entity ID might also be called a <em>message ID</em>.</p>
+</div>
+</div>
+<div class=footnote-definition>
+<sup id=footnote-2><a href=#footnote-reference-2>2</a></sup>
+<div class=footnote-body>
+<p>A UUID is a universally unique identifier, meaning that it can be generated without fear that it might conflict with any already extant identifier. To use them in Clojure, I use the <a href=https://github.com/danlentz/clj-uuid><code>clj-uuid</code></a> library.</p>
+<div class="src src-clojure">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-clojure data-lang=clojure><span class=p>(</span><span class=nf>require</span> <span class=o>&#39;</span><span class=p>[</span><span class=nv>clj-uuid</span> <span class=ss>:as</span> <span class=nv>uuid</span><span class=p>])</span>
+<span class=p>(</span><span class=nf>uuid/v4</span><span class=p>)</span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<footer class=post-footer>
+<ul class=post-tags>
+<li><a href=http://blog.almost.education/tags/programming/>programming</a></li>
+<li><a href=http://blog.almost.education/tags/software-architecture/>software architecture</a></li>
+<li><a href=http://blog.almost.education/tags/event-sourcing/>event sourcing</a></li>
+</ul>
+</footer>
+</article>
+</main>
+<footer class=footer>
+<span>&copy; 2021 <a href=http://blog.almost.education>blog.AlmostEducated</a></span>
+<span>
+Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+        <a href=https://git.io/hugopapermod rel=noopener target=_blank>PaperMod</a>
+</span>
+</footer>
+<a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg>
+</a>
+<script>let menu=document.getElementById('menu');menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)},document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener("click",function(b){b.preventDefault();var a=this.getAttribute("href").substr(1);window.matchMedia('(prefers-reduced-motion: reduce)').matches?document.querySelector(`[id='${decodeURIComponent(a)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(a)}']`).scrollIntoView({behavior:"smooth"}),a==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${a}`)})})</script>
+<script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script>
+<script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove('dark'),localStorage.setItem("pref-theme",'light')):(document.body.classList.add('dark'),localStorage.setItem("pref-theme",'dark'))})</script>
+</body>
+</html>
