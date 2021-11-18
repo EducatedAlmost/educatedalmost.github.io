@@ -1,7 +1,76 @@
 ---
-title: "Correlation and causation ids"
-date: 2021-12-24T21:20:44Z
-draft: true
+title: "Correlation and causation IDs"
+date: 2021-11-18T00:00:00Z
+draft: false
 tags: [ "programming", "software architecture", "event sourcing" ]
 ---
 
+This is a very useful pattern that I see rarely used. When working with systems that pass messages, it can be difficult to later reconstruct a conversation or the sequence of events. It is second nature to us to assign entity IDs[fn:entity-id] to messages, but two other IDs will help us to understand the structure of conversations.
+
+One is a /correlation ID/. This is used to tie the conversation together. When initiating a conversation a correlation ID is created and any reply simply copies the correlation ID as its own.
+
+The other is a /causation ID/. This is used to record the immediate cause of the message, or which message this is a reply to. When replying, the original message's entity ID is copied as the reply's causation ID.
+
+Messages can be anything: commands, entity events, user input, user data, system events.
+
+I've displayed them in order and used integer IDs instead of UUIDs[fn:uuid] only for readability's sake. To retrieve the conversation we can query our database for all messages with the correlation ID ~547~, and sort them into a tree using their entity and causation IDs.
+
+#+begin_src clojure
+{::id/corr 547
+ ::id/caus nil
+ ::id/entity 901
+ ::content "Whose motorcycle is this?"}
+
+{::id/corr 547
+ ::id/caus 901
+ ::id/entity 829
+ ::content "It's a chopper, baby."}
+
+{::id/corr 547
+ ::id/caus 829
+ ::id/entity 489
+ ::content "Whose chopper is this?"}
+
+{::id/corr 547
+ ::id/caus 489
+ ::id/entity 122
+ ::content "It's Zed's."}
+
+{::id/corr 547
+ ::id/caus 122
+ ::id/entity 004
+ ::content "Who's Zed?"}
+
+{::id/corr 547
+ ::id/caus 004
+ ::id/entity 675
+ ::content "Zed's dead, baby. Zed's dead."}
+#+end_src
+
+This is useful because it allows us to find the causes of downstream issues. In a previous project I worked on, we were consuming data provided by third parties, which would occasionally contain mistakes. If we found that a user of ours had become a multi-billionaire overnight, we could check the causation ID of the responsible event which would direct us to the source file that contained the data.
+
+An advanced form of this pattern allows each message to have several correlation and causation IDs. An event's correlation IDs could point to not just the file that was the source of the data, but also the particular line of the CSV, and the import job. In a risk management service, the warning message can have as its causation IDs all the IDs of the offers that contribute to the risky position.
+
+#+begin_src clojure
+{::id/correlations
+ [#uuid "15b797d2-7cbd-4295-89da-d2c94e49832a" ;; the source file
+  #uuid "c991a43c-214e-4d77-b1b1-06cbe1bb51e9" ;; the particular line
+  #uuid "75f65ec9-1441-4ac6-a909-eceb30f9cce1" ;; the import job
+  ]
+ ::id/causations
+ [#uuid "67bdf0d6-4d5e-4c0d-a840-8732e94a78a8" ;; the IDs of current positions
+  #uuid "bab99163-54e4-4350-9356-b7bd18ed9ed2"
+  #uuid "2fe68d11-9434-470b-8caa-64b07ecb9d26"
+  #uuid "b97bf998-dab6-45bb-8dde-163c947ad0d5"]}
+#+end_src
+
+This necessarily complicates the process of finding immediate and ultimate causes of effects so is only recommended for situations where one is certain it will help.
+
+[fn:entity-id] An entity ID might also be called a /message ID/.
+
+[fn:uuid] A UUID is a universally unique identifier, meaning that it can be generated without fear that it might conflict with any already extant identifier. To use them in Clojure, I use the [[https://github.com/danlentz/clj-uuid][~clj-uuid~]] library.
+
+#+begin_src clojure
+(require '[clj-uuid :as uuid])
+(uuid/v4)
+#+end_src
