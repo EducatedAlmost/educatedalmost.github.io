@@ -5,12 +5,11 @@
 <meta name=robots content="index, follow">
 <title>Event Sourcing | blog.AlmostEducated</title>
 <meta name=keywords content="programming,software architecture,event sourcing">
-<meta name=description content="Could be useful for A/B testing Loading from a configuration service Accepting configuration from a user (SAAS)
- Event Sourcing
- State isn't stored. We rebuild it every time we need to query or do something to it. It has its drawbacks, but ut does allow us to do things that would be impossible otherwise. We can view out system's history with new perspectives, or add in missed past events.">
+<meta name=description content="This article is in the process of being written.
+Introduction   State isn't stored. We rebuild it every time we need to query or do something to it. It has its drawbacks, but it does allow us to do things that would be impossible otherwise. We can view out system's history with new perspectives, or add in missed past events. Our view of the past is necessarily wrong for any complex system and yet we design systems that lack any way to account for that.">
 <meta name=author content="AlmostEducated">
 <link rel=canonical href=http://blog.almost.education/posts/event-sourcing/>
-<link crossorigin=anonymous href=/assets/css/stylesheet.min.6d808efd6d6f240af88963a6bac7418b1aac88ef547c645281bfea83ab666ae7.css integrity="sha256-bYCO/W1vJAr4iWOmusdBixqsiO9UfGRSgb/qg6tmauc=" rel="preload stylesheet" as=style>
+<link crossorigin=anonymous href=/assets/css/stylesheet.min.58a033c0c7916fad77c5dfdffb45992d585075aa3bd3fd9fed09e7daf663c82b.css integrity="sha256-WKAzwMeRb613xd/f+0WZLVhQdao70/2f7Qnn2vZjyCs=" rel="preload stylesheet" as=style>
 <link rel=preload href=/img/ae-logo-trans.png as=image>
 <script defer crossorigin=anonymous src=/assets/js/highlight.min.f5a1b978a132c6aeb40625c357309394e91f4bd93496f86730204de5630b035b.js integrity="sha256-9aG5eKEyxq60BiXDVzCTlOkfS9k0lvhnMCBN5WMLA1s=" onload=hljs.initHighlightingOnLoad()></script>
 <link rel=icon href=http://blog.almost.education/img/ae-logo-trans.png>
@@ -28,20 +27,18 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-15THDLZMKJ"></script>
 <script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-15THDLZMKJ',{anonymize_ip:!1})}</script>
 <meta property="og:title" content="Event Sourcing">
-<meta property="og:description" content="Could be useful for A/B testing Loading from a configuration service Accepting configuration from a user (SAAS)
- Event Sourcing
- State isn't stored. We rebuild it every time we need to query or do something to it. It has its drawbacks, but ut does allow us to do things that would be impossible otherwise. We can view out system's history with new perspectives, or add in missed past events.">
+<meta property="og:description" content="This article is in the process of being written.
+Introduction   State isn't stored. We rebuild it every time we need to query or do something to it. It has its drawbacks, but it does allow us to do things that would be impossible otherwise. We can view out system's history with new perspectives, or add in missed past events. Our view of the past is necessarily wrong for any complex system and yet we design systems that lack any way to account for that.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="http://blog.almost.education/posts/event-sourcing/"><meta property="article:section" content="posts">
 <meta property="article:published_time" content="2021-11-17T00:00:00+00:00">
 <meta property="article:modified_time" content="2021-11-17T00:00:00+00:00">
 <meta name=twitter:card content="summary">
 <meta name=twitter:title content="Event Sourcing">
-<meta name=twitter:description content="Could be useful for A/B testing Loading from a configuration service Accepting configuration from a user (SAAS)
- Event Sourcing
- State isn't stored. We rebuild it every time we need to query or do something to it. It has its drawbacks, but ut does allow us to do things that would be impossible otherwise. We can view out system's history with new perspectives, or add in missed past events.">
+<meta name=twitter:description content="This article is in the process of being written.
+Introduction   State isn't stored. We rebuild it every time we need to query or do something to it. It has its drawbacks, but it does allow us to do things that would be impossible otherwise. We can view out system's history with new perspectives, or add in missed past events. Our view of the past is necessarily wrong for any complex system and yet we design systems that lack any way to account for that.">
 <script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":2,"name":"Posts","item":"http://blog.almost.education/posts/"},{"@type":"ListItem","position":3,"name":"Event Sourcing","item":"http://blog.almost.education/posts/event-sourcing/"}]}</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Event Sourcing","name":"Event Sourcing","description":"Could be useful for A/B testing Loading from a configuration service Accepting configuration from a user (SAAS)\n Event Sourcing\n State isn\u0026#39;t stored. We rebuild it every time we need to query or do something to it. It has its drawbacks, but ut does allow us to do things that would be impossible otherwise. We can view out system\u0026#39;s history with new perspectives, or add in missed past events.","keywords":["programming","software architecture","event sourcing"],"articleBody":" Could be useful for A/B testing Loading from a configuration service Accepting configuration from a user (SAAS)\n Event Sourcing\n State isn't stored. We rebuild it every time we need to query or do something to it. It has its drawbacks, but ut does allow us to do things that would be impossible otherwise. We can view out system's history with new perspectives, or add in missed past events. Our view of the past is necessarily wrong for any complex system and yet we design systems that lack any way to account for that.\n Useful when? The state of an aggregate is tied up with its history\n Example\n Deactivating accounts after a period of inactivity, client requests changes to the account. Developers have to make the change, try and track down the accounts that were affected. How do you do that? Do you really have those logs? Can you use them to change your DB? Will you not accidentally reactivate someone who really shouldn't be? In the meantime, you have clients who've tried to perform actions on their account but were rejected because their account was deactivated. Your operations team are spending their time finding the details of the failed actions to retry it. Why not just reinterpret the attempt in the new context of an active account?\n Can I come up with a more human-centred analogy?\n Events mean different things in different contexts.\n What's the difference between an event and a command? Commands can be rejected? Is this actually the distinction?\n Where is event sourcing inappropriate? Simple domains. Where rebuilding the domain is prohibitively expensive. When the team don't understand it.\n1 2 3 4 5  account.created account.deactivated.inactivity user.payment.requested user.payment.declined account.address.requested     We can change our perspectives to ignore deactivations that happen for bad reasons. In the new light where we ignore account.deactivated.inactivity if it lists too short an inactivity period, the user is now active in the context of subsequent events. We would not want to reinterpret the payment requests however. Thankfully, these events, if stored in the user's stream of events at all, are just links to events in the Payments aggregate or domain. Loading the Account aggregate, and it being active will not retrigger these payments, thankfully.\n Whilst old context, address didn't change\n Using Rashomon to do something interesting\n","wordCount":"381","inLanguage":"en","datePublished":"2021-11-17T00:00:00Z","dateModified":"2021-11-17T00:00:00Z","author":{"@type":"Person","name":"AlmostEducated"},"mainEntityOfPage":{"@type":"WebPage","@id":"http://blog.almost.education/posts/event-sourcing/"},"publisher":{"@type":"Organization","name":"blog.AlmostEducated","logo":{"@type":"ImageObject","url":"http://blog.almost.education/img/ae-logo-trans.png"}}}</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Event Sourcing","name":"Event Sourcing","description":"This article is in the process of being written.\nIntroduction   State isn\u0026#39;t stored. We rebuild it every time we need to query or do something to it. It has its drawbacks, but it does allow us to do things that would be impossible otherwise. We can view out system\u0026#39;s history with new perspectives, or add in missed past events. Our view of the past is necessarily wrong for any complex system and yet we design systems that lack any way to account for that.","keywords":["programming","software architecture","event sourcing"],"articleBody":"  This article is in the process of being written.\nIntroduction   State isn't stored. We rebuild it every time we need to query or do something to it. It has its drawbacks, but it does allow us to do things that would be impossible otherwise. We can view out system's history with new perspectives, or add in missed past events. Our view of the past is necessarily wrong for any complex system and yet we design systems that lack any way to account for that.\n  My projects   I've worked a fair bit with event sourcing:\n  Rashomon (GitHub)\n  Demesne (GitHub)\n  Eventstore.clj (GitHub)\n  All articles with the 'event sourcing' tag\n  History   Greg Young Event Store DB\n  An event store   Rebuilding from known states   Reverting   Diagnosing   Reinterpreting   Could be useful for A/B testing Loading from a configuration service Accepting configuration from a user (SAAS)\n Useful when? The state of an aggregate is tied up with its history\n Example\n Deactivating accounts after a period of inactivity, client requests changes to the account. Developers have to make the change, try and track down the accounts that were affected. How do you do that? Do you really have those logs? Can you use them to change your DB? Will you not accidentally reactivate someone who really shouldn't be? In the meantime, you have clients who've tried to perform actions on their account but were rejected because their account was deactivated. Your operations team are spending their time finding the details of the failed actions to retry it. Why not just reinterpret the attempt in the new context of an active account?\n Can I come up with a more human-centred analogy?\n Events mean different things in different contexts.\n What's the difference between an event and a command? Commands can be rejected? Is this actually the distinction?\n Where is event sourcing inappropriate? Simple domains. Where rebuilding the domain is prohibitively expensive. When the team don't understand it.\n1 2 3 4 5  account.created account.deactivated.inactivity user.payment.requested user.payment.declined account.address.requested     We can change our perspectives to ignore deactivations that happen for bad reasons. In the new light where we ignore account.deactivated.inactivity if it lists too short an inactivity period, the user is now active in the context of subsequent events. We would not want to reinterpret the payment requests however. Thankfully, these events, if stored in the user's stream of events at all, are just links to events in the Payments aggregate or domain. Loading the Account aggregate, and it being active will not retrigger these payments, thankfully.\n Whilst old context, address didn't change\n  Drawbacks and difficulties   Related patterns   Correlation and causation IDs\n  Software   Event Store DB\n Kafka\n  ","wordCount":"436","inLanguage":"en","datePublished":"2021-11-17T00:00:00Z","dateModified":"2021-11-17T00:00:00Z","author":{"@type":"Person","name":"AlmostEducated"},"mainEntityOfPage":{"@type":"WebPage","@id":"http://blog.almost.education/posts/event-sourcing/"},"publisher":{"@type":"Organization","name":"blog.AlmostEducated","logo":{"@type":"ImageObject","url":"http://blog.almost.education/img/ae-logo-trans.png"}}}</script>
 </head>
 <body class=dark id=top>
 <script>localStorage.getItem("pref-theme")==="light"&&document.body.classList.remove('dark')</script>
@@ -78,14 +75,78 @@ Event Sourcing
 <li><a href=http://blog.almost.education/tags/event-sourcing/>event sourcing</a></li>
 </ul>
 </header>
-<div class=post-content><p>
+<div class=post-content>
+<p>
+<em>This article is in the process of being written.</em></p>
+<div id=outline-container-headline-1 class=outline-2>
+<h2 id=headline-1>
+Introduction
+</h2>
+<div id=outline-text-headline-1 class=outline-text-2>
+<p>
+State isn't stored. We rebuild it every time we need to query or do something to it. It has its drawbacks, but it does allow us to do things that would be impossible otherwise. We can view out system's history with new perspectives, or add in missed past events. Our view of the past is necessarily wrong for any complex system and yet we design systems that lack any way to account for that.</p>
+</div>
+</div>
+<div id=outline-container-headline-2 class=outline-2>
+<h2 id=headline-2>
+My projects
+</h2>
+<div id=outline-text-headline-2 class=outline-text-2>
+<p>
+I've worked a fair bit with event sourcing:</p>
+<ul>
+<li>
+<p><a href=http://blog.almost.education/posts/rashomon/>Rashomon</a> (<a href=https://github.com/EducatedAlmost/rashomon>GitHub</a>)</p>
+</li>
+<li>
+<p><a href=http://blog.almost.education/posts/demesne/>Demesne</a> (<a href=https://github.com/EducatedAlmost/demesne>GitHub</a>)</p>
+</li>
+<li>
+<p>Eventstore.clj (<a href=https://github.com/EducatedAlmost/eventstore.clj>GitHub</a>)</p>
+</li>
+</ul>
+<p><a href=/tags/event-sourcing/>All articles with the <em>'event sourcing'</em> tag</a></p>
+</div>
+</div>
+<div id=outline-container-headline-3 class=outline-2>
+<h2 id=headline-3>
+History
+</h2>
+<div id=outline-text-headline-3 class=outline-text-2>
+<p>
+Greg Young
+Event Store DB</p>
+</div>
+</div>
+<div id=outline-container-headline-4 class=outline-2>
+<h2 id=headline-4>
+An event store
+</h2>
+</div>
+<div id=outline-container-headline-5 class=outline-2>
+<h2 id=headline-5>
+Rebuilding from known states
+</h2>
+</div>
+<div id=outline-container-headline-6 class=outline-2>
+<h2 id=headline-6>
+Reverting
+</h2>
+</div>
+<div id=outline-container-headline-7 class=outline-2>
+<h2 id=headline-7>
+Diagnosing
+</h2>
+</div>
+<div id=outline-container-headline-8 class=outline-2>
+<h2 id=headline-8>
+Reinterpreting
+</h2>
+<div id=outline-text-headline-8 class=outline-text-2>
+<p>
 Could be useful for A/B testing
 Loading from a configuration service
 Accepting configuration from a user (SAAS)</p>
-<p>
-Event Sourcing</p>
-<p>
-State isn't stored. We rebuild it every time we need to query or do something to it. It has its drawbacks, but ut does allow us to do things that would be impossible otherwise. We can view out system's history with new perspectives, or add in missed past events. Our view of the past is necessarily wrong for any complex system and yet we design systems that lack any way to account for that.</p>
 <p>
 Useful when?
 The state of an aggregate is tied up with its history</p>
@@ -123,8 +184,33 @@ account.address.requested</code></pre></td></tr></table>
 We can change our perspectives to ignore deactivations that happen for bad reasons. In the new light where we ignore <code>account.deactivated.inactivity</code> if it lists too short an inactivity period, the user is now active in the context of subsequent events. We would not want to reinterpret the payment requests however. Thankfully, these events, if stored in the user's stream of events at all, are just links to events in the Payments aggregate or domain. Loading the Account aggregate, and it being active will not retrigger these payments, thankfully.</p>
 <p>
 Whilst old context, address didn't change</p>
+</div>
+</div>
+<div id=outline-container-headline-9 class=outline-2>
+<h2 id=headline-9>
+Drawbacks and difficulties
+</h2>
+</div>
+<div id=outline-container-headline-10 class=outline-2>
+<h2 id=headline-10>
+Related patterns
+</h2>
+<div id=outline-text-headline-10 class=outline-text-2>
 <p>
-Using Rashomon to do something interesting</p>
+<a href=http://blog.almost.education/posts/corr-caus-ids/>Correlation and causation IDs</a></p>
+</div>
+</div>
+<div id=outline-container-headline-11 class=outline-2>
+<h2 id=headline-11>
+Software
+</h2>
+<div id=outline-text-headline-11 class=outline-text-2>
+<p>
+Event Store DB</p>
+<p>
+Kafka</p>
+</div>
+</div>
 </div>
 <footer class=post-footer>
 <ul class=post-tags>
