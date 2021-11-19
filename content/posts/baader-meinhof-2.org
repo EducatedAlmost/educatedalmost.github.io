@@ -2,7 +2,7 @@
 title: "Revisiting the Baader–Meinhof phenomenon"
 date: 2021-10-30T16:45:16Z
 draft: false
-tags: [ "psychology" ]
+tags: [ "psychology", "non-tech" ]
 ---
 
 /I will update this post as events unfold./

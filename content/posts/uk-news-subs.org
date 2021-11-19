@@ -1,8 +1,9 @@
 ---
 title: "UK newspaper subscriptions"
 date: 2021-11-19T19:47:15Z
-draft: true
+draft: false
 summary: "How much does a subscription cost?"
+tags: [ "non-tech" ]
 ---
 
 After reading it for over a decade, I've noticed a decline in the /Guardian's/ quality. I'm looking for another newspaper to read but, surprisingly, the prices of their competitors range wildly.
