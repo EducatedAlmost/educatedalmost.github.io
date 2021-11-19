@@ -1,0 +1,33 @@
+---
+title: "UK newspaper subscriptions"
+date: 2021-11-19T19:47:15Z
+draft: true
+summary: "How much does a subscription cost?"
+---
+
+After reading it for over a decade, I've noticed a decline in the /Guardian's/ quality. I'm looking for another newspaper to read but, surprisingly, the prices of their competitors range wildly.
+
+In the past I've really enjoyed /The Spectator/ and /Private Eye/. I would love to try the /Financial Times/, but at that price I'm more likely to pick /The Telegraph/.
+
+* Newspapers
+
+/Prices are per month./
+
+| Guardian        | £0.00  |
+| Indy            | *      |
+| Financial Times | £53.00 |
+| The Telegraph   | £12.99 |
+| The Times       | £26.00 |
+
+The Indy's subscription page wouldn't load for me.
+
+* Magazines
+
+/Prices are per month./
+
+| New Statesman | ~£10   |
+| Private Eye   | ~£3.00 |
+| The Economist | £17.90 |
+| The Spectator | £9.99  |
+
+The New Statesman and Private Eye do not offer monthly subscriptions. Private Eye's online content is free, this is for print.
