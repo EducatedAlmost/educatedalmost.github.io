@@ -6,6 +6,8 @@ summary: You don't understand a pattern until you can implement it — domain-dr
 tags: [ "programming", "clojure", "event sourcing", "cqrs", "domain-driven design" ]
 ---
 
+/An example of domain-driven design, CQRS, and event sourcing, in Clojure./
+
 https://github.com/EducatedAlmost/demesne
 
 See also my post on [[{{< ref "event-sourcing.org" >}}][event sourcing]].

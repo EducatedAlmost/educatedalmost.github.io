@@ -5,7 +5,7 @@ draft: false
 tags: [ "clojure", "programming" ]
 ---
 
-/Macros to ease the use of aliases in Clojure./
+/Macros to ease the use of namespace aliases in Clojure./
 
 [[https://github.com/EducatedAlmost/alias-ns.git]]
 

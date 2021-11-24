@@ -2,9 +2,11 @@
 title: "æ/Rashomon"
 date: 2021-11-19T00:00:00+00:00
 draft: false
-summary: See things from another perspective.
+summary: See things from another perspective; Clojure functions that build datastructures from events.
 tags: [ "programming", "clojure", "event sourcing", "film" ]
 ---
+
+/Clojure functions that build datastructures from events with dynamic perspectives./
 
 /Rashomon/ is a 1950 psychological thriller film directed by Akira Kurosawa. Based on Ryunosuke Akutagawa's /In A Grove/, it tells the story of a samurai's death from the perspectives of: the bandit who killed him, his wife, the samurai himself, and finally a woodcutter, none of whom can agree at the subsequent trial.
 

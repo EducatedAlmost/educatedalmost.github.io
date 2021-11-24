@@ -2,9 +2,11 @@
 title: "æ/bang.el"
 date: 2021-10-20T00:00:00+00:00
 draft: false
-summary: Use DuckDuckGo's Bangs from the comfort of Emacs!
+summary: Use DuckDuckGo's !Bangs from the comfort of Emacs!
 tags: [ "programming", "emacs", "elisp"]
 ---
+
+/Use DuckDuckGo's !Bangs from the comfort of Emacs!/
 
 [[https://github.com/EducatedAlmost/bang.el]]
 
