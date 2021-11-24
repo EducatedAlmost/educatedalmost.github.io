@@ -2,6 +2,7 @@
 title: "æ/alias+ns"
 date: 2021-11-24T13:30:06Z
 draft: false
+tags: [ "clojure", "programming" ]
 ---
 
 /Macros to ease the use of aliases in Clojure./
