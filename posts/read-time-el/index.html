@@ -5,7 +5,7 @@
 <meta name=robots content="index, follow">
 <title>æ/read-time.el | blog.AlmostEducated</title>
 <meta name=keywords content="programming,elisp,emacs">
-<meta name=description content="An Emacs package that tells you how long it takes to read things.">
+<meta name=description content="An Emacs function that tells you how long it takes to read things.">
 <meta name=author content="AlmostEducated">
 <link rel=canonical href=http://blog.almost.education/posts/read-time-el/>
 <link crossorigin=anonymous href=/assets/css/stylesheet.min.58a033c0c7916fad77c5dfdffb45992d585075aa3bd3fd9fed09e7daf663c82b.css integrity="sha256-WKAzwMeRb613xd/f+0WZLVhQdao70/2f7Qnn2vZjyCs=" rel="preload stylesheet" as=style>
@@ -26,16 +26,16 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-15THDLZMKJ"></script>
 <script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-15THDLZMKJ',{anonymize_ip:!1})}</script>
 <meta property="og:title" content="æ/read-time.el">
-<meta property="og:description" content="An Emacs package that tells you how long it takes to read things.">
+<meta property="og:description" content="An Emacs function that tells you how long it takes to read things.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="http://blog.almost.education/posts/read-time-el/"><meta property="article:section" content="posts">
 <meta property="article:published_time" content="2021-11-16T00:00:00+00:00">
 <meta property="article:modified_time" content="2021-11-16T00:00:00+00:00">
 <meta name=twitter:card content="summary">
 <meta name=twitter:title content="æ/read-time.el">
-<meta name=twitter:description content="An Emacs package that tells you how long it takes to read things.">
+<meta name=twitter:description content="An Emacs function that tells you how long it takes to read things.">
 <script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":2,"name":"Posts","item":"http://blog.almost.education/posts/"},{"@type":"ListItem","position":3,"name":"æ/read-time.el","item":"http://blog.almost.education/posts/read-time-el/"}]}</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"æ/read-time.el","name":"æ\/read-time.el","description":"An Emacs package that tells you how long it takes to read things.","keywords":["programming","elisp","emacs"],"articleBody":" https://github.com/EducatedAlmost/read-time.el\n For a short while I was recording educational videos and audiobooks from scripts written in Emacs. A key piece of information I needed but didn't have access to was the time it would take to read these when recording. Emacs does provide the useful count-words function, but there was no read-time.\n Reading speeds average around 5 words per second, dropping to 3 for careful speech, and rising above ten for speed readers. For small word counts one may easily divide the word count by ones speed to find the reading time, but it is not easy for larger word counts.\n read-time does it for you. Called interactively, it returns the time to read the whole buffer or the region.\n1 2  (read-time (point min) (point max)) ;; = 14 seconds     And one may specify a reading speed by setting read-time-words-per-sec, or by providing a third argument.\n1 2  (read-time (point min) (point max) 10) ;; = 24 minutes 10 seconds     I hope you find the package useful!\n","wordCount":"168","inLanguage":"en","datePublished":"2021-11-16T00:00:00Z","dateModified":"2021-11-16T00:00:00Z","author":{"@type":"Person","name":"AlmostEducated"},"mainEntityOfPage":{"@type":"WebPage","@id":"http://blog.almost.education/posts/read-time-el/"},"publisher":{"@type":"Organization","name":"blog.AlmostEducated","logo":{"@type":"ImageObject","url":"http://blog.almost.education/img/ae-logo-trans.png"}}}</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"æ/read-time.el","name":"æ\/read-time.el","description":"An Emacs function that tells you how long it takes to read things.","keywords":["programming","elisp","emacs"],"articleBody":" An Emacs function that tells you how long it takes to read things.\n https://github.com/EducatedAlmost/read-time.el\n For a short while I was recording educational videos and audiobooks from scripts written in Emacs. A key piece of information I needed but didn't have access to was the time it would take to read these when recording. Emacs does provide the useful count-words function, but there was no read-time.\n Reading speeds average around 5 words per second, dropping to 3 for careful speech, and rising above ten for speed readers. For small word counts one may easily divide the word count by ones speed to find the reading time, but it is not easy for larger word counts.\n read-time does it for you. Called interactively, it returns the time to read the whole buffer or the region.\n1 2  (read-time (point min) (point max)) ;; = 14 seconds     And one may specify a reading speed by setting read-time-words-per-sec, or by providing a third argument.\n1 2  (read-time (point min) (point max) 10) ;; = 24 minutes 10 seconds     I hope you find the package useful!\n","wordCount":"181","inLanguage":"en","datePublished":"2021-11-16T00:00:00Z","dateModified":"2021-11-16T00:00:00Z","author":{"@type":"Person","name":"AlmostEducated"},"mainEntityOfPage":{"@type":"WebPage","@id":"http://blog.almost.education/posts/read-time-el/"},"publisher":{"@type":"Organization","name":"blog.AlmostEducated","logo":{"@type":"ImageObject","url":"http://blog.almost.education/img/ae-logo-trans.png"}}}</script>
 </head>
 <body class=dark id=top>
 <script>localStorage.getItem("pref-theme")==="light"&&document.body.classList.remove('dark')</script>
@@ -73,6 +73,8 @@
 </ul>
 </header>
 <div class=post-content><p>
+<em>An Emacs function that tells you how long it takes to read things.</em></p>
+<p>
 <a href=https://github.com/EducatedAlmost/read-time.el>https://github.com/EducatedAlmost/read-time.el</a></p>
 <p>
 For a short while I was recording educational videos and audiobooks from scripts written in Emacs. A key piece of information I needed but didn't have access to was the time it would take to read these when recording. Emacs does provide the useful <code>count-words</code> function, but there was no <code>read-time</code>.</p>
