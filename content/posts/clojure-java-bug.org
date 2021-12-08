@@ -3,6 +3,7 @@ title: "An 8-year-old Clojure bug, resorting to Java"
 date: 2021-12-08T15:26:12Z
 draft: false
 summary: "Dodge a Clojure bug by using Java and tools.build"
+tags: [ "clojure", "java", "jvm", "programming", "type systems" ]
 ---
 
 I've been writing [[https://github.com/EducatedAlmost/eventstore.clj.git][ae/eventstore.clj]], a Clojure wrapper for the [[https://github.com/EventStore/EventStoreDB-Client-Java][EventStoreDB-Client-Java]] library. Nicely written, it is still >5k lines of your typical verbose Java and I'm hoping I can do more in <1k lines. In writing this I have stumbled upon an 8-year-old Clojure bug, which itself might stem from a JVM bug from the last millennium.
