@@ -5,7 +5,7 @@ draft: false
 summary: "Dodge a Clojure bug by using Java and tools.build"
 ---
 
-I've been writing [[https://github.com/EducatedAlmost/eventstore.clj.git][ae/eventstore.clj]], a Clojure wrapper for the [[https://github.com/EventStore/EventStoreDB-Client-Java][EventStoreDB-Client-Java]] library. Nicely written, it is still >5k lines of your typical verbose Java and I'm hoping I can do more in <1k lines. In writing this I have stumbled upon an 8-year-old Clojure bug, which itself might stem from a JVM bug from the last millenium.
+I've been writing [[https://github.com/EducatedAlmost/eventstore.clj.git][ae/eventstore.clj]], a Clojure wrapper for the [[https://github.com/EventStore/EventStoreDB-Client-Java][EventStoreDB-Client-Java]] library. Nicely written, it is still >5k lines of your typical verbose Java and I'm hoping I can do more in <1k lines. In writing this I have stumbled upon an 8-year-old Clojure bug, which itself might stem from a JVM bug from the last millennium.
 
 * Finding a Clojure–Java interop bug
 
@@ -43,7 +43,7 @@ Uncaught exception, not in assertion
 I get exceptions like this all the time working with Clojure–Java interop, either I've:
 - called the right method on the wrong class
 - called the wrong method on the right class
-- called a inaccessible method
+- called an inaccessible method
 
 Let's find out which methods ~ReadAllOptions~ provides:
 
@@ -60,14 +60,14 @@ Let's find out which methods ~ReadAllOptions~ provides:
 ; ...
 #+end_src
 
-Look at \#19, it has a public method called timeouts, and after checking ~(.getClass timeout)~ we can be sure that this call should work.
+Look at #19, it has a public method called timeouts, and after checking ~(.getClass timeout)~ we can be sure that this call should work.
 
-It turns out that this is a bug that goes back to at least 2013, when it was first tracked in the Clojure JIRA ([[https://clojure.atlassian.net/browse/CLJ-1243][\#CLJ–1243]]) and I suspect it might be related to a 22-year-old JVM bug ([[https://bugs.java.com/bugdatabase/view_bug.do?bug_id=4283544][\#JDK–4283544]]).
+It turns out that this is a bug that goes back to at least 2013, when it was first tracked in the Clojure Jira ([[https://clojure.atlassian.net/browse/CLJ-1243][#CLJ–1243]]) and I suspect it might be related to a 22-year-old JVM bug ([[https://bugs.java.com/bugdatabase/view_bug.do?bug_id=4283544][#JDK–4283544]]).
 
 Well, what to do? I don't think there's much use in waiting for this to get fixed. Let's do as hackers do and hack. Given that I'm fairly certain that what I want to do is legal in Java, let's look at the Java interop options of which there are three levels:
 
 1. class / member accesses and the dot special form
-2. ~proxy~, ~gen-class~, ~reify~
+2. ~proxy~, [[#gen-class][~gen-class~]], ~reify~
 3. writing Java
 
 * Writing Java
@@ -155,3 +155,127 @@ Running ~clojure -T:build compile~ will compile the Java source files as can be 
 #+begin_src clojure
 {:paths ["src" "resources" "target/classes"]}
 #+end_src
+
+* Trying ~gen-class~?
+:PROPERTIES:
+:CUSTOM_ID: gen-class
+:END:
+
+In attempting to use ~gen-class~ to circumvent this bug, I found an even older Clojure bug! Using the builder pattern, the builder's methods return itself. This allows one to use method chaining in Java, or threading macros in Clojure.
+
+#+begin_src java
+Foo.newBuilder()
+    .red()
+    .mirrored()
+    .short()
+    .wearing(jacket)
+    .build()
+// => an instance of Foo
+#+end_src
+
+#+begin_src clojure
+(-> Foo
+    .newBuilder
+    .red
+    .mirrored
+    .short
+    (.wearing jacket)
+    .build)
+;; => an instance of Foo
+#+end_src
+
+One would write the method like so, so the function makes the change to the internal state, and then returns itself.
+
+#+begin_src clojure
+(gen-class :name "ae.ReadAllOptionsBuilder"
+           :methods [[timeouts
+                      [com.eventstore.dbclient.Timeouts]
+                      ae.ReadAllOptionsBuilder]])
+
+(defn -timeouts [this timeouts]
+  (-> this .state (.timeouts timeouts))
+  this)
+#+end_src
+
+If it only were so. Ticket [[https://clojure.atlassian.net/browse/CLJ-84][#CLJ-84]], /compile gen-class fail when class returns self/, makes it clear that it is not possible for a ~gen-class~ method to return an instance of the same class. Created on 17th June 2009 by Rick Hickey, this ticket is as old as Clojure's ticketing system itself. What happens if we return ~void~ instead?
+
+#+begin_src clojure
+(ns ae.read-all-options
+  (:import [com.eventstore.dbclient
+            Direction
+            Position
+            ReadAllOptions
+            Timeouts
+            UserCredentials]))
+
+(gen-class
+ :name "ae.eventstore.ReadAllOptionsCljTwo"
+ :state state
+ :init init
+ :constructors {[] []}
+ :methods [[getForeign [] com.eventstore.dbclient.ReadAllOptions]
+           [authenticated [com.eventstore.dbclient.UserCredentials] void]
+           [requiresLeader [boolean] void]
+           [timeouts [com.eventstore.dbclient.Timeouts] void]
+           [resolveLinkTos [boolean] void]
+           [fromPosition [com.eventstore.dbclient.Position] void]
+           [direction [com.eventstore.dbclient.Direction] void]
+           [build [] com.eventstore.dbclient.ReadAllOptions]])
+
+(defn -init []
+  [[] (ReadAllOptions/get)])
+
+(defn -getForeign [this]
+  (.state this))
+
+(defn -authenticated [this credentials]
+  (-> this .state (.authenticated credentials)))
+
+(defn -requiresLeader [this value]
+  (-> this .state (.requiresLeader value)))
+
+(defn -timeouts [this timeouts]
+  (-> this .state (.timeouts timeouts)))
+#+end_src
+
+Given that the methods are returning void, we have to use an abomination like this with an implicit ~do~ and explicit altering of state:
+
+#+begin_src clojure
+(defn apply-base-options [builder {::options/keys [timeouts requires-leader?]
+                                   ::keys [credentials]}]
+  (if (some? timeouts) (.timeouts builder (->Timeouts timeouts)) nil)
+  (if (some? requires-leader?) (.requiresLeader builder requires-leader?) nil)
+  (if (some? credentials) (.authenticated builder (->UserCredentials credentials)) nil))
+#+end_src
+
+And AOT compile to make use of ~gen-class~ by adding a new subtask to ~build.clj~:
+
+#+begin_src clojure
+(defn compile-2 [_]
+  (compile nil) ;; only needed if you haven't removed the Java code
+  (b/compile-clj {:basis basis
+                  :src-dirs ["src"]
+                  :class-dir class-dir}))
+#+end_src
+
+And the best thing? It doesn't even work.
+
+#+begin_src clojure
+java.lang.IllegalArgumentException: No matching method timeouts found taking 1 args for class com.eventstore.dbclient.ReadAllOptions
+   No matching method timeouts found taking 1 args for class
+   com.eventstore.dbclient.ReadAllOptions
+            Reflector.java:  127  clojure.lang.Reflector/invokeMatchingMethod
+            Reflector.java:  102  clojure.lang.Reflector/invokeInstanceMethod
+      read_all_options.clj:   36  ae.read-all-options/-timeouts
+      read_all_options.clj:   35  ae.read-all-options/-timeouts
+                       nil:   -1  ae.eventstore.ReadAllOptionsCljTwo/timeouts
+#+end_src
+
+* Other uses
+
+I can't imagine that such a setup will be useful too often, but here are a couple that come to mind:
+
+- Java is more performant (~2\times?)
+- an existing codebase migrating to Clojure (à la [[https://www.redhat.com/architect/pros-and-cons-strangler-architecture-pattern][strangler architecture]])
+- providing a reliable Java API
+- using tools that require Java magic
