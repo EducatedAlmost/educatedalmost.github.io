@@ -1,0 +1,157 @@
+---
+title: "An 8-year-old Clojure bug, resorting to Java"
+date: 2021-12-08T15:26:12Z
+draft: false
+summary: "Dodge a Clojure bug by using Java and tools.build"
+---
+
+I've been writing [[https://github.com/EducatedAlmost/eventstore.clj.git][ae/eventstore.clj]], a Clojure wrapper for the [[https://github.com/EventStore/EventStoreDB-Client-Java][EventStoreDB-Client-Java]] library. Nicely written, it is still >5k lines of your typical verbose Java and I'm hoping I can do more in <1k lines. In writing this I have stumbled upon an 8-year-old Clojure bug, which itself might stem from a JVM bug from the last millenium.
+
+* Finding a Clojure–Java interop bug
+
+I loath private, protected, and their ilk, much preferring to make everything public 99% of the time. Power to the consumer! Here's an (/abbreviated/) example from the Java library. A protected base class which provided the subclass with a public method.
+
+#+begin_src java
+protected class OptionsBase<T> {
+
+    public T timeouts (Timeouts timeouts) {
+        this.timeouts = timeouts;
+        return (T)this;
+    }
+}
+
+public class ReadAllOptions extends OptionsBase<ReadAllOptions> {
+    public static ReadAllOptions get() {
+        return new ReadAllOptions();
+    }
+}
+#+end_src
+
+In Java, this is perfectly legal. In Clojure:
+
+#+begin_src clojure
+(-> (ReadAllOptions/get)
+    (.timeouts timeouts))
+#+end_src
+
+#+begin_src
+Error in ->ReadAllOptions-test
+Uncaught exception, not in assertion
+   error: java.lang.IllegalArgumentException: No matching method timeouts found taking 1 args for class com.eventstore.dbclient.ReadAllOptions
+#+end_src
+
+I get exceptions like this all the time working with Clojure–Java interop, either I've:
+- called the right method on the wrong class
+- called the wrong method on the right class
+- called a inaccessible method
+
+Let's find out which methods ~ReadAllOptions~ provides:
+
+#+begin_src clojure
+(->> ReadAllOptions
+     .getMethods
+     (map str))
+; => ...
+;  17. "public java.lang.Object com.eventstore.dbclient.OptionsBase.requiresLeader()"
+;  18. "public java.lang.Object com.eventstore.dbclient.OptionsBase.requiresLeader(boolean)"
+;  19. "public java.lang.Object com.eventstore.dbclient.OptionsBase.timeouts(com.eventstore.dbclient.Timeouts)"
+;  20. "public java.lang.Object com.eventstore.dbclient.OptionsBase.notRequireLeader()"
+;  21. "public final void java.lang.Object.wait(long,int) throws java.lang.InterruptedException"
+; ...
+#+end_src
+
+Look at \#19, it has a public method called timeouts, and after checking ~(.getClass timeout)~ we can be sure that this call should work.
+
+It turns out that this is a bug that goes back to at least 2013, when it was first tracked in the Clojure JIRA ([[https://clojure.atlassian.net/browse/CLJ-1243][\#CLJ–1243]]) and I suspect it might be related to a 22-year-old JVM bug ([[https://bugs.java.com/bugdatabase/view_bug.do?bug_id=4283544][\#JDK–4283544]]).
+
+Well, what to do? I don't think there's much use in waiting for this to get fixed. Let's do as hackers do and hack. Given that I'm fairly certain that what I want to do is legal in Java, let's look at the Java interop options of which there are three levels:
+
+1. class / member accesses and the dot special form
+2. ~proxy~, ~gen-class~, ~reify~
+3. writing Java
+
+* Writing Java
+
+In this rare case, it looks like writing Java is ones only option. But I, like many other Clojure developers, was once a Java developer, and the Java needed is very simple, it is a wrapper for ~ReadAllOptions~, so the offending methods will be called inside our Java code.
+
+#+begin_src java
+import com.eventstore.dbclient.ReadAllOptions;
+import com.eventstore.dbclient.Timeouts;
+
+public class ReadAllOptionsClj {
+    public ReadAllOptions foreign;
+
+    public ReadAllOptionsClj () {
+        this.foreign = ReadAllOptions.get();
+    }
+
+    public ReadAllOptionsClj timeouts (Timeouts timeouts) {
+        this.foreign.timeouts(timeouts);
+        return this;
+    }
+
+    public ReadAllOptions build () {
+        return this.foreign;
+    }
+}
+#+end_src
+
+I've used a builder pattern here. This is good to call using Clojure's ~cond->~ threading macro. It works by evaluating a predicate, and treating the next as if in a normal thread-first macro. In the following code this makes sure that methods are only called if the argument is non-nil, the builder's default value is used otherwise.
+
+#+begin_src clojure
+(cond-> (new ReadAllOptionsClj)
+  (some? timeouts) (.timeouts timeouts)
+  ;; add many other fields to the builder
+  ;; (some? host) (.addHost host)
+  true (.build))
+#+end_src
+
+As always when calling Java from Clojure, one must import the class:
+
+#+begin_src clojure
+(ns ...
+  (:require [...])
+  (:import [ae.eventstore.j ReadAllOptionsClj]))
+#+end_src
+
+But before it can be used, the Java needs to be compiled.
+
+* Compiling Java with tools.build
+
+Building this in Leiningen should be [[https://cljdoc.org/d/leiningen/leiningen/2.9.8/doc/polyglot-clojure-java-projects-with-leiningen][really simple]]. Lein's ~defproject~ has the key ~:java-source-paths~ which can be compiled using ~lein javac~, but this is usually unnecessary as all the usual Lein tasks will do it for you.
+
+I made the switch to ~deps.edn~ last year, unfortunately it won't do compile Java code automatically. But this does provide one with an opportunity to learn how to use [[https://github.com/clojure/tools.build][~tools.build~]], written by Alex Miller (@puredanger). Asserting that /builds are programs/, we must do for ourselves what Lein would be doing.
+
+To ~deps.edn~ one must add an alias for the task to be performed, add any dependencies needed for that task, and the namespace containing the functions to use. Our tasks will be ~build~, our only dependency ~tools.build~, and our namespace ~build~.
+
+#+begin_src clojure
+{:alias {:build {io.github.clojure/tools.build {:git/tag "v0.6.8" :git/sha "d79ae84"}
+                 :ns-default build}}}
+#+end_src
+
+One then creates ~build.clj~ in the project's root where we will start defining our build task:
+
+#+begin_src clojure
+(ns build
+  (:require [clojure.tools.build.api :as b]))
+#+end_src
+
+The most important subtask will be compiling our Java code, for which ~tools.build~ provides the ~javac~ function.
+
+#+begin_src clojure
+(def class-dir "target/classes")
+(def basis (b/create-basis {:project "deps.edn"}))
+(defn compile [_]
+  (b/javac {:src-dirs ["java"]
+            :class-dir class-dir
+            :basis basis
+            :javac-opts ["-source" "8" "-target" "8"]}))
+#+end_src
+
+I assume here that the Java code is within ~java~ but it might be possible to keep it as a subdirectory or ~src~ as one would with ~clj~, ~cljc~, and ~cljs~.
+
+Running ~clojure -T:build compile~ will compile the Java source files as can be seen by looking in ~target/classes~. Once ~target/classes~ is added to the classpath you will be ready to call the class from Clojure.
+
+#+begin_src clojure
+{:paths ["src" "resources" "target/classes"]}
+#+end_src
