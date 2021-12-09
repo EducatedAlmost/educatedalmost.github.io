@@ -16,7 +16,7 @@
 <link rel=mask-icon href=http://blog.almost.education/safari-pinned-tab.svg>
 <meta name=theme-color content="#2e2e33">
 <meta name=msapplication-TileColor content="#2e2e33">
-<meta name=generator content="Hugo 0.89.4">
+<meta name=generator content="Hugo 0.90.0">
 <link rel=alternate type=application/rss+xml href=http://blog.almost.education/index.xml>
 <noscript>
 <style>#theme-toggle,.top-link{display:none}</style>
@@ -55,6 +55,18 @@
 </nav>
 </header>
 <main class=main>
+<article class=post-entry>
+<header class=entry-header>
+<h2>Clojure's rarer threading macros: some-> and cond->
+</h2>
+</header>
+<section class=entry-content>
+<p>I use Clojure's threading macros perhaps more than I should, but I do so because they mimic the way I think about the code I write. A lisp program is a tree and yet most of the programs that we write are, or should be, lines of functions acting on a datastructure1.
+The value of threading macros 1 (* 3 (+ 2 (- 10 (+ 10 (/ 2 2))))) To grok this code I should start from the bottommost leaf, in this case (/ 2 2), but it is at the far right counter to where it is natural for me to start reading....</p>
+</section>
+<footer class=entry-footer>2021—12—09 Thu&nbsp;·&nbsp;AlmostEducated</footer>
+<a class=entry-link aria-label="post link to Clojure's rarer threading macros: some- and cond-" href=http://blog.almost.education/posts/clojure-threading-macros/></a>
+</article>
 <article class=post-entry>
 <header class=entry-header>
 <h2>An 8-year-old Clojure bug, resorting to Java
