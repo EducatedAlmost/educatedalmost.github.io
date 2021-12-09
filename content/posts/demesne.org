@@ -46,6 +46,6 @@ This contrasts with a style of thinking which is common amongst developers. Ther
 
 For two years I worked on a team that used CQRS, ES, and DDD. And yet my team lead wrote a library with abstracted many of the details and whilst I worked on every part of the system I have as yet never before created it from scratch. This project is a challenge to myself to prove that I know what I think I know, and it has been successful one.
 
-* Footnotes
+# Footnotes
 
 [fn:rutherford] The idea originates with [[https://en.wikipedia.org/wiki/Ernest_Rutherford][Ernest Rutherford]] who is [[https://quoteinvestigator.com/2019/10/19/barmaid/][often quoted]] as saying that a scientific discovery has no merit until it can be explained to a barmaid.

@@ -47,6 +47,7 @@ Add this to your ~init.el~, ~.spacemacs~, or ~config.el~:
 #+end_src
 
 # Footnotes
+
 [fn:dired] ~dired~: directory editor
 
 [fn:documentation] Try calling ~describe-variable~ with ~C-h v~.

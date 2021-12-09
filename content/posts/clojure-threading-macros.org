@@ -1,0 +1,173 @@
+---
+title: "Clojure's rarer threading macros: some-> and cond->"
+date: 2021-12-09T19:43:18Z
+draft: false
+---
+
+I use Clojure's threading macros perhaps more than I should, but I do so because they mimic the way I think about the code I write. A lisp program is a tree and yet most of the programs that we write are, or should be, lines of functions acting on a datastructure[fn:perlis].
+
+* The value of threading macros
+
+#+begin_src clojure
+(* 3 (+ 2 (- 10 (+ 10 (/ 2 2)))))
+#+end_src
+
+To grok this code I should start from the bottommost leaf, in this case ~(/ 2 2)~, but it is at the far right counter to where it is natural for me to start reading. Conversely the same code written with a threading macro mirrors how we think about what the code is doing.
+
+#+begin_src clojure
+(-> 2 (/ 2) (+ 10) (- 10) (+ 2) (* 3))
+#+end_src
+
+They also force the programmer into writing /simpler/ code because they just don't handle trees well.
+
+#+begin_src clojure
+(-> 2
+    (/ 2)
+    (+ 10)
+    (- (-> 25 (/ 5) (* 2)))
+    (+ 2)
+    (* 3))
+#+end_src
+
+What a mess. Better to split it into two linear forms.
+
+#+begin_src clojure
+;; Better do this
+(let [x (-> 25 (/ 5) (* 2))]
+  (-> 2 (/ 2) (+ 10) (- x) (+ 2) (* 3)))
+#+end_src
+
+So threading macros help make easy things simple and complex things hard[fn:chiasmus].
+
+* ~as->~
+
+[[https://clojuredocs.org/clojure.core/as-%3E][~as->~]] just allows one to use a symbol to specify where the threaded value goes in each form. It is helpful when the position in the function changes. Some Clojure functions take the datastructure as the first argument, other take a function.
+
+#+begin_src clojure
+(as-> (db/get id) $
+  (update $ :foo f x y)
+  (map g $))
+#+end_src
+
+* ~some->~
+
+[[https://clojuredocs.org/clojure.core/some-%3E][~some->~]] works similarly to ~->~, except that evaluation of the form terminates as soon as the threaded value becomes ~nil~. It's named for [[https://clojuredocs.org/clojure.core/some_q][~some?~]] which only returns ~false~ if the arguments is ~nil~. It is, generally, unnecessary in Clojure. Why? Because Clojure's core functions, and the functions that we write, gracefully handle ~nil~.
+
+#+begin_src clojure
+(map + nil) ; => ()
+(assoc nil :k :v) ; => {:k :v}
+(dissoc nil :k) ; => nil
+(str nil) ; => ""
+#+end_src
+
+The same cannot be said for calling functions in Java. Try adding a value to a null ~HashMap~, or ~.toString~ on a null object, and you'll throw a ~NullPointerException~.
+
+#+begin_src clojure
+(-> id
+    db/find-by-id
+    (.put "foo" "bar")
+    db/save)
+
+(-> id
+    db/find-by-id
+    (assoc :id id "foo" "bar")
+    db/save)
+#+end_src
+
+If ~db/find-by-id~ returns ~nil~, implying a missing entity, the first form will explode when it tries to ~.put~ on a ~null~ object. The second gracefully creates and saves a new entity. If we still need to deal with the Java style, we can do so by either wrapping the form in a ~try~ form, or use ~some->~.
+
+#+begin_src clojure
+(if-let [save-res (some-> id db/find-by-id (.put "foo" "bar") db/save)]
+  (handle-success save-res)
+  (handle-missing-entity id))
+#+end_src
+
+When ~db/find-by-id~ returns ~nil~, ~some->~ immediately returns ~nil~ without evaluating ~.put~ or any of the further forms. Because ~nil~ is not ~true?~, we can use it to direct our control flow.
+
+* ~cond->~
+
+I have found [[https://clojuredocs.org/clojure.core/cond-%3E][~cond->~]], named for [[https://clojuredocs.org/clojure.core/cond][~cond~]], to be the biggest code-saver out of any of Clojure's rarer standard library functions. Again, I use it mostly when working with Java, specifically with ~Builders~. A ~Builder~ is one of the most common patterns you will see in object-oriented languages, it works to progressively build up an object, allowing for defaults.
+
+#+begin_src java
+public class EnterpriseIntegrator {
+    private String foo;
+    private String bar;
+    private String qux;
+    private String quux;
+    public EnterpriseIntegrator (
+        String foo, String bar, String qux, String quux) {
+        // ...
+    };
+    public newBuilder () {
+        return new EnterpriseIntegratorBuilder();
+    }
+}
+
+public class EnterpriseIntegratorBuilder {
+    private String foo = "foo";
+    private String bar = "bar";
+    private String qux = "qux";
+    private String quux = "quux";
+    public EnterpriseIntegratorBuilder foo (String foo) {
+        this.foo = foo;
+        return this;
+    }
+    // ...
+    public EnterpriseIntegrator build () {
+        return new EnterpriseIntegrator (
+            this.foo, this.bar, this.qux, this.quux);
+    }
+}
+#+end_src
+
+Of course, if this was Clojure we could just do this:
+
+#+begin_src clojure
+(def defaults {:foo "foo" :bar "bar" :qux "qux" :quux "quux"})
+(merge defaults {:foo "foobar" :bar "baz"})
+;; => {:foo "foobar" :bar "baz" :qux "qux" :quux "quux"}
+#+end_src
+
+But occasionally we will need to use a Java-style ~Builder~, and if writing an abstraction of this call it will be unclear at the time of calling exactly which fields will need to be set.
+
+#+begin_src clojure
+(-> (new EnterpriseIntegratorBuilder)
+    (.foo f)
+    (.bar b)
+    (.qux q)
+    (.quux qu))
+#+end_src
+
+This blows up in ones face if that functions get called by someone who wants to use the default value and doesn't want to set ~foo~, it's passed as ~nil~ and as before a ~NullPointerException~ is thrown. ~cond->~ is a threading macro that allows us to only evaluate a form if a predicate returns true, and can be used to avoid this style of error.
+
+#+begin_src clojure
+(cond-> x
+  (pred-1 foo) (.foo "foo")
+  (pred-2 foo) (.bar "bar")
+  (pred-3 foo) (.baz "baz"))
+#+end_src
+
+If the predicate returns true, the next form is used as it would be in ~->~. Unlike ~some->~, if a predicate fails the macro doesn't terminate, it just moves onto the next predicate. We can check that a variable is non-~nil~ before trying to set the field on the builder.
+
+#+begin_src clojure
+(defn ->EnterpriseIntegrator [{:keys [foo bar baz]}]
+  (cond-> (new EnterpriseIntegrator)
+    (some? foo) (.foo foo)
+    (some? bar) (.bar bar)
+    (some? baz) (.baz baz)
+    true (.build)))
+#+end_src
+
+And finally we call ~build~ to return the ~EnterpriseIntegrator~.
+
+* Other macros
+
+~->~, ~some->~, and ~cond->~ each have a matching macro, ~->>~, ~some->>~, and ~cond->>~, which inserts the threaded value as the last argument in each form. I don't find them often to be of much use.
+
+You can see Clojure's official guide on the subject [[https://clojure.org/guides/threading_macros][here]].
+
+# Footnotes
+
+[fn:perlis] "It is better to have 100 functions operate on one data structure than to have 10 functions operate on 10 data structures." — Alan Perlis, /Epigrams on Programming/
+
+[fn:chiasmus] https://en.wikipedia.org/wiki/Chiasmus
