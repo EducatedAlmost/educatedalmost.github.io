@@ -2,6 +2,7 @@
 title: "Clojure's rarer threading macros: some-> and cond->"
 date: 2021-12-09T19:43:18Z
 draft: false
+tags: [ "clojure", "java", "lisp", "programming", "software patterns" ]
 ---
 
 I use Clojure's threading macros perhaps more than I should, but I do so because they mimic the way I think about the code I write. A lisp programme is a tree and yet most of the programmes that we write are, or should be, lines of functions acting on a datastructure[fn:perlis] [fn:language-system].
