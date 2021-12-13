@@ -4,21 +4,23 @@ date: 2021-12-09T19:43:18Z
 draft: false
 ---
 
-I use Clojure's threading macros perhaps more than I should, but I do so because they mimic the way I think about the code I write. A lisp program is a tree and yet most of the programs that we write are, or should be, lines of functions acting on a datastructure[fn:perlis].
+I use Clojure's threading macros perhaps more than I should, but I do so because they mimic the way I think about the code I write. A lisp programme is a tree and yet most of the programmes that we write are, or should be, lines of functions acting on a datastructure[fn:perlis] [fn:language-system].
 
 * The value of threading macros
 
 #+begin_src clojure
 (* 3 (+ 2 (- 10 (+ 10 (/ 2 2)))))
+                         ^
 #+end_src
 
-To grok this code I should start from the bottommost leaf, in this case ~(/ 2 2)~, but it is at the far right counter to where it is natural for me to start reading. Conversely the same code written with a threading macro mirrors how we think about what the code is doing.
+To grok this code I have to start from the bottommost leaf, in this case ~(/ 2 2)~, yet it is at the line's far right contrary to where it is natural for me and most of the world[fn:r-t-l] to start reading. Conversely the same code written with a threading macro mirrors how we think about what the code is doing.
 
 #+begin_src clojure
 (-> 2 (/ 2) (+ 10) (- 10) (+ 2) (* 3))
+    ^
 #+end_src
 
-They also force the programmer into writing /simpler/ code because they just don't handle trees well.
+They also force the programmer into writing /simpler/ code because threading macros don't handle trees well.
 
 #+begin_src clojure
 (-> 2
@@ -29,7 +31,7 @@ They also force the programmer into writing /simpler/ code because they just don
     (* 3))
 #+end_src
 
-What a mess. Better to split it into two linear forms.
+What a mess. It's much better to split it into two linear forms.
 
 #+begin_src clojure
 ;; Better do this
@@ -41,7 +43,7 @@ So threading macros help make easy things simple and complex things hard[fn:chia
 
 * ~as->~
 
-[[https://clojuredocs.org/clojure.core/as-%3E][~as->~]] just allows one to use a symbol to specify where the threaded value goes in each form. It is helpful when the position in the function changes. Some Clojure functions take the datastructure as the first argument, other take a function.
+[[https://clojuredocs.org/clojure.core/as-%3E][~as->~]] allows one to use a symbol to specify where the threaded value goes in each form. It is helpful when the threaded value's position in the function's arguments changes. Some Clojure functions take the datastructure as the first argument, others take a function.
 
 #+begin_src clojure
 (as-> (db/get id) $
@@ -51,13 +53,16 @@ So threading macros help make easy things simple and complex things hard[fn:chia
 
 * ~some->~
 
-[[https://clojuredocs.org/clojure.core/some-%3E][~some->~]] works similarly to ~->~, except that evaluation of the form terminates as soon as the threaded value becomes ~nil~. It's named for [[https://clojuredocs.org/clojure.core/some_q][~some?~]] which only returns ~false~ if the arguments is ~nil~. It is, generally, unnecessary in Clojure. Why? Because Clojure's core functions, and the functions that we write, gracefully handle ~nil~.
+[[https://clojuredocs.org/clojure.core/some-%3E][~some->~]] works similarly to ~->~, except that evaluation of the form terminates as soon as the threaded value becomes ~nil~. It's named for [[https://clojuredocs.org/clojure.core/some_q][~some?~]] which only returns ~false~ if its argument is ~nil~. It is, generally, unnecessary in Clojure. Why? Because Clojure's core functions, and the functions that we write, gracefully handle ~nil~.
 
 #+begin_src clojure
 (map + nil) ; => ()
 (assoc nil :k :v) ; => {:k :v}
 (dissoc nil :k) ; => nil
 (str nil) ; => ""
+(+ nil) ; => nil
+(- nil) ; => NullPointerException,
+        ; it's not always the case
 #+end_src
 
 The same cannot be said for calling functions in Java. Try adding a value to a null ~HashMap~, or ~.toString~ on a null object, and you'll throw a ~NullPointerException~.
@@ -74,45 +79,57 @@ The same cannot be said for calling functions in Java. Try adding a value to a n
     db/save)
 #+end_src
 
-If ~db/find-by-id~ returns ~nil~, implying a missing entity, the first form will explode when it tries to ~.put~ on a ~null~ object. The second gracefully creates and saves a new entity. If we still need to deal with the Java style, we can do so by either wrapping the form in a ~try~ form, or use ~some->~.
+If ~db/find-by-id~ returns ~nil~, implying a missing entity, the first form will explode when it tries to ~.put~ on a ~null~ object. The second gracefully creates and saves a new entity. If we still need to deal with the Java method, we can do so by either wrapping the form in a ~try~ form, or use ~some->~.
 
 #+begin_src clojure
-(if-let [save-res (some-> id db/find-by-id (.put "foo" "bar") db/save)]
-  (handle-success save-res)
+(if-some [save-result (some-> id
+                              db/find-by-id
+                              (.put "foo" "bar")
+                              db/save)]
+  (handle-success save-result)
   (handle-missing-entity id))
 #+end_src
 
-When ~db/find-by-id~ returns ~nil~, ~some->~ immediately returns ~nil~ without evaluating ~.put~ or any of the further forms. Because ~nil~ is not ~true?~, we can use it to direct our control flow.
+~if-some~ is just like ~if-let~, except instead of the test failing for falsy values, it fails for ~nil~ values. Equivalently, the test passes for ~(some? test)~ instead of ~(true? test)~.
+
+When ~db/find-by-id~ returns ~nil~, ~some->~ immediately returns ~nil~ without evaluating the remaining forms of the threading macro, ~.put~ and ~db/save~. ~if-some~ then handles the case of a missing entity. Otherwise, as long as ~db/save~ returns any non-~nil~ value, it is bound to ~save-result~ and ~(handle-success save-result)~ will be called, even if the result is ~false~.
 
 * ~cond->~
 
-I have found [[https://clojuredocs.org/clojure.core/cond-%3E][~cond->~]], named for [[https://clojuredocs.org/clojure.core/cond][~cond~]], to be the biggest code-saver out of any of Clojure's rarer standard library functions. Again, I use it mostly when working with Java, specifically with ~Builders~. A ~Builder~ is one of the most common patterns you will see in object-oriented languages, it works to progressively build up an object, allowing for defaults.
+I have found [[https://clojuredocs.org/clojure.core/cond-%3E][~cond->~]], named for [[https://clojuredocs.org/clojure.core/cond][~cond~]], to be the biggest code-saver out of any of Clojure's rarer standard library functions. Again, I use it mostly when working with Java, specifically with Builders. A Builder is one of the most common patterns you will see in object-oriented languages, it works to progressively build up an object, allowing for each field to have a default value, set fields by more convoluted means[fn:builder-method], or verify fields before they are set[fn:builder-verify].
 
 #+begin_src java
 public class EnterpriseIntegrator {
+
     private String foo;
     private String bar;
     private String qux;
     private String quux;
+
     public EnterpriseIntegrator (
         String foo, String bar, String qux, String quux) {
         // ...
     };
+
     public newBuilder () {
         return new EnterpriseIntegratorBuilder();
     }
 }
 
 public class EnterpriseIntegratorBuilder {
+
     private String foo = "foo";
     private String bar = "bar";
     private String qux = "qux";
     private String quux = "quux";
+
     public EnterpriseIntegratorBuilder foo (String foo) {
         this.foo = foo;
         return this;
     }
+
     // ...
+
     public EnterpriseIntegrator build () {
         return new EnterpriseIntegrator (
             this.foo, this.bar, this.qux, this.quux);
@@ -128,7 +145,7 @@ Of course, if this was Clojure we could just do this:
 ;; => {:foo "foobar" :bar "baz" :qux "qux" :quux "quux"}
 #+end_src
 
-But occasionally we will need to use a Java-style ~Builder~, and if writing an abstraction of this call it will be unclear at the time of calling exactly which fields will need to be set.
+But occasionally we will need to use a Java-style Builder.
 
 #+begin_src clojure
 (-> (new EnterpriseIntegratorBuilder)
@@ -138,16 +155,26 @@ But occasionally we will need to use a Java-style ~Builder~, and if writing an a
     (.quux qu))
 #+end_src
 
-This blows up in ones face if that functions get called by someone who wants to use the default value and doesn't want to set ~foo~, it's passed as ~nil~ and as before a ~NullPointerException~ is thrown. ~cond->~ is a threading macro that allows us to only evaluate a form if a predicate returns true, and can be used to avoid this style of error.
+This blows up in ones face if this code get called by someone who wants to use the default value and doesn't want to set ~foo~. In that case ~f~ is ~nil~ and a ~NullPointerException~ is thrown. ~cond->~ is a threading macro that allows us to only evaluate a form if a predicate returns true, and can be used to avoid this style of error.
 
 #+begin_src clojure
 (cond-> x
-  (pred-1 foo) (.foo "foo")
-  (pred-2 foo) (.bar "bar")
-  (pred-3 foo) (.baz "baz"))
+  (pred-1 f) (.foo "foo")
+  (pred-2 b) (.bar "bar")
+  (pred-3 q) (.qux "qux"))
 #+end_src
 
-If the predicate returns true, the next form is used as it would be in ~->~. Unlike ~some->~, if a predicate fails the macro doesn't terminate, it just moves onto the next predicate. We can check that a variable is non-~nil~ before trying to set the field on the builder.
+If the predicate returns true, the next form is used as it would be in ~->~. Unlike ~some->~, if a predicate fails the macro doesn't terminate, it just moves onto the next predicate.
+
+If ~(pred-2 b)~ is the only predicate to fail, it becomes equivalent to this:
+
+#+begin_src clojure
+(-> x
+    (.foo "foo")
+    (.qux "qux"))
+#+end_src
+
+We can use this to check that a variable is non-~nil~ before trying to set the field on the Builder.
 
 #+begin_src clojure
 (defn ->EnterpriseIntegrator [{:keys [foo bar baz]}]
@@ -170,4 +197,27 @@ You can see Clojure's official guide on the subject [[https://clojure.org/guides
 
 [fn:perlis] "It is better to have 100 functions operate on one data structure than to have 10 functions operate on 10 data structures." — Alan Perlis, /Epigrams on Programming/
 
+[fn:language-system] [[https://youtu.be/ROor6_NGIWU?t=1592][The Language of the System]] by Rich Hickey, Conj 2012. Having abandoned object-oriented languages, don't recreate them in the large by building a system of components that look like objects. Instead, choose to structure your system like you structure your functional programmes, pipelines of functions.
+
+[fn:r-t-l] The major exceptions being Arabic, Hebrew, and Urdu.
+
 [fn:chiasmus] https://en.wikipedia.org/wiki/Chiasmus
+
+[fn:builder-method]
+#+begin_src java
+public EnterpriseIntegratorBuilder setCredentials (Credentials creds) {
+    this.username = creds.getUsername();
+    this.password = creds.getPassword();
+    return this;
+}
+#+end_src
+
+[fn:builder-verify]
+#+begin_src java
+public EnterpriseIntegratorBuilder setTimeoutMillis (int to) {
+    if (to > 0) {
+        this.timeoutMillis = to;
+    } // else one can use the default value or throw an exception
+    return this;
+}
+#+end_src
