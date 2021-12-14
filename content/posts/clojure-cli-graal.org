@@ -1,0 +1,146 @@
+---
+title: "Clojure CLI apps using GraalVM"
+date: 2021-12-14T18:28:42Z
+draft: true
+tags: [ "clojure", "jvm", "cli", "programming" ]
+---
+
+Clojure, like other JVM languages, excels in long-running tasks[fn:aot-vs-jit]. But I was always jealous of the languages that I'd used for scripting and command line tools which can't wait a second for a JVM to start for each invocation. Despite its slow startup time, the JVM shines at peak throughput. Some times we want one, sometimes the other. For tasks that have a very short lifetime (~1s), we need Ahead of Time compilation.
+
+* AOT vs. JIT
+
+Whatever happens, the code you write is translated to machine code that is executed on the host machine. One might think that, when compiling C, this is a single step, but it is a process from preprocessor to compiler to assembler and then linker. At the end of this, all of the machine code has been produced before the programme is run.
+
+** JIT
+
+Not so with Java and JVM languages. When one '/compiles/' a JVM project, say by calling ~javac~, one produces bytecode — not machine code. When the programme is run and the JVM is started, the JVM does the work of compiling its bytecode into machine code on an /ad hoc/ basis as methods are called, hence the name /just-in-time/ compilation[fn:mccarthy].
+
+JIT has its benefits. It can make optimisations because it knows exactly the machine it is compiling for, whereas with C the build machine will likely be different from the machine the code runs on. The JVM also has the ability to profile the code as it runs and make optimisations based on how the code is actually used. Say in the code there is are reference to ~foo.bar(false, n)~ and ~foo.bar(true, n)~ but as the code is run it the latter is called millions of times more often than the former. JIT compilation can see this and optimise calls to ~foo.bar~ where the first argument is ~true~. This is the sort of information that is not available when compiling beforehand.
+
+** AOT
+
+Perhaps. by now, you have guessed that the alternative is /ahead-of-time/ compilation. Compiling ahead of time, there is no need for a JVM to run, and thus no profiling and no /ad hoc/ compilation. The result is a programme that starts instantly and with a /much/ smaller memory footprint (~\times10).
+
+For two decades, there was no other way to run JVM languages except on the JVM by way of JIT. But now, with the release of [[https://www.graalvm.org/][GraalVM]] in 2019, we can now compile our JVM programmes via AOT, straight to machine code.
+
+* GraalVM
+
+GraalVM, from the Old French /graal/ meaning /grail/, is an Oracle project comprising:
+- GraalVM Compiler, JIT compiler for Java
+- GraalVM Native Image, AOT compiler for Java
+- Truffle Language Implementation Framework, specification for running other languages on GraalVM
+- LLVM and Javascript runtimes
+
+We're interested in the AOT compiler. First we need a copy of GraalVM; go to https://www.graalvm.org/downloads/ and download the appropriate package, or if using Arch one install it from the [[https://aur.archlinux.org/packages/native-image-jdk11-bin/][AUR]].
+
+From wherever you install external binaries (~/usr/bin~, ~~/bin~), extract the archive and set an environment variable
+
+#+begin_src
+tar -xzvf ~/dl/graalvm-ce-java11-linux-amd64-21.3.0.tar.gz
+export GRAALVM_HOME=~/bin/graalvm-ce-java11-21.3.0
+#+end_src
+
+This might not add Graal's executables to your PATH, but they can be run using ~$GRAALVM_HOME/bin/...~ etc.. If you encounter permissions issues, you might have to run ~chmod +x <executable>~ for the file to be able to be executed.
+
+** /Hello Graal/
+
+I keep all my source code in ~~/src~, make changes to the commands for your system. These commands create a new Clojure project.
+
+#+begin_src bash
+mkdir -p ~/src/hello-graal/src/hello_graal
+cd ~/src/hello-graal
+touch ./src/hello_graal/main.clj
+#+end_src
+
+And in ~main.clj~ create this very simple /Hello World/ application.
+
+#+begin_src clojure
+(ns hello-graal.main
+  (:gen-class))
+
+(defn -main [& _args]
+  (println "Hello Graal!"))
+#+end_src
+
+We can use Clojure's ~compile~ to compile the namespace into classfiles, as one would with ~javac~. The bytecode in the classfiles would normally be used by the JVM, but we will use them with Graal's ~native-image~ to produce an executable binary. Graal doesn't explicitly support Clojure, but once Clojure is compiled to bytecode it is just the same as any other JVM language, including Java.
+
+#+begin_src
+mkdir classes
+clojure -M -e "(compile 'hello-graal.main)"
+#+end_src
+
+We can write a script, ~compile~, that contains the call to Graal's ~native-image~.
+
+#+begin_src bash
+#!/usr/bin/env bash
+
+if [ -z "$GRAALVM_HOME" ]; then
+    echo 'Please set GRAALVM_HOME'
+    exit 1
+fi
+
+mkdir classes
+clojure -M -e "(compile 'hello-graal.main)"
+
+# Ensure Graal native-image program is installed
+"$GRAALVM_HOME/bin/gu" install native-image
+
+"$GRAALVM_HOME/bin/native-image" \
+    -cp "$(clojure -Spath):classes" \
+    -H:Name=hello-graal \
+    -H:+ReportExceptionStackTraces \
+    --initialize-at-build-time  \
+    --verbose \
+    --no-fallback \
+    --no-server \
+    "-J-Xmx3g" \
+    hello_graal.main
+#+end_src
+
+When this script is run it produces an executable, ~hello-graal~. Give it a try!
+
+#+begin_src
+chmod +x compile
+./compile
+./hello-graal
+#+end_src
+
+** Next steps
+
+This is a subject I'd like to return to. I see great promise for the role of Clojure in creating native applications. It's already being used by [[https://github.com/babashka/babashka][Babashka]], [[https://github.com/clojure-lsp/clojure-lsp][clojure-lsp]], and [[https://github.com/clj-kondo/clj-kondo][clj-kondo]], three tools I use on a daily basis.
+
+Our next steps might be to add the ability to add command-line options and arguments using [[https://github.com/clojure/tools.cli][tools.cli]]. And we can read from ~stdin~ using ~(new java.io.BufferedReader *in*)~.
+
+#+begin_src clojure
+(ns hello-graal.main
+  (:require [clojure.tools.cli :as cli]))
+
+(def cli-options
+  [["-v" "--verbose" "Verbosity"]])
+
+(defn -main [& args]
+  (let [opts (cli/parse-opts args cli-options)]
+    (doseq [ln (line-seq (new java.io.BufferedReader *in*))]
+      ;; Use a line from input.
+      )))
+#+end_src
+
+In part two I will show how to replicate some of the functionality of clj-kondo, and then implement some missing features.
+
+[fn:aot-vs-jit] [[https://www.youtube.com/watch?v=PeMvksAZbdw&t=647s][Maximising Java Application Performance with GraalVM]] by Oleg Šelajev at GOTO 2020.
+
+[fn:mccarthy]
+The earliest possible mention of JIT I know of is from John McCarthy of Lisp fame:
+#+begin_quote
+The programmer may have selected S-functions compiled into machine
+language programs put into the core memory. Values of compiled functions
+are computed about 60 times as fast as they would if interpreted. Compilation
+is fast enough so that it is not necessary to punch compiled program for future
+use.
+#+end_quote
+— [[http://www-formal.stanford.edu/jmc/recursive.pdf][Recursive Functions of Symbolic Expressions and Their Computation by Machine, Part I, 1960]]
+
+#+begin_quote
+Instead, we suspect that the earliest published work on JIT compilation was McCarthy’s [1960] LISP paper. He men- tioned compilation of functions into ma- chine language, a process fast enough that the compiler’s output needn’t be saved. This can be seen as an inevitable result of having programs and data share the same notation [McCarthy 1981].
+#+end_quote
+— [[https://www.eecs.ucf.edu/~dcm/Teaching/COT4810-Spring2011/Literature/JustInTimeCompilation.pdf][John Aycock, 2003]]
