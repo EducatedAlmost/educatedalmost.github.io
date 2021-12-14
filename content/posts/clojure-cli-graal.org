@@ -107,7 +107,7 @@ chmod +x compile
 
 ** Next steps
 
-This is a subject I'd like to return to. I see great promise for the role of Clojure in creating native applications. It's already being used by [[https://github.com/babashka/babashka][Babashka]], [[https://github.com/clojure-lsp/clojure-lsp][clojure-lsp]], and [[https://github.com/clj-kondo/clj-kondo][clj-kondo]], three tools I use on a daily basis.
+This is a subject I'd like to return to. I see great promise for the role of Clojure in creating native applications. Graal's already being used by [[https://github.com/babashka/babashka][Babashka]], [[https://github.com/clojure-lsp/clojure-lsp][clojure-lsp]], and [[https://github.com/clj-kondo/clj-kondo][clj-kondo]], three tools I use on a daily basis.
 
 Our next steps might be to add the ability to add command-line options and arguments using [[https://github.com/clojure/tools.cli][tools.cli]]. And we can read from ~stdin~ using ~(new java.io.BufferedReader *in*)~.
 
