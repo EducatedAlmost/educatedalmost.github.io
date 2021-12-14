@@ -1,6 +1,6 @@
 ---
 title: "An 8-year-old Clojure bug, resorting to Java"
-date: 2021-12-08T15:26:12Z
+date: 2021-12-01T15:26:12Z
 draft: false
 summary: "Dodge a Clojure bug by using Java and tools.build"
 tags: [ "clojure", "java", "jvm", "programming", "type systems" ]

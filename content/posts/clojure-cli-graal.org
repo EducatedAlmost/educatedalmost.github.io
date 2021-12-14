@@ -15,25 +15,25 @@ Whatever happens, the code you write is translated to machine code that is execu
 
 Not so with Java and JVM languages. When one '/compiles/' a JVM project, say by calling ~javac~, one produces bytecode — not machine code. When the programme is run and the JVM is started, the JVM does the work of compiling its bytecode into machine code on an /ad hoc/ basis as methods are called, hence the name /just-in-time/ compilation[fn:mccarthy].
 
-JIT has its benefits. It can make optimisations because it knows exactly the machine it is compiling for, whereas with C the build machine will likely be different from the machine the code runs on. The JVM also has the ability to profile the code as it runs and make optimisations based on how the code is actually used. Say in the code there is are reference to ~foo.bar(false, n)~ and ~foo.bar(true, n)~ but as the code is run it the latter is called millions of times more often than the former. JIT compilation can see this and optimise calls to ~foo.bar~ where the first argument is ~true~. This is the sort of information that is not available when compiling beforehand.
+JIT has its benefits. It can make optimisations because it knows exactly the machine it is compiling for, whereas with C the build machine will likely be different from the machine the code runs on. The JVM also has the ability to profile the code as it runs and make optimisations based on how the code is actually used. Say in the code there is are references to ~foo.bar(false, n)~ and ~foo.bar(true, n)~ but as the code is run the latter is called millions of times more often than the former. JIT compilation can see this and optimise calls to ~foo.bar~ where the first argument is ~true~. This is the sort of information that is not available when compiling beforehand.
 
 ** AOT
 
-Perhaps. by now, you have guessed that the alternative is /ahead-of-time/ compilation. Compiling ahead of time, there is no need for a JVM to run, and thus no profiling and no /ad hoc/ compilation. The result is a programme that starts instantly and with a /much/ smaller memory footprint (~\times10).
+Perhaps, by now, you have guessed that the alternative is /ahead-of-time/ compilation. Compiling ahead of time, there is no need for a JVM to run, and thus no profiling and no /ad hoc/ compilation. The result is a programme that starts instantly and with a /much/ smaller memory footprint (~\times10).
 
 For two decades, there was no other way to run JVM languages except on the JVM by way of JIT. But now, with the release of [[https://www.graalvm.org/][GraalVM]] in 2019, we can now compile our JVM programmes via AOT, straight to machine code.
 
 * GraalVM
 
 GraalVM, from the Old French /graal/ meaning /grail/, is an Oracle project comprising:
-- GraalVM Compiler, JIT compiler for Java
-- GraalVM Native Image, AOT compiler for Java
-- Truffle Language Implementation Framework, specification for running other languages on GraalVM
+- GraalVM Compiler, a JIT compiler for Java
+- GraalVM Native Image, a AOT compiler for Java
+- Truffle Language Implementation Framework, a specification for running other languages on GraalVM
 - LLVM and Javascript runtimes
 
 We're interested in the AOT compiler. First we need a copy of GraalVM; go to https://www.graalvm.org/downloads/ and download the appropriate package, or if using Arch one install it from the [[https://aur.archlinux.org/packages/native-image-jdk11-bin/][AUR]].
 
-From wherever you install external binaries (~/usr/bin~, ~~/bin~), extract the archive and set an environment variable
+From wherever you install external binaries (~/usr/bin~, ~~/bin~), extract the archive and set its location as an environment variable:
 
 #+begin_src
 tar -xzvf ~/dl/graalvm-ce-java11-linux-amd64-21.3.0.tar.gz
