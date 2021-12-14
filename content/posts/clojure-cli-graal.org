@@ -1,7 +1,7 @@
 ---
 title: "Clojure CLI apps using GraalVM"
 date: 2021-12-14T18:28:42Z
-draft: true
+draft: false
 tags: [ "clojure", "jvm", "cli", "programming" ]
 ---
 
