@@ -35,11 +35,11 @@ The first breakthrough came when I realised I could make certain parts of my Ema
 
 This has its limitations. It doesn't work for any programme that doesn't use a programming language to define its configuration, excluding just about anything that doesn't use Lisp, Vimscript, Lua, or shell scripts.
 
-To my knowledge, there is no reliable way to have /toml/, /json/, or /yaml/ files perform variable substitution or read conditionals. The closest I came was to use Bash to write the machine-specific configuration in ~~/.bash_profile~ when it was run by the login shell.
+To my knowledge, there is no reliable way to have /toml/, /json/, or /yaml/ files perform variable substitution or read conditionals. The closest I came was to use Bash to write the machine-specific configuration in ~~/.bash_profile~[fn:profile] when it was run by the login shell[fn:host].
 
 #+begin_src sh
 DOT=$HOME/.dotfiles
-CUSTOM=$DOT/i3/.i3/config.$(hostname)
+CUSTOM=$DOT/i3/.i3/config.$HOSTNAME
 DEFAULT=$DOT/i3/.i3/config.default
 if [[ -f "$CUSTOM" ]]; then
 	cat $CUSTOM > $DOT/i3/.i3/config
@@ -58,8 +58,8 @@ Instead of appending, Isogeny uses substitution points in a template, which migh
 ...
 Font size: {{ font.size }}
 Font family: {{ font.family }}
-Hosts: {% for host in hosts %}
-  Host: {{ host }} {% endfor %}
+Ports: {% for port in ports %}
+  Port: {{ port }} {% endfor %}
 ...
 #+end_src
 
@@ -68,10 +68,10 @@ The values of the variables is provided by a /context/ in an EDN file.
 #+begin_src clojure
 {:font {:size 12
         :family "Fira mono"}
- :hosts ["127.0.0.1" "localhost"]}
+ :ports [3355 3356]}
 #+end_src
 
-The user should keep a different context for each machine. They can be named something like ~programme.<HOSTNAME>.edn~ so that the correct context can easily be picked using ~programme.$HOSTNAME.edn~.
+The user should keep a different context for each machine. They can be named something like ~programme.<HOSTNAME>.edn~ so that the correct context can easily be picked using ~programme.$HOSTNAME.edn~[fn:host].
 
 The final result should be the rendered file in the correct position to be used by its programme.
 
@@ -79,9 +79,9 @@ The final result should be the rendered file in the correct position to be used 
 ...
 Font size: 12
 Font family: Fira mono
-Hosts:
-  Host: 127.0.0.1
-  Host: localhost
+Ports:
+  Port: 3355
+  Port: 3356
 ...
 #+end_src
 
@@ -96,27 +96,41 @@ Calls to Isogeny look like so:
 
 The default context provides for a fallback should the specific context be missing, something that is useful when something has been misconfigured or when using a new machine. It can be inconvenient to have a display manager or window manager fail to launch.
 
+Isogeny can help you prepare your config for use with Isogeny, it leaves the current config in place.
+
+#+begin_src sh
+./isogeny.clj --prepare ~/path/to/config
+# => ~/path/to/config.template, a copy of current config
+# => ~/path/to/config.<HOSTNAME>.edn, an empty context to edit
+#+end_src
+
 In the couple of days since I wrote the first working version of Isogeny, I have had great fun coming up with new functionality and seeing just how quickly I could implement it. These include:
 - ~--add-tags~ :: add custom tags to the renderer
 - ~--strict~ :: fail when a value is missing
 - ~--context-string~ :: provide context as a CLI option that overrides values in the file
 - ~--deep-merge~ ::  use deep-merge rather than merge when overriding
 - ~--verbose~ ::  provide detailed logging
+- ~--safe~ :: will not edit or overwrite existing files
 - ~--multi-template~ :: render multiple templates with a single call to Isogeny
+- ~--prepare~ :: prepare config to be used with Isogeny
 
 With these added features, I think that Isogeny fits the use cases of almost everyone conscious of configuration. Now my configuration setup looks like this, run on login:
 
 #+begin_src sh
-./isogeny.clj --multi-template \
+~/bin/isogeny.clj --multi-template \
     -c ~/.dotfiles/isogeny/context.$HOSTNAME.edn \
     -d ~/.dotfiles/isogeny/context.default.edn \
     --strict --verbose --deep-merge \
     ~/.config/sway/config.template \
     ~/.config/alacritty/alacritty.yml.template \
-    ~/.config/dunst/dunstrc \
-    ~/.config/gammastep/config.ini
+    ~/.config/dunst/dunstrc.template \
+    ~/.config/gammastep/config.ini.template
 #+end_src
 
 And with that, all my files are configured to this machine. Please, give it a [[https://github.com/educatedalmost/isogeny][try]], submit issues and feature requests, and keep your configuration in good order.
 
 [fn:selmer] Isogeny owes a great debt to [[https://github.com/yogthos/Selmer][Selmer]], the work of Yogthos.
+
+[fn:profile] On some systems, it is ~~/.profile~ that is sourced on login, not ~~/.bash_profile~.
+
+[fn:host] ~HOSTNAME~ is available in Bash, ~HOST~ in Zsh, or just use ~$(uname -n)~.
