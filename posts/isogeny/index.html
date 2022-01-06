@@ -1,0 +1,346 @@
+<!doctype html><html lang=en dir=auto>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
+<meta name=robots content="index, follow">
+<title>æ/Isogeny | blog.AlmostEducated</title>
+<meta name=keywords content="programming,sysadmin,clojure">
+<meta name=description content="Isogeny makes all configuration dynamic.">
+<meta name=author content="AlmostEducated">
+<link rel=canonical href=http://blog.almost.education/posts/isogeny/>
+<link crossorigin=anonymous href=/assets/css/stylesheet.min.58a033c0c7916fad77c5dfdffb45992d585075aa3bd3fd9fed09e7daf663c82b.css integrity="sha256-WKAzwMeRb613xd/f+0WZLVhQdao70/2f7Qnn2vZjyCs=" rel="preload stylesheet" as=style>
+<link rel=preload href=/img/ae-logo-trans.png as=image>
+<script defer crossorigin=anonymous src=/assets/js/highlight.min.f5a1b978a132c6aeb40625c357309394e91f4bd93496f86730204de5630b035b.js integrity="sha256-9aG5eKEyxq60BiXDVzCTlOkfS9k0lvhnMCBN5WMLA1s=" onload=hljs.initHighlightingOnLoad()></script>
+<link rel=icon href=http://blog.almost.education/img/ae-logo-trans.png>
+<link rel=icon type=image/png sizes=16x16 href=http://blog.almost.education/favicon-16x16.png>
+<link rel=icon type=image/png sizes=32x32 href=http://blog.almost.education/favicon-32x32.png>
+<link rel=apple-touch-icon href=http://blog.almost.education/img/ae-logo-trans.png>
+<link rel=mask-icon href=http://blog.almost.education/safari-pinned-tab.svg>
+<meta name=theme-color content="#2e2e33">
+<meta name=msapplication-TileColor content="#2e2e33">
+<meta name=generator content="Hugo 0.91.2">
+<noscript>
+<style>#theme-toggle,.top-link{display:none}</style>
+</noscript>
+<script type=text/javascript async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=default"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-15THDLZMKJ"></script>
+<script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-15THDLZMKJ',{anonymize_ip:!1})}</script>
+<meta property="og:title" content="æ/Isogeny">
+<meta property="og:description" content="Isogeny makes all configuration dynamic.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.almost.education/posts/isogeny/"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2022-01-05T21:32:01+00:00">
+<meta property="article:modified_time" content="2022-01-05T21:32:01+00:00">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="æ/Isogeny">
+<meta name=twitter:description content="Isogeny makes all configuration dynamic.">
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":2,"name":"Posts","item":"http://blog.almost.education/posts/"},{"@type":"ListItem","position":3,"name":"æ/Isogeny","item":"http://blog.almost.education/posts/isogeny/"}]}</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"æ/Isogeny","name":"æ\/Isogeny","description":"Isogeny makes all configuration dynamic.","keywords":["programming","sysadmin","clojure"],"articleBody":" Read the code: Isogeny\n At any one time I have at least four machines running Linux: a desktop, a laptop, a server, and a phone. Keeping the configuration for the four systems in line can be a challenge — for some programmes it will be the same for all machines, and for others there will be almost nothing in common between the server and phone.\n In my most naïve approach, I kept a single file in version control and made edits to the working copy without committing them, but this is unable to receive changes from upstream. Next I kept a separate file for each machine, but this meant keeping four files perfectly just out-of-sync, and programmes often had difficulty knowing which config file to use.\n The first breakthrough came when I realised I could make certain parts of my Emacs configuration dynamic:\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16  (setq settings '((\"phobos\" . ((mono-font-size . 20) (var-font-size . 28))) (\"luna\" . ((mono-font-size . 20) (var-font-size . 28))) (\"europa\" . ((mono-font-size . 18) (var-font-size . 24))) (\"ceres\" . ((mono-font-size . 10) (var-font-size . 12))))) (defun fetch-setting (setting) (cdr (assoc setting (cdr (assoc system-name settings))))) (setq doom-font (font-spec :family \"Fira code\" :size (fetch-setting 'mono-font-size)))     This has its limitations. It doesn't work for any programme that doesn't use a programming language to define its configuration, excluding just about anything that doesn't use Lisp, Vimscript, Lua, or shell scripts.\n To my knowledge, there is no reliable way to have toml, json, or yaml files perform variable substitution or read conditionals. The closest I came was to use Bash to write the machine-specific configuration in ~/.bash_profile when it was run by the login shell.\n1 2 3 4 5 6 7 8  DOT=$HOME/.dotfiles CUSTOM=$DOT/i3/.i3/config.$(hostname) DEFAULT=$DOT/i3/.i3/config.default if [[ -f \"$CUSTOM\" ]]; then cat $CUSTOM  $DOT/i3/.i3/config else cat $DEFAULT  $DOT/i3/.i3/config fi     I was initially hopeful that I could use the machine-specific configuration just to append to a larger, shared configuration, but it was not to be. The files don't always allow their section to be moved around on a whim, and moving a line into machine-specific configuration required one to remember to do the same for every machine. It also adds a huge amount of cruft to ~/.bash_profile, when I keep configuration for ~20 programmes this means ~150 lines of ifs and elses cluttering what should be a simple file.\n Here I got the idea for Isogeny. It does the work at the same moment, but in a Clojure script and using the brilliant Selmer1 template rendering library.\n Instead of appending, Isogeny uses substitution points in a template, which might be familiar to anyone who has used templates in front-end development.\n1 2 3 4 5 6  ... Font size: {{ font.size }} Font family: {{ font.family }} Hosts: {% for host in hosts %} Host: {{ host }} {% endfor %} ...     The values of the variables is provided by a context in an EDN file.\n1 2 3  {:font {:size 12 :family \"Fira mono\"} :hosts [\"127.0.0.1\" \"localhost\"]}     The user should keep a different context for each machine. They can be named something like programme..edn so that the correct context can easily be picked using programme.$HOSTNAME.edn.\n The final result should be the rendered file in the correct position to be used by its programme.\n1 2 3 4 5 6 7  ... Font size: 12 Font family: Fira mono Hosts: Host: 127.0.0.1 Host: localhost ...     Calls to Isogeny look like so:\n1 2 3 4  ./isogeny.clj -t foo.template \\  -c foo.context.specific.edn \\  -d foo.context.default.edn \\  -o foo.config     The default context provides for a fallback should the specific context be missing, something that is useful when something has been misconfigured or when using a new machine. It can be inconvenient to have a display manager or window manager fail to launch.\n In the couple of days since I wrote the first working version of Isogeny, I have had great fun coming up with new functionality and seeing just how quickly I could implement it. These include:\n  --add-tags   add custom tags to the renderer\n  --strict   fail when a value is missing\n  --context-string   provide context as a CLI option that overrides values in the file\n  --deep-merge   use deep-merge rather than merge when overriding\n  --verbose   provide detailed logging\n  --multi-template   render multiple templates with a single call to Isogeny\n  With these added features, I think that Isogeny fits the use cases of almost everyone conscious of configuration. Now my configuration setup looks like this, run on login:\n1 2 3 4 5 6 7 8  ./isogeny.clj --multi-template \\  -c ~/.dotfiles/isogeny/context.$HOSTNAME.edn \\  -d ~/.dotfiles/isogeny/context.default.edn \\  --strict --verbose --deep-merge \\  ~/.config/sway/config.template \\  ~/.config/alacritty/alacritty.yml.template \\  ~/.config/dunst/dunstrc \\  ~/.config/gammastep/config.ini     And with that, all my files are configured to this machine. Please, give it a try, submit issues and feature requests, and keep your configuration in good order.\n1 Isogeny owes a great debt to Selmer, the work of Yogthos.\n    ","wordCount":"826","inLanguage":"en","datePublished":"2022-01-05T21:32:01Z","dateModified":"2022-01-05T21:32:01Z","author":{"@type":"Person","name":"AlmostEducated"},"mainEntityOfPage":{"@type":"WebPage","@id":"http://blog.almost.education/posts/isogeny/"},"publisher":{"@type":"Organization","name":"blog.AlmostEducated","logo":{"@type":"ImageObject","url":"http://blog.almost.education/img/ae-logo-trans.png"}}}</script>
+</head>
+<body class=dark id=top>
+<script>localStorage.getItem("pref-theme")==="light"&&document.body.classList.remove('dark')</script>
+<header class=header>
+<nav class=nav>
+<div class=logo>
+<a href=http://blog.almost.education accesskey=h title="blog.AlmostEducated (Alt + H)">
+<img src=/img/ae-logo-trans.png alt=logo aria-label=logo height=" 30px">blog.AlmostEducated</a>
+<span class=logo-switches>
+<button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</button>
+</span>
+</div>
+<ul id=menu>
+<li>
+<a href=http://blog.almost.education/tags/ title=tags>
+<span>tags</span>
+</a>
+</li>
+</ul>
+</nav>
+</header>
+<main class=main>
+<article class=post-single>
+<header class=post-header>
+<h1 class=post-title>
+æ/Isogeny
+</h1>
+<div class=post-meta>2022—01—05 Wed&nbsp;·&nbsp;AlmostEducated
+</div>
+<ul class=post-tags>
+<li><a href=http://blog.almost.education/tags/programming/>programming</a></li>
+<li><a href=http://blog.almost.education/tags/sysadmin/>sysadmin</a></li>
+<li><a href=http://blog.almost.education/tags/clojure/>clojure</a></li>
+</ul>
+</header>
+<div class=post-content><p>
+Read the code: <a href=https://github.com/educatedalmost/isogeny>Isogeny</a></p>
+<p>
+At any one time I have at least four machines running Linux: a desktop, a laptop, a server, and a phone. Keeping the <a href=https://github.com/EducatedAlmost/.dotfiles>configuration</a> for the four systems in line can be a challenge — for some programmes it will be the same for all machines, and for others there will be almost nothing in common between the server and phone.</p>
+<p>
+In my most naïve approach, I kept a single file in version control and made edits to the working copy without committing them, but this is unable to receive changes from upstream. Next I kept a separate file for each machine, but this meant keeping four files perfectly just out-of-sync, and programmes often had difficulty knowing which config file to use.</p>
+<p>
+The first breakthrough came when I realised I could make certain parts of my Emacs configuration dynamic:</p>
+<div class="src src-lisp">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-lisp data-lang=lisp><span class=p>(</span><span class=k>setq</span> <span class=nv>settings</span>
+      <span class=o>&#39;</span><span class=p>((</span><span class=s>&#34;phobos&#34;</span> <span class=o>.</span> <span class=p>((</span><span class=nv>mono-font-size</span> <span class=o>.</span> <span class=mi>20</span><span class=p>)</span>
+                     <span class=p>(</span><span class=nv>var-font-size</span> <span class=o>.</span> <span class=mi>28</span><span class=p>)))</span>
+        <span class=p>(</span><span class=s>&#34;luna&#34;</span> <span class=o>.</span> <span class=p>((</span><span class=nv>mono-font-size</span> <span class=o>.</span> <span class=mi>20</span><span class=p>)</span>
+                     <span class=p>(</span><span class=nv>var-font-size</span> <span class=o>.</span> <span class=mi>28</span><span class=p>)))</span>
+        <span class=p>(</span><span class=s>&#34;europa&#34;</span> <span class=o>.</span> <span class=p>((</span><span class=nv>mono-font-size</span> <span class=o>.</span> <span class=mi>18</span><span class=p>)</span>
+                     <span class=p>(</span><span class=nv>var-font-size</span> <span class=o>.</span> <span class=mi>24</span><span class=p>)))</span>
+        <span class=p>(</span><span class=s>&#34;ceres&#34;</span> <span class=o>.</span> <span class=p>((</span><span class=nv>mono-font-size</span> <span class=o>.</span> <span class=mi>10</span><span class=p>)</span>
+                     <span class=p>(</span><span class=nv>var-font-size</span> <span class=o>.</span> <span class=mi>12</span><span class=p>)))))</span>
+
+<span class=p>(</span><span class=nb>defun</span> <span class=nv>fetch-setting</span> <span class=p>(</span><span class=nv>setting</span><span class=p>)</span>
+  <span class=p>(</span><span class=nf>cdr</span> <span class=p>(</span><span class=nf>assoc</span> <span class=nv>setting</span>
+              <span class=p>(</span><span class=nf>cdr</span> <span class=p>(</span><span class=nf>assoc</span> <span class=nv>system-name</span> <span class=nv>settings</span><span class=p>)))))</span>
+
+<span class=p>(</span><span class=k>setq</span> <span class=nv>doom-font</span> <span class=p>(</span><span class=nv>font-spec</span> <span class=ss>:family</span> <span class=s>&#34;Fira code&#34;</span>
+                           <span class=ss>:size</span> <span class=p>(</span><span class=nv>fetch-setting</span> <span class=ss>&#39;mono-font-size</span><span class=p>)))</span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<p>
+This has its limitations. It doesn't work for any programme that doesn't use a programming language to define its configuration, excluding just about anything that doesn't use Lisp, Vimscript, Lua, or shell scripts.</p>
+<p>
+To my knowledge, there is no reliable way to have <em>toml</em>, <em>json</em>, or <em>yaml</em> files perform variable substitution or read conditionals. The closest I came was to use Bash to write the machine-specific configuration in <code>~/.bash_profile</code> when it was run by the login shell.</p>
+<div class="src src-sh">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=nv>DOT</span><span class=o>=</span><span class=nv>$HOME</span>/.dotfiles
+<span class=nv>CUSTOM</span><span class=o>=</span><span class=nv>$DOT</span>/i3/.i3/config.<span class=k>$(</span>hostname<span class=k>)</span>
+<span class=nv>DEFAULT</span><span class=o>=</span><span class=nv>$DOT</span>/i3/.i3/config.default
+<span class=k>if</span> <span class=o>[[</span> -f <span class=s2>&#34;</span><span class=nv>$CUSTOM</span><span class=s2>&#34;</span> <span class=o>]]</span><span class=p>;</span> <span class=k>then</span>
+	cat <span class=nv>$CUSTOM</span> &gt; <span class=nv>$DOT</span>/i3/.i3/config
+<span class=k>else</span>
+	cat <span class=nv>$DEFAULT</span> &gt; <span class=nv>$DOT</span>/i3/.i3/config
+<span class=k>fi</span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<p>
+I was initially hopeful that I could use the machine-specific configuration just to append to a larger, shared configuration, but it was not to be. The files don't always allow their section to be moved around on a whim, and moving a line into machine-specific configuration required one to remember to do the same for every machine. It also adds a huge amount of cruft to <code>~/.bash_profile</code>, when I keep configuration for ~20 programmes this means ~150 lines of ifs and elses cluttering what should be a simple file.</p>
+<p>
+Here I got the idea for Isogeny. It does the work at the same moment, but in a Clojure script and using the brilliant Selmer<sup class=footnote-reference><a id=footnote-reference-1 href=#footnote-1>1</a></sup> template rendering library.</p>
+<p>
+Instead of appending, Isogeny uses substitution points in a template, which might be familiar to anyone who has used templates in front-end development.</p>
+<div class="src src-text">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-text data-lang=text>...
+Font size: {{ font.size }}
+Font family: {{ font.family }}
+Hosts: {% for host in hosts %}
+  Host: {{ host }} {% endfor %}
+...</code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<p>
+The values of the variables is provided by a <em>context</em> in an EDN file.</p>
+<div class="src src-clojure">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-clojure data-lang=clojure><span class=p>{</span><span class=ss>:font</span> <span class=p>{</span><span class=ss>:size</span> <span class=mi>12</span>
+        <span class=ss>:family</span> <span class=s>&#34;Fira mono&#34;</span><span class=p>}</span>
+ <span class=ss>:hosts</span> <span class=p>[</span><span class=s>&#34;127.0.0.1&#34;</span> <span class=s>&#34;localhost&#34;</span><span class=p>]}</span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<p>
+The user should keep a different context for each machine. They can be named something like <code>programme.&lt;HOSTNAME>.edn</code> so that the correct context can easily be picked using <code>programme.$HOSTNAME.edn</code>.</p>
+<p>
+The final result should be the rendered file in the correct position to be used by its programme.</p>
+<div class="src src-text">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-text data-lang=text>...
+Font size: 12
+Font family: Fira mono
+Hosts:
+  Host: 127.0.0.1
+  Host: localhost
+...</code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<p>
+Calls to Isogeny look like so:</p>
+<div class="src src-sh">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-sh data-lang=sh>./isogeny.clj -t foo.template <span class=se>\
+</span><span class=se></span>    -c foo.context.specific.edn <span class=se>\
+</span><span class=se></span>    -d foo.context.default.edn <span class=se>\
+</span><span class=se></span>    -o foo.config</code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<p>
+The default context provides for a fallback should the specific context be missing, something that is useful when something has been misconfigured or when using a new machine. It can be inconvenient to have a display manager or window manager fail to launch.</p>
+<p>
+In the couple of days since I wrote the first working version of Isogeny, I have had great fun coming up with new functionality and seeing just how quickly I could implement it. These include:</p>
+<dl>
+<dt>
+<code>--add-tags</code>
+</dt>
+<dd>
+<p>add custom tags to the renderer</p>
+</dd>
+<dt>
+<code>--strict</code>
+</dt>
+<dd>
+<p>fail when a value is missing</p>
+</dd>
+<dt>
+<code>--context-string</code>
+</dt>
+<dd>
+<p>provide context as a CLI option that overrides values in the file</p>
+</dd>
+<dt>
+<code>--deep-merge</code>
+</dt>
+<dd>
+<p>use deep-merge rather than merge when overriding</p>
+</dd>
+<dt>
+<code>--verbose</code>
+</dt>
+<dd>
+<p>provide detailed logging</p>
+</dd>
+<dt>
+<code>--multi-template</code>
+</dt>
+<dd>
+<p>render multiple templates with a single call to Isogeny</p>
+</dd>
+</dl>
+<p>With these added features, I think that Isogeny fits the use cases of almost everyone conscious of configuration. Now my configuration setup looks like this, run on login:</p>
+<div class="src src-sh">
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-sh data-lang=sh>./isogeny.clj --multi-template <span class=se>\
+</span><span class=se></span>    -c ~/.dotfiles/isogeny/context.<span class=nv>$HOSTNAME</span>.edn <span class=se>\
+</span><span class=se></span>    -d ~/.dotfiles/isogeny/context.default.edn <span class=se>\
+</span><span class=se></span>    --strict --verbose --deep-merge <span class=se>\
+</span><span class=se></span>    ~/.config/sway/config.template <span class=se>\
+</span><span class=se></span>    ~/.config/alacritty/alacritty.yml.template <span class=se>\
+</span><span class=se></span>    ~/.config/dunst/dunstrc <span class=se>\
+</span><span class=se></span>    ~/.config/gammastep/config.ini</code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<p>
+And with that, all my files are configured to this machine. Please, give it a <a href=https://github.com/educatedalmost/isogeny>try</a>, submit issues and feature requests, and keep your configuration in good order.</p>
+<div class=footnotes>
+<hr class=footnotes-separatator>
+<div class=footnote-definitions>
+<div class=footnote-definition>
+<sup id=footnote-1><a href=#footnote-reference-1>1</a></sup>
+<div class=footnote-body>
+<p>Isogeny owes a great debt to <a href=https://github.com/yogthos/Selmer>Selmer</a>, the work of Yogthos.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<footer class=post-footer>
+<ul class=post-tags>
+<li><a href=http://blog.almost.education/tags/programming/>programming</a></li>
+<li><a href=http://blog.almost.education/tags/sysadmin/>sysadmin</a></li>
+<li><a href=http://blog.almost.education/tags/clojure/>clojure</a></li>
+</ul>
+</footer><div id=disqus_thread>
+</div>
+<script>(function(){var a=document,b=a.createElement('script');b.src='https://blog-almost-education.disqus.com/embed.js',b.setAttribute('data-timestamp',+new Date),(a.head||a.body).appendChild(b)})()</script>
+<noscript>
+Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a>
+</noscript>
+</article>
+</main>
+<footer class=footer>
+<span>&copy; 2022 <a href=http://blog.almost.education>blog.AlmostEducated</a></span>
+<span>
+Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+        <a href=https://git.io/hugopapermod rel=noopener target=_blank>PaperMod</a>
+</span>
+</footer>
+<a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg>
+</a>
+<script>let menu=document.getElementById('menu');menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)},document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener("click",function(b){b.preventDefault();var a=this.getAttribute("href").substr(1);window.matchMedia('(prefers-reduced-motion: reduce)').matches?document.querySelector(`[id='${decodeURIComponent(a)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(a)}']`).scrollIntoView({behavior:"smooth"}),a==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${a}`)})})</script>
+<script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script>
+<script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove('dark'),localStorage.setItem("pref-theme",'light')):(document.body.classList.add('dark'),localStorage.setItem("pref-theme",'dark'))})</script>
+</body>
+</html>
