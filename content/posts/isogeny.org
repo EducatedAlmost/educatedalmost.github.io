@@ -1,0 +1,122 @@
+---
+title: "æ/Isogeny"
+date: 2022-01-05T21:32:01Z
+draft: false
+summary: Isogeny makes all configuration dynamic.
+tags: [ "programming", "sysadmin", "clojure" ]
+---
+
+Read the code: [[https://github.com/educatedalmost/isogeny][Isogeny]]
+
+At any one time I have at least four machines running Linux: a desktop, a laptop, a server, and a phone. Keeping the [[https://github.com/EducatedAlmost/.dotfiles][configuration]] for the four systems in line can be a challenge — for some programmes it will be the same for all machines, and for others there will be almost nothing in common between the server and phone.
+
+In my most naïve approach, I kept a single file in version control and made edits to the working copy without committing them, but this is unable to receive changes from upstream. Next I kept a separate file for each machine, but this meant keeping four files perfectly just out-of-sync, and programmes often had difficulty knowing which config file to use.
+
+The first breakthrough came when I realised I could make certain parts of my Emacs configuration dynamic:
+
+#+begin_src lisp
+(setq settings
+      '(("phobos" . ((mono-font-size . 20)
+                     (var-font-size . 28)))
+        ("luna" . ((mono-font-size . 20)
+                     (var-font-size . 28)))
+        ("europa" . ((mono-font-size . 18)
+                     (var-font-size . 24)))
+        ("ceres" . ((mono-font-size . 10)
+                     (var-font-size . 12)))))
+
+(defun fetch-setting (setting)
+  (cdr (assoc setting
+              (cdr (assoc system-name settings)))))
+
+(setq doom-font (font-spec :family "Fira code"
+                           :size (fetch-setting 'mono-font-size)))
+#+end_src
+
+This has its limitations. It doesn't work for any programme that doesn't use a programming language to define its configuration, excluding just about anything that doesn't use Lisp, Vimscript, Lua, or shell scripts.
+
+To my knowledge, there is no reliable way to have /toml/, /json/, or /yaml/ files perform variable substitution or read conditionals. The closest I came was to use Bash to write the machine-specific configuration in ~~/.bash_profile~ when it was run by the login shell.
+
+#+begin_src sh
+DOT=$HOME/.dotfiles
+CUSTOM=$DOT/i3/.i3/config.$(hostname)
+DEFAULT=$DOT/i3/.i3/config.default
+if [[ -f "$CUSTOM" ]]; then
+	cat $CUSTOM > $DOT/i3/.i3/config
+else
+	cat $DEFAULT > $DOT/i3/.i3/config
+fi
+#+end_src
+
+I was initially hopeful that I could use the machine-specific configuration just to append to a larger, shared configuration, but it was not to be. The files don't always allow their section to be moved around on a whim, and moving a line into machine-specific configuration required one to remember to do the same for every machine. It also adds a huge amount of cruft to ~~/.bash_profile~, when I keep configuration for ~20 programmes this means ~150 lines of ifs and elses cluttering what should be a simple file.
+
+Here I got the idea for Isogeny. It does the work at the same moment, but in a Clojure script and using the brilliant Selmer[fn:selmer] template rendering library.
+
+Instead of appending, Isogeny uses substitution points in a template, which might be familiar to anyone who has used templates in front-end development.
+
+#+begin_src
+...
+Font size: {{ font.size }}
+Font family: {{ font.family }}
+Hosts: {% for host in hosts %}
+  Host: {{ host }} {% endfor %}
+...
+#+end_src
+
+The values of the variables is provided by a /context/ in an EDN file.
+
+#+begin_src clojure
+{:font {:size 12
+        :family "Fira mono"}
+ :hosts ["127.0.0.1" "localhost"]}
+#+end_src
+
+The user should keep a different context for each machine. They can be named something like ~programme.<HOSTNAME>.edn~ so that the correct context can easily be picked using ~programme.$HOSTNAME.edn~.
+
+The final result should be the rendered file in the correct position to be used by its programme.
+
+#+begin_src
+...
+Font size: 12
+Font family: Fira mono
+Hosts:
+  Host: 127.0.0.1
+  Host: localhost
+...
+#+end_src
+
+Calls to Isogeny look like so:
+
+#+begin_src sh
+./isogeny.clj -t foo.template \
+    -c foo.context.specific.edn \
+    -d foo.context.default.edn \
+    -o foo.config
+#+end_src
+
+The default context provides for a fallback should the specific context be missing, something that is useful when something has been misconfigured or when using a new machine. It can be inconvenient to have a display manager or window manager fail to launch.
+
+In the couple of days since I wrote the first working version of Isogeny, I have had great fun coming up with new functionality and seeing just how quickly I could implement it. These include:
+- ~--add-tags~ :: add custom tags to the renderer
+- ~--strict~ :: fail when a value is missing
+- ~--context-string~ :: provide context as a CLI option that overrides values in the file
+- ~--deep-merge~ ::  use deep-merge rather than merge when overriding
+- ~--verbose~ ::  provide detailed logging
+- ~--multi-template~ :: render multiple templates with a single call to Isogeny
+
+With these added features, I think that Isogeny fits the use cases of almost everyone conscious of configuration. Now my configuration setup looks like this, run on login:
+
+#+begin_src sh
+./isogeny.clj --multi-template \
+    -c ~/.dotfiles/isogeny/context.$HOSTNAME.edn \
+    -d ~/.dotfiles/isogeny/context.default.edn \
+    --strict --verbose --deep-merge \
+    ~/.config/sway/config.template \
+    ~/.config/alacritty/alacritty.yml.template \
+    ~/.config/dunst/dunstrc \
+    ~/.config/gammastep/config.ini
+#+end_src
+
+And with that, all my files are configured to this machine. Please, give it a [[https://github.com/educatedalmost/isogeny][try]], submit issues and feature requests, and keep your configuration in good order.
+
+[fn:selmer] Isogeny owes a great debt to [[https://github.com/yogthos/Selmer][Selmer]], the work of Yogthos.
