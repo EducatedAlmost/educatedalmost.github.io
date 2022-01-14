@@ -1,3 +1,490 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>emacs on blog.AlmostEducated</title><link>http://blog.almost.education/tags/emacs/</link><description>Recent content in emacs on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Tue, 16 Nov 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/emacs/index.xml" rel="self" type="application/rss+xml"/><item><title>æ/read-time.el</title><link>http://blog.almost.education/posts/read-time-el/</link><pubDate>Tue, 16 Nov 2021 00:00:00 +0000</pubDate><guid>http://blog.almost.education/posts/read-time-el/</guid><description>An Emacs function that tells you how long it takes to read things.</description></item><item><title>dired-listing-switches and ls</title><link>http://blog.almost.education/posts/dired-listing-switches/</link><pubDate>Sat, 13 Nov 2021 19:35:28 +0000</pubDate><guid>http://blog.almost.education/posts/dired-listing-switches/</guid><description>Have you ever been unsatisfied with the way that dired1 lists your files? Ever wished it wouldn&amp;#39;t show you the group and owner for every file despite them all being exactly the same? Want to get those directories out of the way of your files?
-… enter dired-listing-switches.
-The first time I saw this variable set in another person&amp;#39;s init.el I thought it must be a kind of magic.</description></item><item><title>æ/bang.el</title><link>http://blog.almost.education/posts/bang-el/</link><pubDate>Wed, 20 Oct 2021 00:00:00 +0000</pubDate><guid>http://blog.almost.education/posts/bang-el/</guid><description>Use DuckDuckGo&amp;#39;s !Bangs from the comfort of Emacs!</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>emacs on blog.AlmostEducated</title><link>http://blog.almost.education/tags/emacs/</link><description>Recent content in emacs on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Tue, 16 Nov 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/emacs/index.xml" rel="self" type="application/rss+xml"/><item><title>æ/read-time.el</title><link>http://blog.almost.education/posts/read-time-el/</link><pubDate>Tue, 16 Nov 2021 00:00:00 +0000</pubDate><guid>http://blog.almost.education/posts/read-time-el/</guid><description>&lt;p>
+&lt;em>An Emacs function that tells you how long it takes to read things.&lt;/em>&lt;/p>
+&lt;p>
+&lt;a href="https://github.com/EducatedAlmost/read-time.el">https://github.com/EducatedAlmost/read-time.el&lt;/a>&lt;/p>
+&lt;p>
+For a short while I was recording educational videos and audiobooks from scripts written in Emacs. A key piece of information I needed but didn&amp;#39;t have access to was the time it would take to read these when recording. Emacs does provide the useful &lt;code>count-words&lt;/code> function, but there was no &lt;code>read-time&lt;/code>.&lt;/p>
+&lt;p>
+Reading speeds average around 5 words per second, dropping to 3 for careful speech, and rising above ten for speed readers. For small word counts one may easily divide the word count by ones speed to find the reading time, but it is not easy for larger word counts.&lt;/p>
+&lt;p>
+&lt;code>read-time&lt;/code> does it for you. Called interactively, it returns the time to read the whole buffer or the region.&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="nv">read-time&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">point&lt;/span> &lt;span class="nf">min&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">point&lt;/span> &lt;span class="nf">max&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="c1">;; =&amp;gt; 14 seconds&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+And one may specify a reading speed by setting &lt;code>read-time-words-per-sec&lt;/code>, or by providing a third argument.&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="nv">read-time&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">point&lt;/span> &lt;span class="nf">min&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">point&lt;/span> &lt;span class="nf">max&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="c1">;; =&amp;gt; 24 minutes 10 seconds&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+I hope you find the package useful!&lt;/p></description></item><item><title>dired-listing-switches and ls</title><link>http://blog.almost.education/posts/dired-listing-switches/</link><pubDate>Sat, 13 Nov 2021 19:35:28 +0000</pubDate><guid>http://blog.almost.education/posts/dired-listing-switches/</guid><description>&lt;p>
+Have you ever been unsatisfied with the way that &lt;a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html">dired&lt;/a>&lt;sup class="footnote-reference">&lt;a id="footnote-reference-1" href="#footnote-1">1&lt;/a>&lt;/sup> lists your files? Ever wished it wouldn&amp;#39;t show you the group and owner for every file despite them all being exactly the same? Want to get those directories out of the way of your files?&lt;/p>
+&lt;p>
+… enter &lt;code>dired-listing-switches&lt;/code>.&lt;/p>
+&lt;p>
+The first time I saw this variable set in another person&amp;#39;s &lt;code>init.el&lt;/code> I thought it must be a kind of magic. Mine looks like this:&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="k">setq&lt;/span> &lt;span class="nv">dired-listing-switches&lt;/span> &lt;span class="s">&amp;#34;-aBGhl --group-directories-first&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+The trick is, and I would have realised this if I knew how to look up the documentation of Emacs variables&lt;sup class="footnote-reference">&lt;a id="footnote-reference-2" href="#footnote-2">2&lt;/a>&lt;/sup>, that these are flags that are passed to &lt;a href="https://www.man7.org/linux/man-pages/man1/ls.1.html">&lt;code>ls&lt;/code>&lt;/a>. It makes sense that Emacs would delegate to another tool, it&amp;#39;s part of the UNIX philosophy&lt;sup class="footnote-reference">&lt;a id="footnote-reference-3" href="#footnote-3">3&lt;/a>&lt;/sup> to trust tasks to other tools rather than do them oneself.&lt;/p>
+&lt;p>
+What flags does &lt;code>ls&lt;/code> take? A lot. &lt;code>ls --help&lt;/code> has 120 lines; these are the options you&amp;#39;re most likely to want to try:&lt;/p>
+&lt;p>
+&lt;code>-l&lt;/code> &lt;strong>is the only flag that is required&lt;/strong>. It prints a number of details for each file in a list, instead of the default of &lt;code>ls&lt;/code>, a grid.&lt;/p>
+&lt;dl>
+&lt;dt>
+&lt;code>-a, --all&lt;/code>
+&lt;/dt>
+&lt;dd>show all files, don&amp;#39;t ignore files starting with &lt;code>.&lt;/code>&lt;/dd>
+&lt;dt>
+&lt;code>-A, --almost-all&lt;/code>
+&lt;/dt>
+&lt;dd>like &lt;code>-a&lt;/code>, but it does ignore the files &lt;code>.&lt;/code> and &lt;code>..&lt;/code>&lt;/dd>
+&lt;dt>
+&lt;code>-B, --ignore-backups&lt;/code>
+&lt;/dt>
+&lt;dd>show all files, don&amp;#39;t ignore files starting with &lt;code>.&lt;/code>&lt;/dd>
+&lt;dt>
+&lt;code>-G, --no-group&lt;/code>
+&lt;/dt>
+&lt;dd>don&amp;#39;t print group names&lt;/dd>
+&lt;dt>
+&lt;code>--group-directories-first&lt;/code>
+&lt;/dt>
+&lt;dd>directories are listed first&lt;/dd>
+&lt;dt>
+&lt;code>-h, --human-readable&lt;/code>
+&lt;/dt>
+&lt;dd>present sizes of files like 1K, 4M, 12G&lt;/dd>
+&lt;dt>
+&lt;code>-I, --ignore=PATTERN&lt;/code>
+&lt;/dt>
+&lt;dd>ignores &lt;code>PATTERN&lt;/code>, unless &lt;code>-a&lt;/code> or &lt;code>-A&lt;/code> is set&lt;/dd>
+&lt;dt>
+&lt;code>-r, --reverse&lt;/code>
+&lt;/dt>
+&lt;dd>list in reverse order&lt;/dd>
+&lt;dt>
+&lt;code>-S&lt;/code>
+&lt;/dt>
+&lt;dd>sort by file size&lt;/dd>
+&lt;dt>
+&lt;code>--sort=WORD&lt;/code>
+&lt;/dt>
+&lt;dd>sort by &lt;code>none&lt;/code>, &lt;code>size&lt;/code>, &lt;code>time&lt;/code>, &lt;code>version&lt;/code>, &lt;code>extension&lt;/code>&lt;/dd>
+&lt;dt>
+&lt;code>-t&lt;/code>
+&lt;/dt>
+&lt;dd>sort by time&lt;/dd>
+&lt;dt>
+&lt;code>--time=WORD&lt;/code>
+&lt;/dt>
+&lt;dd>the definition of time, &lt;code>access&lt;/code>, &lt;code>ctime&lt;/code> (change), &lt;code>birth&lt;/code>&lt;/dd>
+&lt;dt>
+&lt;code>-U&lt;/code>
+&lt;/dt>
+&lt;dd>do not sort&lt;/dd>
+&lt;dt>
+&lt;code>-X&lt;/code>
+&lt;/dt>
+&lt;dd>sort alphabetically by file extension&lt;/dd>
+&lt;/dl>
+&lt;p>As well as these, there are a couple of other interesting switches which are either unusable or unhelpful for Emacs and dired, but might be useful when using &lt;code>ls&lt;/code> elsewhere:&lt;/p>
+&lt;dl>
+&lt;dt>
+&lt;code>-R, --recursive&lt;/code>
+&lt;/dt>
+&lt;dd>list the directory and all subdirectories recursively&lt;/dd>
+&lt;dt>
+&lt;code>-x&lt;/code>
+&lt;/dt>
+&lt;dd>&lt;code>ls&lt;/code> usually lists down and then across, this transposes that&lt;/dd>
+&lt;/dl>
+&lt;p>Add this to your &lt;code>init.el&lt;/code>, &lt;code>.spacemacs&lt;/code>, or &lt;code>config.el&lt;/code>:&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="k">setq&lt;/span> &lt;span class="nv">dired-listing-switches&lt;/span> &lt;span class="s">&amp;#34;-aBGhl --group-directories-first&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnotes">
+&lt;hr class="footnotes-separatator">
+&lt;div class="footnote-definitions">
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-1">&lt;a href="#footnote-reference-1">1&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>&lt;code>dired&lt;/code>: directory editor&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-2">&lt;a href="#footnote-reference-2">2&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>Try calling &lt;code>describe-variable&lt;/code> with &lt;code>C-h v&lt;/code>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-3">&lt;a href="#footnote-reference-3">3&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>&lt;a href="https://en.wikipedia.org/wiki/Unix_philosophy">Wikipedia&lt;/a> — an approach to software development that favours small modular components to monoliths; sometimes stated — &amp;#39;do one thing and do it well&amp;#39;. Whether Emacs in general follows this philosophy is a matter of &lt;a href="https://protesilaos.com/codelog/2021-09-22-live-stream-emacs-unix/">debate&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div></description></item><item><title>æ/bang.el</title><link>http://blog.almost.education/posts/bang-el/</link><pubDate>Wed, 20 Oct 2021 00:00:00 +0000</pubDate><guid>http://blog.almost.education/posts/bang-el/</guid><description>
+&lt;p>
+&lt;em>Use DuckDuckGo&amp;#39;s !Bangs from the comfort of Emacs!&lt;/em>&lt;/p>
+&lt;p>
+&lt;a href="https://github.com/EducatedAlmost/bang.el">https://github.com/EducatedAlmost/bang.el&lt;/a>&lt;/p>
+&lt;p>
+I use &lt;a href="https://duckduckgo.com/">DuckDuckGo&lt;/a>. Its become popular for its emphasis on user privacy in contrast to the giant of the market, Google, who it seems every six months is implicated in &lt;a href="https://news.ycombinator.com/item?id=28976487">unethical behaviour&lt;/a>. But honestly, I use DuckDuckGo because it looks nicer. Search for something in Google &lt;a href="https://duckduckgo.com/?q=!g foo">&lt;code>(bang &amp;#34;g&amp;#34; &amp;#34;foo&amp;#34;)&lt;/code>&lt;/a> and as well as the expected search results, one is shown &amp;#39;people also ask&amp;#39;, top news stories, video thumbnails from the Foo Fighters YouTube channel, and a summary of their latest tweets. When one expects a uniform list of simple search results, one is instead shown a noisy list of varying components.&lt;/p>
+&lt;div id="outline-container-headline-1" class="outline-2">
+&lt;h2 id="headline-1">
+&lt;em>Bang&lt;/em>
+&lt;/h2>
+&lt;div id="outline-text-headline-1" class="outline-text-2">
+&lt;p>
+And yet I&amp;#39;ve ended up using DDG for something almost unrelated, &lt;em>Bang&lt;/em>. If you search DDG for &lt;code>!x foo&lt;/code>, it delegates that search to the website represented by the Bang prefix &lt;code>x&lt;/code> and searches it for &lt;code>foo&lt;/code>. For example, you might want to search for the &lt;code>bang.el&lt;/code> GitHub page, &lt;a href="https://duckduckgo.com/?q=!gh bang.el">&lt;code>!gh bang.el&lt;/code>&lt;/a>, or Wikipedia for Emacs, &lt;a href="https://duckduckgo.com/?q=!w Emacs">&lt;code>!w Emacs&lt;/code>&lt;/a>, see &lt;a href="https://duckduckgo.com/bang">here&lt;/a> for a list of prefixes. Instead of going to the website&amp;#39;s homepage, and then searching, Bang takes you straight to the results page. Called without a term, the Bang will usually take you to the homepage. Without a prefix, it takes you to DGG&amp;#39;s first result. If DDG is your browser&amp;#39;s default search engine this becomes really fast.&lt;/p>
+&lt;p>
+By my estimates, Bang shaves 10–30 seconds off every search, something that I do 10–100 times every day. By the reasoning of this classic xkcd comic, this is exactly the sort of task we should be making more efficient.&lt;/p>
+&lt;p>
+&lt;img src="https://imgs.xkcd.com/comics/is_it_worth_the_time_2x.png" alt="https://imgs.xkcd.com/comics/is_it_worth_the_time_2x.png" title="https://imgs.xkcd.com/comics/is_it_worth_the_time_2x.png" />&lt;/p>
+&lt;p>
+Over five years, 15 seconds saved 30 times every day nets us a total of &lt;strong>10 days&lt;/strong>! &lt;a href="https://duckduckgo.com/?q=!wa 15 seconds * 30 * 365 * 5">&lt;code>(bang &amp;#34;wa&amp;#34; &amp;#34;15 seconds * 30 * 365 * 5&amp;#34;)&lt;/code>&lt;/a>&lt;/p>
+&lt;p>
+Another key to greater productivity is cutting out what might disrupt ones flow. If I see the Wikipedia homepage, there&amp;#39;s a 50% chance that three hours later I&amp;#39;ll have 30 tabs open, and my previous work will be long forgotten. Bang takes me straight to the page I want, after which I can just close the browser.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-2" class="outline-2">
+&lt;h2 id="headline-2">
+Examples
+&lt;/h2>
+&lt;div id="outline-text-headline-2" class="outline-text-2">
+&lt;dl>
+&lt;dt>
+&lt;code>!gh&lt;/code>
+&lt;/dt>
+&lt;dd>GitHub repositories&lt;/dd>
+&lt;dt>
+&lt;code>!clj&lt;/code>
+&lt;/dt>
+&lt;dd>ClojureDocs&lt;/dd>
+&lt;dt>
+&lt;code>!xiny&lt;/code>
+&lt;/dt>
+&lt;dd>Learn X in Y minutes, a introduction to any programming language&lt;/dd>
+&lt;dt>
+&lt;code>!pm&lt;/code>
+&lt;/dt>
+&lt;dd>PubMed, biomedical papers&lt;/dd>
+&lt;dt>
+&lt;code>!arx&lt;/code>
+&lt;/dt>
+&lt;dd>arXiv, physics papers&lt;/dd>
+&lt;dt>
+&lt;code>!wa&lt;/code>
+&lt;/dt>
+&lt;dd>WolframAlpha, computational knowledge engine&lt;/dd>
+&lt;dt>
+&lt;code>!ma&lt;/code>
+&lt;/dt>
+&lt;dd>MemoryAlpha, the Star Trek Wiki&lt;/dd>
+&lt;dt>
+&lt;code>!awoiaf&lt;/code>
+&lt;/dt>
+&lt;dd>A Wiki of Ice and Fire&lt;/dd>
+&lt;/dl>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-3" class="outline-2">
+&lt;h2 id="headline-3">
+What is missing from Bang?
+&lt;/h2>
+&lt;div id="outline-text-headline-3" class="outline-text-2">
+&lt;p>
+There are four types of Bangs that are disallowed:&lt;/p>
+&lt;ul>
+&lt;li>those for &lt;strong>illegal&lt;/strong> websites&lt;/li>
+&lt;li>those for websites with &lt;strong>explicit content&lt;/strong>&lt;/li>
+&lt;li>those that would be &lt;strong>overly niche&lt;/strong>&lt;/li>
+&lt;li>those that would violate the website&amp;#39;s &lt;strong>terms of service&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-4" class="outline-2">
+&lt;h2 id="headline-4">
+&lt;code>bang.el&lt;/code>
+&lt;/h2>
+&lt;div id="outline-text-headline-4" class="outline-text-2">
+&lt;p>
+&lt;code>bang.el&lt;/code> takes this a step further. Not only does one get to skip the process of going to the website, now one can use the Bang from Emacs itself.&lt;/p>
+&lt;div id="outline-container-headline-5" class="outline-3">
+&lt;h3 id="headline-5">
+&lt;code>browse-url&lt;/code>
+&lt;/h3>
+&lt;div id="outline-text-headline-5" class="outline-text-3">
+&lt;p>
+All &lt;code>bang.el&lt;/code> functions ultimately call &lt;code>browse-url&lt;/code>. To choose which program is used by Emacs to open the link, one can edit the values of &lt;code>browse-url-browser-function&lt;/code> and &lt;code>browse-url-generic-function&lt;/code> as documented &lt;a href="https://www.emacswiki.org/emacs/BrowseUrl">here&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-6" class="outline-3">
+&lt;h3 id="headline-6">
+&lt;code>bang&lt;/code>
+&lt;/h3>
+&lt;div id="outline-text-headline-6" class="outline-text-3">
+&lt;p>
+The general purpose function, that accepts a prefix and the thing to be searched, and opens it with &lt;code>browse-url&lt;/code>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-7" class="outline-3">
+&lt;h3 id="headline-7">
+&lt;code>bang-info&lt;/code>
+&lt;/h3>
+&lt;div id="outline-text-headline-7" class="outline-text-3">
+&lt;p>
+This no-argument function takes the caller to the Bang homepage where one can learn more about it.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-8" class="outline-3">
+&lt;h3 id="headline-8">
+&lt;code>bang-find-prefix&lt;/code>
+&lt;/h3>
+&lt;div id="outline-text-headline-8" class="outline-text-3">
+&lt;p>
+If one wishes to learn which prefix is needed for which website, this function can be called that uses Bang&amp;#39;s own search to find it.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-9" class="outline-2">
+&lt;h2 id="headline-9">
+&lt;code>bang.el&lt;/code> and Org-roam
+&lt;/h2>
+&lt;div id="outline-text-headline-9" class="outline-text-2">
+&lt;p>
+What is &lt;a href="https://www.orgroam.com/">Org-roam&lt;/a>?&lt;/p>
+&lt;blockquote>
+&lt;p>A plain-text knowledge management system.&lt;/p>
+&lt;/blockquote>
+&lt;p>
+Inspired by &lt;a href="https://roamresearch.com/">Roam Research&lt;/a>, org-roam is &lt;em>the&lt;/em> best tool for creating a personal wiki, knowledge store, or &lt;a href="https://en.wikipedia.org/wiki/Zettelkasten">Zettelkasten&lt;/a>. I&amp;#39;ve accumulated &amp;gt;8500 nodes after a year of use &lt;a href="https://www.wolframalpha.com/input/?i=8500%2F365">&lt;code>!wa 8500/365&lt;/code>&lt;/a> so I can attest to its brilliance. I originally started writing &lt;code>bang.el&lt;/code> to quickly view the Wikipedia page of the subject I was writing about. For this reason, the initial name of the project was &lt;code>roam-to-wiki.el&lt;/code> and the first function became &lt;code>bang-roam-wiki.el&lt;/code>, which searches the current org-roam node in Wikipedia.&lt;/p>
+&lt;p>
+I find this to often be the case. A small simple function … we grow scope. Introduce variable where there was none previously.
+&lt;code>roam-to-wiki.el&lt;/code> became &lt;code>bang-roam.el&lt;/code> and then, simply, &lt;code>bang.el&lt;/code>. The &lt;code>bang-roam&lt;/code> and &lt;code>bang-roam-wiki&lt;/code> functions still exist, so you can easily search for a node&amp;#39;s title, either in Wikipedia, or anywhere else.&lt;/p>
+&lt;div id="outline-container-headline-10" class="outline-3">
+&lt;h3 id="headline-10">
+&lt;code>bang-roam&lt;/code>
+&lt;/h3>
+&lt;div id="outline-text-headline-10" class="outline-text-3">
+&lt;p>
+Calls &lt;code>bang&lt;/code> with the caller&amp;#39;s choice of prefix and the current org-roam node&amp;#39;s title.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-11" class="outline-3">
+&lt;h3 id="headline-11">
+&lt;code>bang-roam-wiki&lt;/code>
+&lt;/h3>
+&lt;div id="outline-text-headline-11" class="outline-text-3">
+&lt;p>
+Calls &lt;code>bang&lt;/code> with the &lt;code>&amp;#34;w&amp;#34;&lt;/code> prefix and the current org-roam node&amp;#39;s title.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-12" class="outline-2">
+&lt;h2 id="headline-12">
+Ideas
+&lt;/h2>
+&lt;div id="outline-text-headline-12" class="outline-text-2">
+&lt;p>
+I have wondered if &lt;code>bang&lt;/code> might be a good tool for improving the experience of searching for documentation whilst programming. I commonly find myself highlighting a symbol and calling &lt;code>(bang &amp;#34;clj&amp;#34; ...)&lt;/code> to find its definition in in ClojureDocs. Perhaps a function called &lt;code>bang-docs&lt;/code> which determined its prefix from whichever major mode was currently active, and the term defaulting to the symbol at point, would provide, regardless of the language used, an harmonious solution to documentation searching.&lt;/p>
+&lt;p>
+There are tools like &lt;a href="https://github.com/zealdocs/zeal">Zeal&lt;/a> and &lt;a href="https://kapeli.com/dash">Dash&lt;/a>, but I have found them to be a pain as documentation is kept in an external application. &lt;a href="https://github.com/dash-docs-el/helm-dash">Helm Dash&lt;/a> might be a good alternative as it supposedly runs everything from inside Emacs, but I have yet to try it out.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-13" class="outline-2">
+&lt;h2 id="headline-13">
+The code
+&lt;/h2>
+&lt;div id="outline-text-headline-13" class="outline-text-2">
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="nf">require&lt;/span> &lt;span class="ss">&amp;#39;org-roam&lt;/span>&lt;span class="p">)&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+Until I can work out how to make &lt;code>org-roam&lt;/code> optional, it is required due to the &lt;code>bang-roam&lt;/code> functions.&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="nb">defun&lt;/span> &lt;span class="nv">bang-make-link&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">prefix&lt;/span> &lt;span class="nv">term&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="s">&amp;#34;Make the link that is used to search with Bangs, &amp;#39;!PREFIX TERM&amp;#39;.&amp;#34;&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">concat&lt;/span> &lt;span class="s">&amp;#34;https://duckduckgo.com/?q=!&amp;#34;&lt;/span> &lt;span class="nv">prefix&lt;/span> &lt;span class="s">&amp;#34;+&amp;#34;&lt;/span> &lt;span class="nv">term&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">defun&lt;/span> &lt;span class="nv">bang&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">prefix&lt;/span> &lt;span class="nv">term&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="s">&amp;#34;Using Bang, search for TERM in website with corresponding PREFIX.&amp;#34;&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">interactive&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nc">list&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">read-string&lt;/span> &lt;span class="s">&amp;#34;Enter the Bang prefix: &amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">read-string&lt;/span> &lt;span class="s">&amp;#34;Enter the term you wish to search: &amp;#34;&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">when&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">use-region-p&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">buffer-substring&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">region-beginning&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">region-end&lt;/span>&lt;span class="p">))))))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">browse-url&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">bang-make-link&lt;/span> &lt;span class="nv">prefix&lt;/span> &lt;span class="nv">term&lt;/span>&lt;span class="p">)))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+&lt;code>bang&lt;/code> is the central function of the package. If there is an active region, it is used as the default &lt;code>TERM&lt;/code> argument. See the section on &lt;a href="*Using the region as a default argument">default arguments&lt;/a> for an explanation of how this works, and &lt;a href="http://www.ergoemacs.org/emacs/elisp_interactive_form.html">here&lt;/a> for more information on elisp&amp;#39;s interactive forms.&lt;/p>
+&lt;p>
+&lt;code>bang-make-link&lt;/code> demonstrates a good habit of extracting sections of code into pure functions.&lt;/p>
+&lt;p>
+&lt;code>bang-info&lt;/code> and &lt;code>bang-find-prefix&lt;/code> just call the functions &lt;code>(bang &amp;#34;bang&amp;#34; &amp;#34;&amp;#34;)&lt;/code> and &lt;code>(bang &amp;#34;bang&amp;#34; WEBSITE)&lt;/code>, to access Bang&amp;#39;s own information page.&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="nb">defun&lt;/span> &lt;span class="nv">bang-roam&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">prefix&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="s">&amp;#34;Use the node&amp;#39;s title to search using the Bang PREFIX.&amp;#34;&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">interactive&lt;/span> &lt;span class="s">&amp;#34;sEnter the bang prefix: &amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">condition-case&lt;/span> &lt;span class="no">nil&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">bang&lt;/span> &lt;span class="nv">prefix&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">org-roam-node-title&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">org-roam-node-at-point&lt;/span>&lt;span class="p">)))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="kt">error&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">message&lt;/span> &lt;span class="s">&amp;#34;Error: not inside an org-roam node.&amp;#34;&lt;/span>&lt;span class="p">))))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+&lt;code>condition-case&lt;/code> is elisp&amp;#39;s equivalent of a try-catch statement. It executes the bodyform, in this case a call to &lt;code>bang&lt;/code> with a prefix and the node&amp;#39;s title as its arguments, but in the case that one is not inside a org-roam node it throws an exception. After the bodyform, one can provide a number of handlers of the form &lt;code>(ERROR-TYPE body)&lt;/code> which are executed if the throw exception matches the &lt;code>ERROR-TYPE&lt;/code>. In &lt;code>bang-roam&lt;/code> it just informs the caller that the function cannot be called outside of a org-roam node.&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="nf">provide&lt;/span> &lt;span class="ss">&amp;#39;bang&lt;/span>&lt;span class="p">)&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-14" class="outline-2">
+&lt;h2 id="headline-14">
+Using the region as a default argument
+&lt;/h2>
+&lt;div id="outline-text-headline-14" class="outline-text-2">
+&lt;p>
+Previously, the &lt;code>bang&lt;/code> function took no notice of whether a region was active or not.&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="nb">defun&lt;/span> &lt;span class="nv">bang&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">prefix&lt;/span> &lt;span class="nv">term&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="s">&amp;#34;Using Bang, search for TERM in website with corresponding PREFIX.&amp;#34;&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">interactive&lt;/span>
+&lt;span class="s">&amp;#34;sEnter the Bang prefix:
+&lt;/span>&lt;span class="s">sEnter the term you wish to search:&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">browse-url&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">concat&lt;/span> &lt;span class="s">&amp;#34;https://duckduckgo.com/?q=!&amp;#34;&lt;/span> &lt;span class="nv">prefix&lt;/span> &lt;span class="s">&amp;#34; &amp;#34;&lt;/span> &lt;span class="nv">term&lt;/span>&lt;span class="p">)))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+This could be frustrating, as it might require one to carefully retype something that is already present in ones buffer. With thanks to Prof Hugo Nobrega, I&amp;#39;ve rewritten this function so that if there is an active region it will be displayed in the minibuffer when one is prompted for the &lt;code>term&lt;/code> argument, allowing one to either confirm it or enter something different.&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="nv">interactive&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nc">list&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">read-string&lt;/span> &lt;span class="s">&amp;#34;Enter the Bang prefix: &amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">read-string&lt;/span> &lt;span class="s">&amp;#34;Enter the term you wish to search: &amp;#34;&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">when&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">use-region-p&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">buffer-substring&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">region-beginning&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">region-end&lt;/span>&lt;span class="p">))))))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+This also demonstrates the comprehensive form of &lt;code>interactive&lt;/code> that allows one to form a generic list that is that passed as the arguments of the function. &lt;code>buffer-substring&lt;/code> copies text from the buffer between two marks, being &lt;code>region-beginning&lt;/code> and &lt;code>region-end&lt;/code>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-15" class="outline-2">
+&lt;h2 id="headline-15">
+Conclusions
+&lt;/h2>
+&lt;div id="outline-text-headline-15" class="outline-text-2">
+&lt;p>
+Emacs&amp;#39;s extensibility is fantastic — no other editor makes it so easy to write new functions, leveraging existing functions and those of all installed packages. One can just write a tiny elisp file, whereas something like Visual Studio Code requires one to create a new Node.js package. The development experience is also great, being able to define and evaluate in the running editor, the feedback cycle is almost instant. It is vanishingly rare for developers to write their own editor plugins or extensions and yet for Emacs users it is a right of passage from when one first writes ones own &lt;code>init.el&lt;/code>.&lt;/p>
+&lt;p>
+Elisp&amp;#39;s &lt;code>interactive&lt;/code> forms are adaptable, and let us create a nice UI / UX. I was quickly frustrated with the interactive short forms &lt;code>s&lt;/code> and &lt;code>r&lt;/code>, but glad to find out that the longer form where one must create the argument list is not unwieldy.&lt;/p>
+&lt;p>
+One should streamline those processes that one spends the most total time on. Some of these tasks are so small that they are basically invisible, but with the frequency with which we do them, they add up to a large total time. A similar approach can be taken to reducing distractions.&lt;/p>
+&lt;p>
+One function can snowball into a whole project, this can be good or bad. Will it lead to a piece of work that will be useful to yourself and others? Or will it never be finished, with nothing learnt? What&amp;#39;s the pay-off? I&amp;#39;ve seen mistakes made like this, particularly when one aims for too much abstraction or generalisation, like a layer to abstract over all databases whether they be SQL, document, or graph. But then the opposite is true for something like Git which grew out Linus Torvald&amp;#39;s need for a source control system when developing Linux.&lt;/p>
+&lt;/div>
+&lt;/div></description></item></channel></rss>

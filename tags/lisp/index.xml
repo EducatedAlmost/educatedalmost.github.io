@@ -1,2 +1,449 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>lisp on blog.AlmostEducated</title><link>http://blog.almost.education/tags/lisp/</link><description>Recent content in lisp on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Thu, 09 Dec 2021 19:43:18 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/lisp/index.xml" rel="self" type="application/rss+xml"/><item><title>Clojure's rarer threading macros: some-> and cond-></title><link>http://blog.almost.education/posts/clojure-threading-macros/</link><pubDate>Thu, 09 Dec 2021 19:43:18 +0000</pubDate><guid>http://blog.almost.education/posts/clojure-threading-macros/</guid><description>I use Clojure&amp;#39;s threading macros perhaps more than I should, but I do so because they mimic the way I think about the code I write. A lisp programme is a tree and yet most of the programmes that we write are, or should be, lines of functions acting on a datastructure1 2.
-The value of threading macros 1 2 (* 3 (+ 2 (- 10 (+ 10 (/ 2 2))))) ^ To grok this code I have to start from the bottommost leaf, in this case (/ 2 2), yet it is at the line&amp;#39;s far right contrary to where it is natural for me and most of the world3 to start reading.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>lisp on blog.AlmostEducated</title><link>http://blog.almost.education/tags/lisp/</link><description>Recent content in lisp on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Thu, 09 Dec 2021 19:43:18 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/lisp/index.xml" rel="self" type="application/rss+xml"/><item><title>Clojure's rarer threading macros: some-> and cond-></title><link>http://blog.almost.education/posts/clojure-threading-macros/</link><pubDate>Thu, 09 Dec 2021 19:43:18 +0000</pubDate><guid>http://blog.almost.education/posts/clojure-threading-macros/</guid><description>
+&lt;p>
+I use Clojure&amp;#39;s threading macros perhaps more than I should, but I do so because they mimic the way I think about the code I write. A lisp programme is a tree and yet most of the programmes that we write are, or should be, lines of functions acting on a datastructure&lt;sup class="footnote-reference">&lt;a id="footnote-reference-1" href="#footnote-1">1&lt;/a>&lt;/sup> &lt;sup class="footnote-reference">&lt;a id="footnote-reference-2" href="#footnote-2">2&lt;/a>&lt;/sup>.&lt;/p>
+&lt;div id="outline-container-headline-1" class="outline-2">
+&lt;h2 id="headline-1">
+The value of threading macros
+&lt;/h2>
+&lt;div id="outline-text-headline-1" class="outline-text-2">
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="nb">* &lt;/span>&lt;span class="mi">3&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">+ &lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">- &lt;/span>&lt;span class="mi">10&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">+ &lt;/span>&lt;span class="mi">10&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">/ &lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">)))))&lt;/span>
+&lt;span class="o">^&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+To grok this code I have to start from the bottommost leaf, in this case &lt;code>(/ 2 2)&lt;/code>, yet it is at the line&amp;#39;s far right contrary to where it is natural for me and most of the world&lt;sup class="footnote-reference">&lt;a id="footnote-reference-3" href="#footnote-3">3&lt;/a>&lt;/sup> to start reading. Conversely the same code written with a threading macro mirrors how we think about what the code is doing.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="nb">-&amp;gt; &lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">/ &lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">+ &lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">- &lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">+ &lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">* &lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="o">^&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+They also force the programmer into writing &lt;em>simpler&lt;/em> code because threading macros don&amp;#39;t handle trees well.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="nb">-&amp;gt; &lt;/span>&lt;span class="mi">2&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">/ &lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">+ &lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">- &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">-&amp;gt; &lt;/span>&lt;span class="mi">25&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">/ &lt;/span>&lt;span class="mi">5&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">* &lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">+ &lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">* &lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+What a mess. It&amp;#39;s much better to split it into two linear forms.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="c1">;; Better do this&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="k">let &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nv">x&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">-&amp;gt; &lt;/span>&lt;span class="mi">25&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">/ &lt;/span>&lt;span class="mi">5&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">* &lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">))]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">-&amp;gt; &lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">/ &lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">+ &lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">- &lt;/span>&lt;span class="nv">x&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">+ &lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">* &lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">)))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+So threading macros help make easy things simple and complex things hard&lt;sup class="footnote-reference">&lt;a id="footnote-reference-4" href="#footnote-4">4&lt;/a>&lt;/sup>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-2" class="outline-2">
+&lt;h2 id="headline-2">
+&lt;code>as-&amp;gt;&lt;/code>
+&lt;/h2>
+&lt;div id="outline-text-headline-2" class="outline-text-2">
+&lt;p>
+&lt;a href="https://clojuredocs.org/clojure.core/as-%3E">&lt;code>as-&amp;gt;&lt;/code>&lt;/a> allows one to use a symbol to specify where the threaded value goes in each form. It is helpful when the threaded value&amp;#39;s position in the function&amp;#39;s arguments changes. Some Clojure functions take the datastructure as the first argument, others take a function.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="nf">as-&amp;gt;&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">db/get&lt;/span> &lt;span class="nv">id&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nv">$&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">update&lt;/span> &lt;span class="nv">$&lt;/span> &lt;span class="ss">:foo&lt;/span> &lt;span class="nv">f&lt;/span> &lt;span class="nv">x&lt;/span> &lt;span class="nv">y&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">map &lt;/span>&lt;span class="nv">g&lt;/span> &lt;span class="nv">$&lt;/span>&lt;span class="p">))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-3" class="outline-2">
+&lt;h2 id="headline-3">
+&lt;code>some-&amp;gt;&lt;/code>
+&lt;/h2>
+&lt;div id="outline-text-headline-3" class="outline-text-2">
+&lt;p>
+&lt;a href="https://clojuredocs.org/clojure.core/some-%3E">&lt;code>some-&amp;gt;&lt;/code>&lt;/a> works similarly to &lt;code>-&amp;gt;&lt;/code>, except that evaluation of the form terminates as soon as the threaded value becomes &lt;code>nil&lt;/code>. It&amp;#39;s named for &lt;a href="https://clojuredocs.org/clojure.core/some_q">&lt;code>some?&lt;/code>&lt;/a> which only returns &lt;code>false&lt;/code> if its argument is &lt;code>nil&lt;/code>. It is, generally, unnecessary in Clojure. Why? Because Clojure&amp;#39;s core functions, and the functions that we write, gracefully handle &lt;code>nil&lt;/code>.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="nb">map + &lt;/span>&lt;span class="nv">nil&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">; =&amp;gt; ()&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">assoc &lt;/span>&lt;span class="nv">nil&lt;/span> &lt;span class="ss">:k&lt;/span> &lt;span class="ss">:v&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">; =&amp;gt; {:k :v}&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">dissoc &lt;/span>&lt;span class="nv">nil&lt;/span> &lt;span class="ss">:k&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">; =&amp;gt; nil&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">str &lt;/span>&lt;span class="nv">nil&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">; =&amp;gt; &amp;#34;&amp;#34;&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">+ &lt;/span>&lt;span class="nv">nil&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">; =&amp;gt; nil&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">- &lt;/span>&lt;span class="nv">nil&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">; =&amp;gt; NullPointerException,&lt;/span>
+&lt;span class="c1">; it&amp;#39;s not always the case&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+The same cannot be said for calling functions in Java. Try adding a value to a null &lt;code>HashMap&lt;/code>, or &lt;code>.toString&lt;/code> on a null object, and you&amp;#39;ll throw a &lt;code>NullPointerException&lt;/code>.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="nb">-&amp;gt; &lt;/span>&lt;span class="nv">id&lt;/span>
+&lt;span class="nv">db/find-by-id&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">.put&lt;/span> &lt;span class="s">&amp;#34;foo&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;bar&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nv">db/save&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">-&amp;gt; &lt;/span>&lt;span class="nv">id&lt;/span>
+&lt;span class="nv">db/find-by-id&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">assoc &lt;/span>&lt;span class="ss">:id&lt;/span> &lt;span class="nv">id&lt;/span> &lt;span class="s">&amp;#34;foo&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;bar&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nv">db/save&lt;/span>&lt;span class="p">)&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+If &lt;code>db/find-by-id&lt;/code> returns &lt;code>nil&lt;/code>, implying a missing entity, the first form will explode when it tries to &lt;code>.put&lt;/code> on a &lt;code>null&lt;/code> object. The second gracefully creates and saves a new entity. If we still need to deal with the Java method, we can do so by either wrapping the form in a &lt;code>try&lt;/code> form, or use &lt;code>some-&amp;gt;&lt;/code>.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="nf">if-some&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">save-result&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">some-&amp;gt;&lt;/span> &lt;span class="nv">id&lt;/span>
+&lt;span class="nv">db/find-by-id&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">.put&lt;/span> &lt;span class="s">&amp;#34;foo&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;bar&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nv">db/save&lt;/span>&lt;span class="p">)]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">handle-success&lt;/span> &lt;span class="nv">save-result&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">handle-missing-entity&lt;/span> &lt;span class="nv">id&lt;/span>&lt;span class="p">))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+&lt;code>if-some&lt;/code> is just like &lt;code>if-let&lt;/code>, except instead of the test failing for falsy values, it fails for &lt;code>nil&lt;/code> values. Equivalently, the test passes for &lt;code>(some? test)&lt;/code> instead of &lt;code>(true? test)&lt;/code>.&lt;/p>
+&lt;p>
+When &lt;code>db/find-by-id&lt;/code> returns &lt;code>nil&lt;/code>, &lt;code>some-&amp;gt;&lt;/code> immediately returns &lt;code>nil&lt;/code> without evaluating the remaining forms of the threading macro, &lt;code>.put&lt;/code> and &lt;code>db/save&lt;/code>. &lt;code>if-some&lt;/code> then handles the case of a missing entity. Otherwise, as long as &lt;code>db/save&lt;/code> returns any non-&lt;code>nil&lt;/code> value, it is bound to &lt;code>save-result&lt;/code> and &lt;code>(handle-success save-result)&lt;/code> will be called, even if the result is &lt;code>false&lt;/code>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-4" class="outline-2">
+&lt;h2 id="headline-4">
+&lt;code>cond-&amp;gt;&lt;/code>
+&lt;/h2>
+&lt;div id="outline-text-headline-4" class="outline-text-2">
+&lt;p>
+I have found &lt;a href="https://clojuredocs.org/clojure.core/cond-%3E">&lt;code>cond-&amp;gt;&lt;/code>&lt;/a>, named for &lt;a href="https://clojuredocs.org/clojure.core/cond">&lt;code>cond&lt;/code>&lt;/a>, to be the biggest code-saver out of any of Clojure&amp;#39;s rarer standard library functions. Again, I use it mostly when working with Java, specifically with Builders. A Builder is one of the most common patterns you will see in object-oriented languages, it works to progressively build up an object, allowing for each field to have a default value, set fields by more convoluted means&lt;sup class="footnote-reference">&lt;a id="footnote-reference-5" href="#footnote-5">5&lt;/a>&lt;/sup>, or verify fields before they are set&lt;sup class="footnote-reference">&lt;a id="footnote-reference-6" href="#footnote-6">6&lt;/a>&lt;/sup>.&lt;/p>
+&lt;div class="src src-java">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="kd">public&lt;/span> &lt;span class="kd">class&lt;/span> &lt;span class="nc">EnterpriseIntegrator&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="kd">private&lt;/span> &lt;span class="n">String&lt;/span> &lt;span class="n">foo&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="kd">private&lt;/span> &lt;span class="n">String&lt;/span> &lt;span class="n">bar&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="kd">private&lt;/span> &lt;span class="n">String&lt;/span> &lt;span class="n">qux&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="kd">private&lt;/span> &lt;span class="n">String&lt;/span> &lt;span class="n">quux&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="nf">EnterpriseIntegrator&lt;/span> &lt;span class="o">(&lt;/span>
+&lt;span class="n">String&lt;/span> &lt;span class="n">foo&lt;/span>&lt;span class="o">,&lt;/span> &lt;span class="n">String&lt;/span> &lt;span class="n">bar&lt;/span>&lt;span class="o">,&lt;/span> &lt;span class="n">String&lt;/span> &lt;span class="n">qux&lt;/span>&lt;span class="o">,&lt;/span> &lt;span class="n">String&lt;/span> &lt;span class="n">quux&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="c1">// ...
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="o">};&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="nf">newBuilder&lt;/span> &lt;span class="o">()&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">EnterpriseIntegratorBuilder&lt;/span>&lt;span class="o">();&lt;/span>
+&lt;span class="o">}&lt;/span>
+&lt;span class="o">}&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="kd">class&lt;/span> &lt;span class="nc">EnterpriseIntegratorBuilder&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="kd">private&lt;/span> &lt;span class="n">String&lt;/span> &lt;span class="n">foo&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;foo&amp;#34;&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="kd">private&lt;/span> &lt;span class="n">String&lt;/span> &lt;span class="n">bar&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;bar&amp;#34;&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="kd">private&lt;/span> &lt;span class="n">String&lt;/span> &lt;span class="n">qux&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;qux&amp;#34;&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="kd">private&lt;/span> &lt;span class="n">String&lt;/span> &lt;span class="n">quux&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;quux&amp;#34;&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="n">EnterpriseIntegratorBuilder&lt;/span> &lt;span class="nf">foo&lt;/span> &lt;span class="o">(&lt;/span>&lt;span class="n">String&lt;/span> &lt;span class="n">foo&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="k">this&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">foo&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">foo&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="o">}&lt;/span>
+&lt;span class="c1">// ...
+&lt;/span>&lt;span class="c1">&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="n">EnterpriseIntegrator&lt;/span> &lt;span class="nf">build&lt;/span> &lt;span class="o">()&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">EnterpriseIntegrator&lt;/span> &lt;span class="o">(&lt;/span>
+&lt;span class="k">this&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">foo&lt;/span>&lt;span class="o">,&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">bar&lt;/span>&lt;span class="o">,&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">qux&lt;/span>&lt;span class="o">,&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">quux&lt;/span>&lt;span class="o">);&lt;/span>
+&lt;span class="o">}&lt;/span>
+&lt;span class="o">}&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+Of course, if this was Clojure we could just do this:&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="k">def &lt;/span>&lt;span class="nv">defaults&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="ss">:foo&lt;/span> &lt;span class="s">&amp;#34;foo&amp;#34;&lt;/span> &lt;span class="ss">:bar&lt;/span> &lt;span class="s">&amp;#34;bar&amp;#34;&lt;/span> &lt;span class="ss">:qux&lt;/span> &lt;span class="s">&amp;#34;qux&amp;#34;&lt;/span> &lt;span class="ss">:quux&lt;/span> &lt;span class="s">&amp;#34;quux&amp;#34;&lt;/span>&lt;span class="p">})&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">merge &lt;/span>&lt;span class="nv">defaults&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="ss">:foo&lt;/span> &lt;span class="s">&amp;#34;foobar&amp;#34;&lt;/span> &lt;span class="ss">:bar&lt;/span> &lt;span class="s">&amp;#34;baz&amp;#34;&lt;/span>&lt;span class="p">})&lt;/span>
+&lt;span class="c1">;; =&amp;gt; {:foo &amp;#34;foobar&amp;#34; :bar &amp;#34;baz&amp;#34; :qux &amp;#34;qux&amp;#34; :quux &amp;#34;quux&amp;#34;}&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+But occasionally we will need to use a Java-style Builder.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="nb">-&amp;gt; &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new &lt;/span>&lt;span class="nv">EnterpriseIntegratorBuilder&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">.foo&lt;/span> &lt;span class="nv">f&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">.bar&lt;/span> &lt;span class="nv">b&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">.qux&lt;/span> &lt;span class="nv">q&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">.quux&lt;/span> &lt;span class="nv">qu&lt;/span>&lt;span class="p">))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+This blows up in ones face if this code get called by someone who wants to use the default value and doesn&amp;#39;t want to set &lt;code>foo&lt;/code>. In that case &lt;code>f&lt;/code> is &lt;code>nil&lt;/code> and a &lt;code>NullPointerException&lt;/code> is thrown. &lt;code>cond-&amp;gt;&lt;/code> is a threading macro that allows us to only evaluate a form if a predicate returns true, and can be used to avoid this style of error.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="nf">cond-&amp;gt;&lt;/span> &lt;span class="nv">x&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">pred-1&lt;/span> &lt;span class="nv">f&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">.foo&lt;/span> &lt;span class="s">&amp;#34;foo&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">pred-2&lt;/span> &lt;span class="nv">b&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">.bar&lt;/span> &lt;span class="s">&amp;#34;bar&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">pred-3&lt;/span> &lt;span class="nv">q&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">.qux&lt;/span> &lt;span class="s">&amp;#34;qux&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+If the predicate returns true, the next form is used as it would be in &lt;code>-&amp;gt;&lt;/code>. Unlike &lt;code>some-&amp;gt;&lt;/code>, if a predicate fails the macro doesn&amp;#39;t terminate, it just moves onto the next predicate.&lt;/p>
+&lt;p>
+If &lt;code>(pred-2 b)&lt;/code> is the only predicate to fail, it becomes equivalent to this:&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="nb">-&amp;gt; &lt;/span>&lt;span class="nv">x&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">.foo&lt;/span> &lt;span class="s">&amp;#34;foo&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">.qux&lt;/span> &lt;span class="s">&amp;#34;qux&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+We can use this to check that a variable is non-&lt;code>nil&lt;/code> before trying to set the field on the Builder.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="kd">defn &lt;/span>&lt;span class="nv">-&amp;gt;EnterpriseIntegrator&lt;/span> &lt;span class="p">[{&lt;/span>&lt;span class="ss">:keys&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">foo&lt;/span> &lt;span class="nv">bar&lt;/span> &lt;span class="nv">baz&lt;/span>&lt;span class="p">]}]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">cond-&amp;gt;&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">new &lt;/span>&lt;span class="nv">EnterpriseIntegrator&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">some?&lt;/span> &lt;span class="nv">foo&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">.foo&lt;/span> &lt;span class="nv">foo&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">some?&lt;/span> &lt;span class="nv">bar&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">.bar&lt;/span> &lt;span class="nv">bar&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">some?&lt;/span> &lt;span class="nv">baz&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">.baz&lt;/span> &lt;span class="nv">baz&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nv">true&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">.build&lt;/span>&lt;span class="p">)))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+And finally we call &lt;code>build&lt;/code> to return the &lt;code>EnterpriseIntegrator&lt;/code>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-5" class="outline-2">
+&lt;h2 id="headline-5">
+Other macros
+&lt;/h2>
+&lt;div id="outline-text-headline-5" class="outline-text-2">
+&lt;p>
+&lt;code>-&amp;gt;&lt;/code>, &lt;code>some-&amp;gt;&lt;/code>, and &lt;code>cond-&amp;gt;&lt;/code> each have a matching macro, &lt;code>-&amp;gt;&amp;gt;&lt;/code>, &lt;code>some-&amp;gt;&amp;gt;&lt;/code>, and &lt;code>cond-&amp;gt;&amp;gt;&lt;/code>, which inserts the threaded value as the last argument in each form. I don&amp;#39;t find them often to be of much use.&lt;/p>
+&lt;p>
+You can see Clojure&amp;#39;s official guide on the subject &lt;a href="https://clojure.org/guides/threading_macros">here&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnotes">
+&lt;hr class="footnotes-separatator">
+&lt;div class="footnote-definitions">
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-1">&lt;a href="#footnote-reference-1">1&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>&amp;#34;It is better to have 100 functions operate on one data structure than to have 10 functions operate on 10 data structures.&amp;#34; — Alan Perlis, &lt;em>Epigrams on Programming&lt;/em>&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-2">&lt;a href="#footnote-reference-2">2&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>&lt;a href="https://youtu.be/ROor6_NGIWU?t=1592">The Language of the System&lt;/a> by Rich Hickey, Conj 2012. Having abandoned object-oriented languages, don&amp;#39;t recreate them in the large by building a system of components that look like objects. Instead, choose to structure your system like you structure your functional programmes, pipelines of functions.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-3">&lt;a href="#footnote-reference-3">3&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>The major exceptions being Arabic, Hebrew, and Urdu.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-4">&lt;a href="#footnote-reference-4">4&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>&lt;a href="https://en.wikipedia.org/wiki/Chiasmus">https://en.wikipedia.org/wiki/Chiasmus&lt;/a>&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-5">&lt;a href="#footnote-reference-5">5&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;div class="src src-java">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="kd">public&lt;/span> &lt;span class="n">EnterpriseIntegratorBuilder&lt;/span> &lt;span class="nf">setCredentials&lt;/span> &lt;span class="o">(&lt;/span>&lt;span class="n">Credentials&lt;/span> &lt;span class="n">creds&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="k">this&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">username&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">creds&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">getUsername&lt;/span>&lt;span class="o">();&lt;/span>
+&lt;span class="k">this&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">password&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">creds&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">getPassword&lt;/span>&lt;span class="o">();&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="o">}&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-6">&lt;a href="#footnote-reference-6">6&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;div class="src src-java">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="kd">public&lt;/span> &lt;span class="n">EnterpriseIntegratorBuilder&lt;/span> &lt;span class="nf">setTimeoutMillis&lt;/span> &lt;span class="o">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">to&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="o">(&lt;/span>&lt;span class="n">to&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">0&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="k">this&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">timeoutMillis&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">to&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="o">}&lt;/span> &lt;span class="c1">// else one can use the default value or throw an exception
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="o">}&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div></description></item></channel></rss>

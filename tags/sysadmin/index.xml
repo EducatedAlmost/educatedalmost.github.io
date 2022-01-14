@@ -1,1 +1,264 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>sysadmin on blog.AlmostEducated</title><link>http://blog.almost.education/tags/sysadmin/</link><description>Recent content in sysadmin on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Wed, 05 Jan 2022 21:32:01 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/sysadmin/index.xml" rel="self" type="application/rss+xml"/><item><title>æ/Isogeny</title><link>http://blog.almost.education/posts/isogeny/</link><pubDate>Wed, 05 Jan 2022 21:32:01 +0000</pubDate><guid>http://blog.almost.education/posts/isogeny/</guid><description>Isogeny makes all configuration dynamic.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>sysadmin on blog.AlmostEducated</title><link>http://blog.almost.education/tags/sysadmin/</link><description>Recent content in sysadmin on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Wed, 05 Jan 2022 21:32:01 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/sysadmin/index.xml" rel="self" type="application/rss+xml"/><item><title>æ/Isogeny</title><link>http://blog.almost.education/posts/isogeny/</link><pubDate>Wed, 05 Jan 2022 21:32:01 +0000</pubDate><guid>http://blog.almost.education/posts/isogeny/</guid><description>&lt;p>
+Read the code: &lt;a href="https://github.com/educatedalmost/isogeny">Isogeny&lt;/a>&lt;/p>
+&lt;p>
+At any one time I have at least four machines running Linux: a desktop, a laptop, a server, and a phone. Keeping the &lt;a href="https://github.com/EducatedAlmost/.dotfiles">configuration&lt;/a> for the four systems in line can be a challenge — for some programmes it will be the same for all machines, and for others there will be almost nothing in common between the server and phone.&lt;/p>
+&lt;p>
+In my most naïve approach, I kept a single file in version control and made edits to the working copy without committing them, but this is unable to receive changes from upstream. Next I kept a separate file for each machine, but this meant keeping four files perfectly just out-of-sync, and programmes often had difficulty knowing which config file to use.&lt;/p>
+&lt;p>
+The first breakthrough came when I realised I could make certain parts of my Emacs configuration dynamic:&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="k">setq&lt;/span> &lt;span class="nv">settings&lt;/span>
+&lt;span class="o">&amp;#39;&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="s">&amp;#34;phobos&amp;#34;&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="p">((&lt;/span>&lt;span class="nv">mono-font-size&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">var-font-size&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="mi">28&lt;/span>&lt;span class="p">)))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;luna&amp;#34;&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="p">((&lt;/span>&lt;span class="nv">mono-font-size&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">var-font-size&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="mi">28&lt;/span>&lt;span class="p">)))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;europa&amp;#34;&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="p">((&lt;/span>&lt;span class="nv">mono-font-size&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="mi">18&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">var-font-size&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="mi">24&lt;/span>&lt;span class="p">)))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ceres&amp;#34;&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="p">((&lt;/span>&lt;span class="nv">mono-font-size&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">var-font-size&lt;/span> &lt;span class="o">.&lt;/span> &lt;span class="mi">12&lt;/span>&lt;span class="p">)))))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">defun&lt;/span> &lt;span class="nv">fetch-setting&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">setting&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">cdr&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">assoc&lt;/span> &lt;span class="nv">setting&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">cdr&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">assoc&lt;/span> &lt;span class="nv">system-name&lt;/span> &lt;span class="nv">settings&lt;/span>&lt;span class="p">)))))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="k">setq&lt;/span> &lt;span class="nv">doom-font&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">font-spec&lt;/span> &lt;span class="ss">:family&lt;/span> &lt;span class="s">&amp;#34;Fira code&amp;#34;&lt;/span>
+&lt;span class="ss">:size&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">fetch-setting&lt;/span> &lt;span class="ss">&amp;#39;mono-font-size&lt;/span>&lt;span class="p">)))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+This has its limitations. It doesn&amp;#39;t work for any programme that doesn&amp;#39;t use a programming language to define its configuration, excluding just about anything that doesn&amp;#39;t use Lisp, Vimscript, Lua, or shell scripts.&lt;/p>
+&lt;p>
+To my knowledge, there is no reliable way to have &lt;em>toml&lt;/em>, &lt;em>json&lt;/em>, or &lt;em>yaml&lt;/em> files perform variable substitution or read conditionals. The closest I came was to use Bash to write the machine-specific configuration in &lt;code>~/.bash_profile&lt;/code>&lt;sup class="footnote-reference">&lt;a id="footnote-reference-1" href="#footnote-1">1&lt;/a>&lt;/sup> when it was run by the login shell&lt;sup class="footnote-reference">&lt;a id="footnote-reference-2" href="#footnote-2">2&lt;/a>&lt;/sup>.&lt;/p>
+&lt;div class="src src-sh">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="nv">DOT&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">$HOME&lt;/span>/.dotfiles
+&lt;span class="nv">CUSTOM&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">$DOT&lt;/span>/i3/.i3/config.&lt;span class="nv">$HOSTNAME&lt;/span>
+&lt;span class="nv">DEFAULT&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">$DOT&lt;/span>/i3/.i3/config.default
+&lt;span class="k">if&lt;/span> &lt;span class="o">[[&lt;/span> -f &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$CUSTOM&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &lt;span class="o">]]&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="k">then&lt;/span>
+cat &lt;span class="nv">$CUSTOM&lt;/span> &amp;gt; &lt;span class="nv">$DOT&lt;/span>/i3/.i3/config
+&lt;span class="k">else&lt;/span>
+cat &lt;span class="nv">$DEFAULT&lt;/span> &amp;gt; &lt;span class="nv">$DOT&lt;/span>/i3/.i3/config
+&lt;span class="k">fi&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+I was initially hopeful that I could use the machine-specific configuration just to append to a larger, shared configuration, but it was not to be. The files don&amp;#39;t always allow their section to be moved around on a whim, and moving a line into machine-specific configuration required one to remember to do the same for every machine. It also adds a huge amount of cruft to &lt;code>~/.bash_profile&lt;/code>, when I keep configuration for ~20 programmes this means ~150 lines of ifs and elses cluttering what should be a simple file.&lt;/p>
+&lt;p>
+Here I got the idea for Isogeny. It does the work at the same moment, but in a Clojure script and using the brilliant Selmer&lt;sup class="footnote-reference">&lt;a id="footnote-reference-3" href="#footnote-3">3&lt;/a>&lt;/sup> template rendering library.&lt;/p>
+&lt;p>
+Instead of appending, Isogeny uses substitution points in a template, which might be familiar to anyone who has used templates in front-end development.&lt;/p>
+&lt;div class="src src-text">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">...
+Font size: {{ font.size }}
+Font family: {{ font.family }}
+Ports: {% for port in ports %}
+Port: {{ port }} {% endfor %}
+...&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+The values of the variables is provided by a &lt;em>context&lt;/em> in an EDN file.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">{&lt;/span>&lt;span class="ss">:font&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="ss">:size&lt;/span> &lt;span class="mi">12&lt;/span>
+&lt;span class="ss">:family&lt;/span> &lt;span class="s">&amp;#34;Fira mono&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ss">:ports&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="mi">3355&lt;/span> &lt;span class="mi">3356&lt;/span>&lt;span class="p">]}&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+The user should keep a different context for each machine. They can be named something like &lt;code>programme.&amp;lt;HOSTNAME&amp;gt;.edn&lt;/code> so that the correct context can easily be picked using &lt;code>programme.$HOSTNAME.edn&lt;/code>&lt;sup class="footnote-reference">&lt;a id="footnote-reference-2" href="#footnote-2">2&lt;/a>&lt;/sup>.&lt;/p>
+&lt;p>
+The final result should be the rendered file in the correct position to be used by its programme.&lt;/p>
+&lt;div class="src src-text">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">...
+Font size: 12
+Font family: Fira mono
+Ports:
+Port: 3355
+Port: 3356
+...&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+Calls to Isogeny look like so:&lt;/p>
+&lt;div class="src src-sh">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">./isogeny.clj -t foo.template &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> -c foo.context.specific.edn &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> -d foo.context.default.edn &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> -o foo.config&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+The default context provides for a fallback should the specific context be missing, something that is useful when something has been misconfigured or when using a new machine. It can be inconvenient to have a display manager or window manager fail to launch.&lt;/p>
+&lt;p>
+Isogeny can help you prepare your config for use with Isogeny, it leaves the current config in place.&lt;/p>
+&lt;div class="src src-sh">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">./isogeny.clj --prepare ~/path/to/config
+&lt;span class="c1"># =&amp;gt; ~/path/to/config.template, a copy of current config&lt;/span>
+&lt;span class="c1"># =&amp;gt; ~/path/to/config.&amp;lt;HOSTNAME&amp;gt;.edn, an empty context to edit&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+In the couple of days since I wrote the first working version of Isogeny, I have had great fun coming up with new functionality and seeing just how quickly I could implement it. These include:&lt;/p>
+&lt;dl>
+&lt;dt>
+&lt;code>--add-tags&lt;/code>
+&lt;/dt>
+&lt;dd>add custom tags to the renderer&lt;/dd>
+&lt;dt>
+&lt;code>--strict&lt;/code>
+&lt;/dt>
+&lt;dd>fail when a value is missing&lt;/dd>
+&lt;dt>
+&lt;code>--context-string&lt;/code>
+&lt;/dt>
+&lt;dd>provide context as a CLI option that overrides values in the file&lt;/dd>
+&lt;dt>
+&lt;code>--deep-merge&lt;/code>
+&lt;/dt>
+&lt;dd>use deep-merge rather than merge when overriding&lt;/dd>
+&lt;dt>
+&lt;code>--verbose&lt;/code>
+&lt;/dt>
+&lt;dd>provide detailed logging&lt;/dd>
+&lt;dt>
+&lt;code>--safe&lt;/code>
+&lt;/dt>
+&lt;dd>will not edit or overwrite existing files&lt;/dd>
+&lt;dt>
+&lt;code>--multi-template&lt;/code>
+&lt;/dt>
+&lt;dd>render multiple templates with a single call to Isogeny&lt;/dd>
+&lt;dt>
+&lt;code>--prepare&lt;/code>
+&lt;/dt>
+&lt;dd>prepare config to be used with Isogeny&lt;/dd>
+&lt;/dl>
+&lt;p>With these added features, I think that Isogeny fits the use cases of almost everyone conscious of configuration. Now my configuration setup looks like this, run on login:&lt;/p>
+&lt;div class="src src-sh">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">~/bin/isogeny.clj --multi-template &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> -c ~/.dotfiles/isogeny/context.&lt;span class="nv">$HOSTNAME&lt;/span>.edn &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> -d ~/.dotfiles/isogeny/context.default.edn &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> --strict --verbose --deep-merge &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> ~/.config/sway/config.template &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> ~/.config/alacritty/alacritty.yml.template &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> ~/.config/dunst/dunstrc.template &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> ~/.config/gammastep/config.ini.template&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+And with that, all my files are configured to this machine. Please, give it a &lt;a href="https://github.com/educatedalmost/isogeny">try&lt;/a>, submit issues and feature requests, and keep your configuration in good order.&lt;/p>
+&lt;div class="footnotes">
+&lt;hr class="footnotes-separatator">
+&lt;div class="footnote-definitions">
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-1">&lt;a href="#footnote-reference-1">1&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>On some systems, it is &lt;code>~/.profile&lt;/code> that is sourced on login, not &lt;code>~/.bash_profile&lt;/code>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-2">&lt;a href="#footnote-reference-2">2&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>&lt;code>HOSTNAME&lt;/code> is available in Bash, &lt;code>HOST&lt;/code> in Zsh, or just use &lt;code>$(uname -n)&lt;/code>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-3">&lt;a href="#footnote-reference-3">3&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>Isogeny owes a great debt to &lt;a href="https://github.com/yogthos/Selmer">Selmer&lt;/a>, the work of Yogthos.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div></description></item></channel></rss>

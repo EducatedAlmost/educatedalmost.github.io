@@ -1,1 +1,784 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>jvm on blog.AlmostEducated</title><link>http://blog.almost.education/tags/jvm/</link><description>Recent content in jvm on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Tue, 14 Dec 2021 18:28:42 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/jvm/index.xml" rel="self" type="application/rss+xml"/><item><title>Clojure CLI apps using GraalVM</title><link>http://blog.almost.education/posts/clojure-cli-graal/</link><pubDate>Tue, 14 Dec 2021 18:28:42 +0000</pubDate><guid>http://blog.almost.education/posts/clojure-cli-graal/</guid><description>Clojure, like other JVM languages, excels in long-running tasks1. But I was always jealous of the languages that I&amp;#39;d used for scripting and command line tools which can&amp;#39;t wait a second for a JVM to start for each invocation. Despite its slow startup time, the JVM shines at peak throughput. Some times we want one, sometimes the other. For tasks that have a very short lifetime (~1s), we need Ahead of Time compilation.</description></item><item><title>An 8-year-old Clojure bug, resorting to Java</title><link>http://blog.almost.education/posts/clojure-java-bug/</link><pubDate>Wed, 01 Dec 2021 15:26:12 +0000</pubDate><guid>http://blog.almost.education/posts/clojure-java-bug/</guid><description>Dodge a Clojure bug by using Java and tools.build</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>jvm on blog.AlmostEducated</title><link>http://blog.almost.education/tags/jvm/</link><description>Recent content in jvm on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Tue, 14 Dec 2021 18:28:42 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/jvm/index.xml" rel="self" type="application/rss+xml"/><item><title>Clojure CLI apps using GraalVM</title><link>http://blog.almost.education/posts/clojure-cli-graal/</link><pubDate>Tue, 14 Dec 2021 18:28:42 +0000</pubDate><guid>http://blog.almost.education/posts/clojure-cli-graal/</guid><description>
+&lt;p>
+Clojure, like other JVM languages, excels in long-running tasks&lt;sup class="footnote-reference">&lt;a id="footnote-reference-1" href="#footnote-1">1&lt;/a>&lt;/sup>. But I was always jealous of the languages that I&amp;#39;d used for scripting and command line tools which can&amp;#39;t wait a second for a JVM to start for each invocation. Despite its slow startup time, the JVM shines at peak throughput. Some times we want one, sometimes the other. For tasks that have a very short lifetime (~1s), we need Ahead of Time compilation.&lt;/p>
+&lt;div id="outline-container-headline-1" class="outline-2">
+&lt;h2 id="headline-1">
+AOT vs. JIT
+&lt;/h2>
+&lt;div id="outline-text-headline-1" class="outline-text-2">
+&lt;p>
+Whatever happens, the code you write is translated to machine code that is executed on the host machine. One might think that, when compiling C, this is a single step, but it is a process from preprocessor to compiler to assembler and then linker. At the end of this, all of the machine code has been produced before the programme is run.&lt;/p>
+&lt;div id="outline-container-headline-2" class="outline-3">
+&lt;h3 id="headline-2">
+JIT
+&lt;/h3>
+&lt;div id="outline-text-headline-2" class="outline-text-3">
+&lt;p>
+Not so with Java and JVM languages. When one &amp;#39;&lt;em>compiles&lt;/em>&amp;#39; a JVM project, say by calling &lt;code>javac&lt;/code>, one produces bytecode — not machine code. When the programme is run and the JVM is started, the JVM does the work of compiling its bytecode into machine code on an &lt;em>ad hoc&lt;/em> basis as methods are called, hence the name &lt;em>just-in-time&lt;/em> compilation&lt;sup class="footnote-reference">&lt;a id="footnote-reference-2" href="#footnote-2">2&lt;/a>&lt;/sup>.&lt;/p>
+&lt;p>
+JIT has its benefits. It can make optimisations because it knows exactly the machine it is compiling for, whereas with C the build machine will likely be different from the machine the code runs on. The JVM also has the ability to profile the code as it runs and make optimisations based on how the code is actually used. Say in the code there is are references to &lt;code>foo.bar(false, n)&lt;/code> and &lt;code>foo.bar(true, n)&lt;/code> but as the code is run the latter is called millions of times more often than the former. JIT compilation can see this and optimise calls to &lt;code>foo.bar&lt;/code> where the first argument is &lt;code>true&lt;/code>. This is the sort of information that is not available when compiling beforehand.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-3" class="outline-3">
+&lt;h3 id="headline-3">
+AOT
+&lt;/h3>
+&lt;div id="outline-text-headline-3" class="outline-text-3">
+&lt;p>
+Perhaps, by now, you have guessed that the alternative is &lt;em>ahead-of-time&lt;/em> compilation. Compiling ahead of time, there is no need for a JVM to run, and thus no profiling and no &lt;em>ad hoc&lt;/em> compilation. The result is a programme that starts instantly and with a &lt;em>much&lt;/em> smaller memory footprint (~×10).&lt;/p>
+&lt;p>
+For two decades, there was no other way to run JVM languages except on the JVM by way of JIT. But now, with the release of &lt;a href="https://www.graalvm.org/">GraalVM&lt;/a> in 2019, we can now compile our JVM programmes via AOT, straight to machine code.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-4" class="outline-2">
+&lt;h2 id="headline-4">
+GraalVM
+&lt;/h2>
+&lt;div id="outline-text-headline-4" class="outline-text-2">
+&lt;p>
+GraalVM, from the Old French &lt;em>graal&lt;/em> meaning &lt;em>grail&lt;/em>, is an Oracle project comprising:&lt;/p>
+&lt;ul>
+&lt;li>GraalVM Compiler, a JIT compiler for Java&lt;/li>
+&lt;li>GraalVM Native Image, a AOT compiler for Java&lt;/li>
+&lt;li>Truffle Language Implementation Framework, a specification for running other languages on GraalVM&lt;/li>
+&lt;li>LLVM and Javascript runtimes&lt;/li>
+&lt;/ul>
+&lt;p>We&amp;#39;re interested in the AOT compiler. First we need a copy of GraalVM; go to &lt;a href="https://www.graalvm.org/downloads/">https://www.graalvm.org/downloads/&lt;/a> and download the appropriate package, or if using Arch one install it from the &lt;a href="https://aur.archlinux.org/packages/native-image-jdk11-bin/">AUR&lt;/a>.&lt;/p>
+&lt;p>
+From wherever you install external binaries (&lt;code>/usr/bin&lt;/code>, &lt;code>~/bin&lt;/code>), extract the archive and set its location as an environment variable:&lt;/p>
+&lt;div class="src src-text">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">tar -xzvf ~/dl/graalvm-ce-java11-linux-amd64-21.3.0.tar.gz
+export GRAALVM_HOME=~/bin/graalvm-ce-java11-21.3.0&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+This might not add Graal&amp;#39;s executables to your PATH, but they can be run using &lt;code>$GRAALVM_HOME/bin/...&lt;/code> etc.. If you encounter permissions issues, you might have to run &lt;code>chmod +x &amp;lt;executable&amp;gt;&lt;/code> for the file to be able to be executed.&lt;/p>
+&lt;div id="outline-container-headline-5" class="outline-3">
+&lt;h3 id="headline-5">
+&lt;em>Hello Graal&lt;/em>
+&lt;/h3>
+&lt;div id="outline-text-headline-5" class="outline-text-3">
+&lt;p>
+I keep all my source code in &lt;code>~/src&lt;/code>, make changes to the commands for your system. These commands create a new Clojure project.&lt;/p>
+&lt;div class="src src-bash">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">mkdir -p ~/src/hello-graal/src/hello_graal
+&lt;span class="nb">cd&lt;/span> ~/src/hello-graal
+touch ./src/hello_graal/main.clj&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+And in &lt;code>main.clj&lt;/code> create this very simple &lt;em>Hello World&lt;/em> application.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="kd">ns &lt;/span>&lt;span class="nv">hello-graal.main&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="ss">:gen-class&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="kd">defn &lt;/span>&lt;span class="nv">-main&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="nv">_args&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">println &lt;/span>&lt;span class="s">&amp;#34;Hello Graal!&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+We can use Clojure&amp;#39;s &lt;code>compile&lt;/code> to compile the namespace into classfiles, as one would with &lt;code>javac&lt;/code>. The bytecode in the classfiles would normally be used by the JVM, but we will use them with Graal&amp;#39;s &lt;code>native-image&lt;/code> to produce an executable binary. Graal doesn&amp;#39;t explicitly support Clojure, but once Clojure is compiled to bytecode it is just the same as any other JVM language, including Java.&lt;/p>
+&lt;div class="src src-text">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">mkdir classes
+clojure -M -e &amp;#34;(compile &amp;#39;hello-graal.main)&amp;#34;&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+We can write a script, &lt;code>compile&lt;/code>, that contains the call to Graal&amp;#39;s &lt;code>native-image&lt;/code>.&lt;/p>
+&lt;div class="src src-bash">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="cp">#!/usr/bin/env bash
+&lt;/span>&lt;span class="cp">&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="o">[&lt;/span> -z &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$GRAALVM_HOME&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &lt;span class="o">]&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="k">then&lt;/span>
+&lt;span class="nb">echo&lt;/span> &lt;span class="s1">&amp;#39;Please set GRAALVM_HOME&amp;#39;&lt;/span>
+&lt;span class="nb">exit&lt;/span> &lt;span class="m">1&lt;/span>
+&lt;span class="k">fi&lt;/span>
+mkdir classes
+clojure -M -e &lt;span class="s2">&amp;#34;(compile &amp;#39;hello-graal.main)&amp;#34;&lt;/span>
+&lt;span class="c1"># Ensure Graal native-image program is installed&lt;/span>
+&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$GRAALVM_HOME&lt;/span>&lt;span class="s2">/bin/gu&amp;#34;&lt;/span> install native-image
+&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$GRAALVM_HOME&lt;/span>&lt;span class="s2">/bin/native-image&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> -cp &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="k">$(&lt;/span>clojure -Spath&lt;span class="k">)&lt;/span>&lt;span class="s2">:classes&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> -H:Name&lt;span class="o">=&lt;/span>hello-graal &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> -H:+ReportExceptionStackTraces &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> --initialize-at-build-time &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> --verbose &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> --no-fallback &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> --no-server &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> &lt;span class="s2">&amp;#34;-J-Xmx3g&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> hello_graal.main&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+When this script is run it produces an executable, &lt;code>hello-graal&lt;/code>. Give it a try!&lt;/p>
+&lt;div class="src src-text">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">chmod +x compile
+./compile
+./hello-graal&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-6" class="outline-3">
+&lt;h3 id="headline-6">
+Next steps
+&lt;/h3>
+&lt;div id="outline-text-headline-6" class="outline-text-3">
+&lt;p>
+This is a subject I&amp;#39;d like to return to. I see great promise for the role of Clojure in creating native applications. Graal&amp;#39;s already being used by &lt;a href="https://github.com/babashka/babashka">Babashka&lt;/a>, &lt;a href="https://github.com/clojure-lsp/clojure-lsp">clojure-lsp&lt;/a>, and &lt;a href="https://github.com/clj-kondo/clj-kondo">clj-kondo&lt;/a>, three tools I use on a daily basis.&lt;/p>
+&lt;p>
+Our next steps might be to add the ability to add command-line options and arguments using &lt;a href="https://github.com/clojure/tools.cli">tools.cli&lt;/a>. And we can read from &lt;code>stdin&lt;/code> using &lt;code>(new java.io.BufferedReader *in*)&lt;/code>.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="kd">ns &lt;/span>&lt;span class="nv">hello-graal.main&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="ss">:require&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">clojure.tools.cli&lt;/span> &lt;span class="ss">:as&lt;/span> &lt;span class="nv">cli&lt;/span>&lt;span class="p">]))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="k">def &lt;/span>&lt;span class="nv">cli-options&lt;/span>
+&lt;span class="p">[[&lt;/span>&lt;span class="s">&amp;#34;-v&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;--verbose&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;Verbosity&amp;#34;&lt;/span>&lt;span class="p">]])&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="kd">defn &lt;/span>&lt;span class="nv">-main&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="nv">args&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="k">let &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nv">opts&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">cli/parse-opts&lt;/span> &lt;span class="nv">args&lt;/span> &lt;span class="nv">cli-options&lt;/span>&lt;span class="p">)]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">doseq &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nv">ln&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">line-seq &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new &lt;/span>&lt;span class="nv">java.io.BufferedReader&lt;/span> &lt;span class="nv">*in*&lt;/span>&lt;span class="p">))]&lt;/span>
+&lt;span class="c1">;; Use a line from input.&lt;/span>
+&lt;span class="p">)))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+In part two I will show how to replicate some of the functionality of clj-kondo, and then implement some missing features.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnotes">
+&lt;hr class="footnotes-separatator">
+&lt;div class="footnote-definitions">
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-1">&lt;a href="#footnote-reference-1">1&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>&lt;a href="https://www.youtube.com/watch?v=PeMvksAZbdw&amp;amp;t=647s">Maximising Java Application Performance with GraalVM&lt;/a> by Oleg Šelajev at GOTO 2020.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-2">&lt;a href="#footnote-reference-2">2&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>
+The earliest possible mention of JIT I know of is from John McCarthy of Lisp fame:&lt;/p>
+&lt;blockquote>
+&lt;p>The programmer may have selected S-functions compiled into machine
+language programs put into the core memory. Values of compiled functions
+are computed about 60 times as fast as they would if interpreted. Compilation
+is fast enough so that it is not necessary to punch compiled program for future
+use.&lt;/p>
+&lt;/blockquote>
+&lt;p>— &lt;a href="http://www-formal.stanford.edu/jmc/recursive.pdf">Recursive Functions of Symbolic Expressions and Their Computation by Machine, Part I, 1960&lt;/a>&lt;/p>
+&lt;blockquote>
+&lt;p>Instead, we suspect that the earliest published work on JIT compilation was McCarthy’s [1960] LISP paper. He men- tioned compilation of functions into ma- chine language, a process fast enough that the compiler’s output needn’t be saved. This can be seen as an inevitable result of having programs and data share the same notation [McCarthy 1981].&lt;/p>
+&lt;/blockquote>
+&lt;p>— &lt;a href="https://www.eecs.ucf.edu/~dcm/Teaching/COT4810-Spring2011/Literature/JustInTimeCompilation.pdf">John Aycock, 2003&lt;/a>&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div></description></item><item><title>An 8-year-old Clojure bug, resorting to Java</title><link>http://blog.almost.education/posts/clojure-java-bug/</link><pubDate>Wed, 01 Dec 2021 15:26:12 +0000</pubDate><guid>http://blog.almost.education/posts/clojure-java-bug/</guid><description>
+&lt;p>
+I&amp;#39;ve been writing &lt;a href="https://github.com/EducatedAlmost/eventstore.clj.git">ae/eventstore.clj&lt;/a>, a Clojure wrapper for the &lt;a href="https://github.com/EventStore/EventStoreDB-Client-Java">EventStoreDB-Client-Java&lt;/a> library. Nicely written, it is still &amp;gt;5k lines of your typical verbose Java and I&amp;#39;m hoping I can do more in &amp;lt;1k lines. In writing this I have stumbled upon an 8-year-old Clojure bug, which itself might stem from a JVM bug from the last millennium.&lt;/p>
+&lt;div id="outline-container-headline-1" class="outline-2">
+&lt;h2 id="headline-1">
+Finding a Clojure–Java interop bug
+&lt;/h2>
+&lt;div id="outline-text-headline-1" class="outline-text-2">
+&lt;p>
+I loath private, protected, and their ilk, much preferring to make everything public 99% of the time. Power to the consumer! Here&amp;#39;s an (&lt;em>abbreviated&lt;/em>) example from the Java library. A protected base class which provided the subclass with a public method.&lt;/p>
+&lt;div class="src src-java">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="kd">protected&lt;/span> &lt;span class="kd">class&lt;/span> &lt;span class="nc">OptionsBase&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">T&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="n">T&lt;/span> &lt;span class="nf">timeouts&lt;/span> &lt;span class="o">(&lt;/span>&lt;span class="n">Timeouts&lt;/span> &lt;span class="n">timeouts&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="k">this&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">timeouts&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">timeouts&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="o">(&lt;/span>&lt;span class="n">T&lt;/span>&lt;span class="o">)&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="o">}&lt;/span>
+&lt;span class="o">}&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="kd">class&lt;/span> &lt;span class="nc">ReadAllOptions&lt;/span> &lt;span class="kd">extends&lt;/span> &lt;span class="n">OptionsBase&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">ReadAllOptions&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="kd">static&lt;/span> &lt;span class="n">ReadAllOptions&lt;/span> &lt;span class="nf">get&lt;/span>&lt;span class="o">()&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">ReadAllOptions&lt;/span>&lt;span class="o">();&lt;/span>
+&lt;span class="o">}&lt;/span>
+&lt;span class="o">}&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+In Java, this is perfectly legal. In Clojure:&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="nb">-&amp;gt; &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nf">ReadAllOptions/get&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">.timeouts&lt;/span> &lt;span class="nv">timeouts&lt;/span>&lt;span class="p">))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div class="src src-text">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">Error in -&amp;gt;ReadAllOptions-test
+Uncaught exception, not in assertion
+error: java.lang.IllegalArgumentException: No matching method timeouts found taking 1 args for class com.eventstore.dbclient.ReadAllOptions&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+I get exceptions like this all the time working with Clojure–Java interop, either I&amp;#39;ve:&lt;/p>
+&lt;ul>
+&lt;li>called the right method on the wrong class&lt;/li>
+&lt;li>called the wrong method on the right class&lt;/li>
+&lt;li>called an inaccessible method&lt;/li>
+&lt;/ul>
+&lt;p>Let&amp;#39;s find out which methods &lt;code>ReadAllOptions&lt;/code> provides:&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="nf">-&amp;gt;&amp;gt;&lt;/span> &lt;span class="nv">ReadAllOptions&lt;/span>
+&lt;span class="nv">.getMethods&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">map &lt;/span>&lt;span class="nv">str&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="c1">; =&amp;gt; ...&lt;/span>
+&lt;span class="c1">; 17. &amp;#34;public java.lang.Object com.eventstore.dbclient.OptionsBase.requiresLeader()&amp;#34;&lt;/span>
+&lt;span class="c1">; 18. &amp;#34;public java.lang.Object com.eventstore.dbclient.OptionsBase.requiresLeader(boolean)&amp;#34;&lt;/span>
+&lt;span class="c1">; 19. &amp;#34;public java.lang.Object com.eventstore.dbclient.OptionsBase.timeouts(com.eventstore.dbclient.Timeouts)&amp;#34;&lt;/span>
+&lt;span class="c1">; 20. &amp;#34;public java.lang.Object com.eventstore.dbclient.OptionsBase.notRequireLeader()&amp;#34;&lt;/span>
+&lt;span class="c1">; 21. &amp;#34;public final void java.lang.Object.wait(long,int) throws java.lang.InterruptedException&amp;#34;&lt;/span>
+&lt;span class="c1">; ...&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+Look at #19, it has a public method called timeouts, and after checking &lt;code>(.getClass timeout)&lt;/code> we can be sure that this call should work.&lt;/p>
+&lt;p>
+It turns out that this is a bug that goes back to at least 2013, when it was first tracked in the Clojure Jira (&lt;a href="https://clojure.atlassian.net/browse/CLJ-1243">#CLJ–1243&lt;/a>) and I suspect it might be related to a 22-year-old JVM bug (&lt;a href="https://bugs.java.com/bugdatabase/view_bug.do?bug_id=4283544">#JDK–4283544&lt;/a>).&lt;/p>
+&lt;p>
+Well, what to do? I don&amp;#39;t think there&amp;#39;s much use in waiting for this to get fixed. Let&amp;#39;s do as hackers do and hack. Given that I&amp;#39;m fairly certain that what I want to do is legal in Java, let&amp;#39;s look at the Java interop options of which there are three levels:&lt;/p>
+&lt;ol>
+&lt;li>class / member accesses and the dot special form&lt;/li>
+&lt;li>&lt;code>proxy&lt;/code>, &lt;a href="#gen-class">&lt;code>gen-class&lt;/code>&lt;/a>, &lt;code>reify&lt;/code>&lt;/li>
+&lt;li>writing Java&lt;/li>
+&lt;/ol>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-2" class="outline-2">
+&lt;h2 id="headline-2">
+Writing Java
+&lt;/h2>
+&lt;div id="outline-text-headline-2" class="outline-text-2">
+&lt;p>
+In this rare case, it looks like writing Java is ones only option. But I, like many other Clojure developers, was once a Java developer, and the Java needed is very simple, it is a wrapper for &lt;code>ReadAllOptions&lt;/code>, so the offending methods will be called inside our Java code.&lt;/p>
+&lt;div class="src src-java">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="kn">import&lt;/span> &lt;span class="nn">com.eventstore.dbclient.ReadAllOptions&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="kn">import&lt;/span> &lt;span class="nn">com.eventstore.dbclient.Timeouts&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="kd">class&lt;/span> &lt;span class="nc">ReadAllOptionsClj&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="n">ReadAllOptions&lt;/span> &lt;span class="n">foreign&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="nf">ReadAllOptionsClj&lt;/span> &lt;span class="o">()&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="k">this&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">foreign&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">ReadAllOptions&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">get&lt;/span>&lt;span class="o">();&lt;/span>
+&lt;span class="o">}&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="n">ReadAllOptionsClj&lt;/span> &lt;span class="nf">timeouts&lt;/span> &lt;span class="o">(&lt;/span>&lt;span class="n">Timeouts&lt;/span> &lt;span class="n">timeouts&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="k">this&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">foreign&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">timeouts&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="n">timeouts&lt;/span>&lt;span class="o">);&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="o">}&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="n">ReadAllOptions&lt;/span> &lt;span class="nf">build&lt;/span> &lt;span class="o">()&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">foreign&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;span class="o">}&lt;/span>
+&lt;span class="o">}&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+I&amp;#39;ve used a builder pattern here. This is good to call using Clojure&amp;#39;s &lt;code>cond-&amp;gt;&lt;/code> threading macro. It works by evaluating a predicate, and treating the next as if in a normal thread-first macro. In the following code this makes sure that methods are only called if the argument is non-nil, the builder&amp;#39;s default value is used otherwise.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="nf">cond-&amp;gt;&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">new &lt;/span>&lt;span class="nv">ReadAllOptionsClj&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">some?&lt;/span> &lt;span class="nv">timeouts&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">.timeouts&lt;/span> &lt;span class="nv">timeouts&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="c1">;; add many other fields to the builder&lt;/span>
+&lt;span class="c1">;; (some? host) (.addHost host)&lt;/span>
+&lt;span class="nv">true&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">.build&lt;/span>&lt;span class="p">))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+As always when calling Java from Clojure, one must import the class:&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="kd">ns &lt;/span>&lt;span class="nv">...&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="ss">:require&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">...&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="ss">:import&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">ae.eventstore.j&lt;/span> &lt;span class="nv">ReadAllOptionsClj&lt;/span>&lt;span class="p">]))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+But before it can be used, the Java needs to be compiled.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-3" class="outline-2">
+&lt;h2 id="headline-3">
+Compiling Java with tools.build
+&lt;/h2>
+&lt;div id="outline-text-headline-3" class="outline-text-2">
+&lt;p>
+Building this in Leiningen should be &lt;a href="https://cljdoc.org/d/leiningen/leiningen/2.9.8/doc/polyglot-clojure-java-projects-with-leiningen">really simple&lt;/a>. Lein&amp;#39;s &lt;code>defproject&lt;/code> has the key &lt;code>:java-source-paths&lt;/code> which can be compiled using &lt;code>lein javac&lt;/code>, but this is usually unnecessary as all the usual Lein tasks will do it for you.&lt;/p>
+&lt;p>
+I made the switch to &lt;code>deps.edn&lt;/code> last year, unfortunately it won&amp;#39;t do compile Java code automatically. But this does provide one with an opportunity to learn how to use &lt;a href="https://github.com/clojure/tools.build">&lt;code>tools.build&lt;/code>&lt;/a>, written by Alex Miller (@puredanger). Asserting that &lt;em>builds are programs&lt;/em>, we must do for ourselves what Lein would be doing.&lt;/p>
+&lt;p>
+To &lt;code>deps.edn&lt;/code> one must add an alias for the task to be performed, add any dependencies needed for that task, and the namespace containing the functions to use. Our tasks will be &lt;code>build&lt;/code>, our only dependency &lt;code>tools.build&lt;/code>, and our namespace &lt;code>build&lt;/code>.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">{&lt;/span>&lt;span class="ss">:alias&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="ss">:build&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nv">io.github.clojure/tools.build&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="ss">:git/tag&lt;/span> &lt;span class="s">&amp;#34;v0.6.8&amp;#34;&lt;/span> &lt;span class="ss">:git/sha&lt;/span> &lt;span class="s">&amp;#34;d79ae84&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ss">:ns-default&lt;/span> &lt;span class="nv">build&lt;/span>&lt;span class="p">}}}&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+One then creates &lt;code>build.clj&lt;/code> in the project&amp;#39;s root where we will start defining our build task:&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="kd">ns &lt;/span>&lt;span class="nv">build&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="ss">:require&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">clojure.tools.build.api&lt;/span> &lt;span class="ss">:as&lt;/span> &lt;span class="nv">b&lt;/span>&lt;span class="p">]))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+The most important subtask will be compiling our Java code, for which &lt;code>tools.build&lt;/code> provides the &lt;code>javac&lt;/code> function.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="k">def &lt;/span>&lt;span class="nv">class-dir&lt;/span> &lt;span class="s">&amp;#34;target/classes&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="k">def &lt;/span>&lt;span class="nv">basis&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">b/create-basis&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="ss">:project&lt;/span> &lt;span class="s">&amp;#34;deps.edn&amp;#34;&lt;/span>&lt;span class="p">}))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="kd">defn &lt;/span>&lt;span class="nv">compile&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">_&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">b/javac&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="ss">:src-dirs&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s">&amp;#34;java&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="ss">:class-dir&lt;/span> &lt;span class="nv">class-dir&lt;/span>
+&lt;span class="ss">:basis&lt;/span> &lt;span class="nv">basis&lt;/span>
+&lt;span class="ss">:javac-opts&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s">&amp;#34;-source&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;8&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;-target&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;8&amp;#34;&lt;/span>&lt;span class="p">]}))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+I assume here that the Java code is within &lt;code>java&lt;/code> but it might be possible to keep it as a subdirectory or &lt;code>src&lt;/code> as one would with &lt;code>clj&lt;/code>, &lt;code>cljc&lt;/code>, and &lt;code>cljs&lt;/code>.&lt;/p>
+&lt;p>
+Running &lt;code>clojure -T:build compile&lt;/code> will compile the Java source files as can be seen by looking in &lt;code>target/classes&lt;/code>. Once &lt;code>target/classes&lt;/code> is added to the classpath you will be ready to call the class from Clojure.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">{&lt;/span>&lt;span class="ss">:paths&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s">&amp;#34;src&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;resources&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;target/classes&amp;#34;&lt;/span>&lt;span class="p">]}&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-gen-class" class="outline-2">
+&lt;h2 id="gen-class">
+Trying &lt;code>gen-class&lt;/code>?
+&lt;/h2>
+&lt;div id="outline-text-gen-class" class="outline-text-2">
+&lt;p>
+In attempting to use &lt;code>gen-class&lt;/code> to circumvent this bug, I found an even older Clojure bug! Using the builder pattern, the builder&amp;#39;s methods return itself. This allows one to use method chaining in Java, or threading macros in Clojure.&lt;/p>
+&lt;div class="src src-java">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="n">Foo&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">newBuilder&lt;/span>&lt;span class="o">()&lt;/span>
+&lt;span class="o">.&lt;/span>&lt;span class="na">red&lt;/span>&lt;span class="o">()&lt;/span>
+&lt;span class="o">.&lt;/span>&lt;span class="na">mirrored&lt;/span>&lt;span class="o">()&lt;/span>
+&lt;span class="o">.&lt;/span>&lt;span class="na">short&lt;/span>&lt;span class="o">()&lt;/span>
+&lt;span class="o">.&lt;/span>&lt;span class="na">wearing&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="n">jacket&lt;/span>&lt;span class="o">)&lt;/span>
+&lt;span class="o">.&lt;/span>&lt;span class="na">build&lt;/span>&lt;span class="o">()&lt;/span>
+&lt;span class="c1">// =&amp;gt; an instance of Foo
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="nb">-&amp;gt; &lt;/span>&lt;span class="nv">Foo&lt;/span>
+&lt;span class="nv">.newBuilder&lt;/span>
+&lt;span class="nv">.red&lt;/span>
+&lt;span class="nv">.mirrored&lt;/span>
+&lt;span class="nv">.short&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">.wearing&lt;/span> &lt;span class="nv">jacket&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nv">.build&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="c1">;; =&amp;gt; an instance of Foo&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+One would write the method like so, so the function makes the change to the internal state, and then returns itself.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="nf">gen-class&lt;/span> &lt;span class="ss">:name&lt;/span> &lt;span class="s">&amp;#34;ae.ReadAllOptionsBuilder&amp;#34;&lt;/span>
+&lt;span class="ss">:methods&lt;/span> &lt;span class="p">[[&lt;/span>&lt;span class="nv">timeouts&lt;/span>
+&lt;span class="p">[&lt;/span>&lt;span class="nv">com.eventstore.dbclient.Timeouts&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="nv">ae.ReadAllOptionsBuilder&lt;/span>&lt;span class="p">]])&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="kd">defn &lt;/span>&lt;span class="nv">-timeouts&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">this&lt;/span> &lt;span class="nv">timeouts&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">-&amp;gt; &lt;/span>&lt;span class="nv">this&lt;/span> &lt;span class="nv">.state&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">.timeouts&lt;/span> &lt;span class="nv">timeouts&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="nv">this&lt;/span>&lt;span class="p">)&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+If it only were so. Ticket &lt;a href="https://clojure.atlassian.net/browse/CLJ-84">#CLJ-84&lt;/a>, &lt;em>compile gen-class fail when class returns self&lt;/em>, makes it clear that it is not possible for a &lt;code>gen-class&lt;/code> method to return an instance of the same class. Created on 17th June 2009 by Rick Hickey, this ticket is as old as Clojure&amp;#39;s ticketing system itself. What happens if we return &lt;code>void&lt;/code> instead?&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="kd">ns &lt;/span>&lt;span class="nv">ae.read-all-options&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="ss">:import&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">com.eventstore.dbclient&lt;/span>
+&lt;span class="nv">Direction&lt;/span>
+&lt;span class="nv">Position&lt;/span>
+&lt;span class="nv">ReadAllOptions&lt;/span>
+&lt;span class="nv">Timeouts&lt;/span>
+&lt;span class="nv">UserCredentials&lt;/span>&lt;span class="p">]))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">gen-class&lt;/span>
+&lt;span class="ss">:name&lt;/span> &lt;span class="s">&amp;#34;ae.eventstore.ReadAllOptionsCljTwo&amp;#34;&lt;/span>
+&lt;span class="ss">:state&lt;/span> &lt;span class="nv">state&lt;/span>
+&lt;span class="ss">:init&lt;/span> &lt;span class="nv">init&lt;/span>
+&lt;span class="ss">:constructors&lt;/span> &lt;span class="p">{[]&lt;/span> &lt;span class="p">[]}&lt;/span>
+&lt;span class="ss">:methods&lt;/span> &lt;span class="p">[[&lt;/span>&lt;span class="nv">getForeign&lt;/span> &lt;span class="p">[]&lt;/span> &lt;span class="nv">com.eventstore.dbclient.ReadAllOptions&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">[&lt;/span>&lt;span class="nv">authenticated&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">com.eventstore.dbclient.UserCredentials&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="nv">void&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">[&lt;/span>&lt;span class="nv">requiresLeader&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">boolean&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="nv">void&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">[&lt;/span>&lt;span class="nv">timeouts&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">com.eventstore.dbclient.Timeouts&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="nv">void&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">[&lt;/span>&lt;span class="nv">resolveLinkTos&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">boolean&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="nv">void&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">[&lt;/span>&lt;span class="nv">fromPosition&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">com.eventstore.dbclient.Position&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="nv">void&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">[&lt;/span>&lt;span class="nv">direction&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">com.eventstore.dbclient.Direction&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="nv">void&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">[&lt;/span>&lt;span class="nv">build&lt;/span> &lt;span class="p">[]&lt;/span> &lt;span class="nv">com.eventstore.dbclient.ReadAllOptions&lt;/span>&lt;span class="p">]])&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="kd">defn &lt;/span>&lt;span class="nv">-init&lt;/span> &lt;span class="p">[]&lt;/span>
+&lt;span class="p">[[]&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">ReadAllOptions/get&lt;/span>&lt;span class="p">)])&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="kd">defn &lt;/span>&lt;span class="nv">-getForeign&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">this&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">.state&lt;/span> &lt;span class="nv">this&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="kd">defn &lt;/span>&lt;span class="nv">-authenticated&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">this&lt;/span> &lt;span class="nv">credentials&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">-&amp;gt; &lt;/span>&lt;span class="nv">this&lt;/span> &lt;span class="nv">.state&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">.authenticated&lt;/span> &lt;span class="nv">credentials&lt;/span>&lt;span class="p">)))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="kd">defn &lt;/span>&lt;span class="nv">-requiresLeader&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">this&lt;/span> &lt;span class="nv">value&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">-&amp;gt; &lt;/span>&lt;span class="nv">this&lt;/span> &lt;span class="nv">.state&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">.requiresLeader&lt;/span> &lt;span class="nv">value&lt;/span>&lt;span class="p">)))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="kd">defn &lt;/span>&lt;span class="nv">-timeouts&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">this&lt;/span> &lt;span class="nv">timeouts&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">-&amp;gt; &lt;/span>&lt;span class="nv">this&lt;/span> &lt;span class="nv">.state&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">.timeouts&lt;/span> &lt;span class="nv">timeouts&lt;/span>&lt;span class="p">)))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+Given that the methods are returning void, we have to use an abomination like this with an implicit &lt;code>do&lt;/code> and explicit altering of state:&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="kd">defn &lt;/span>&lt;span class="nv">apply-base-options&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">builder&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="ss">::options/keys&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">timeouts&lt;/span> &lt;span class="nv">requires-leader?&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="ss">::keys&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">credentials&lt;/span>&lt;span class="p">]}]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="k">if &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nf">some?&lt;/span> &lt;span class="nv">timeouts&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">.timeouts&lt;/span> &lt;span class="nv">builder&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">-&amp;gt;Timeouts&lt;/span> &lt;span class="nv">timeouts&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="nv">nil&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="k">if &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nf">some?&lt;/span> &lt;span class="nv">requires-leader?&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">.requiresLeader&lt;/span> &lt;span class="nv">builder&lt;/span> &lt;span class="nv">requires-leader?&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nv">nil&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="k">if &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nf">some?&lt;/span> &lt;span class="nv">credentials&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">.authenticated&lt;/span> &lt;span class="nv">builder&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">-&amp;gt;UserCredentials&lt;/span> &lt;span class="nv">credentials&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="nv">nil&lt;/span>&lt;span class="p">))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+And AOT compile to make use of &lt;code>gen-class&lt;/code> by adding a new subtask to &lt;code>build.clj&lt;/code>:&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="kd">defn &lt;/span>&lt;span class="nv">compile-2&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">_&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">compile&lt;/span> &lt;span class="nv">nil&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">;; only needed if you haven&amp;#39;t removed the Java code&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">b/compile-clj&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="ss">:basis&lt;/span> &lt;span class="nv">basis&lt;/span>
+&lt;span class="ss">:src-dirs&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s">&amp;#34;src&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="ss">:class-dir&lt;/span> &lt;span class="nv">class-dir&lt;/span>&lt;span class="p">}))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+And the best thing? It doesn&amp;#39;t even work.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="nv">java.lang.IllegalArgumentException&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="nv">No&lt;/span> &lt;span class="nv">matching&lt;/span> &lt;span class="nv">method&lt;/span> &lt;span class="nv">timeouts&lt;/span> &lt;span class="nv">found&lt;/span> &lt;span class="nv">taking&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="nv">args&lt;/span> &lt;span class="nb">for class &lt;/span>&lt;span class="nv">com.eventstore.dbclient.ReadAllOptions&lt;/span>
+&lt;span class="nv">No&lt;/span> &lt;span class="nv">matching&lt;/span> &lt;span class="nv">method&lt;/span> &lt;span class="nv">timeouts&lt;/span> &lt;span class="nv">found&lt;/span> &lt;span class="nv">taking&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="nv">args&lt;/span> &lt;span class="nb">for &lt;/span>&lt;span class="nv">class&lt;/span>
+&lt;span class="nv">com.eventstore.dbclient.ReadAllOptions&lt;/span>
+&lt;span class="nv">Reflector.java&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="mi">127&lt;/span> &lt;span class="nv">clojure.lang.Reflector/invokeMatchingMethod&lt;/span>
+&lt;span class="nv">Reflector.java&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="mi">102&lt;/span> &lt;span class="nv">clojure.lang.Reflector/invokeInstanceMethod&lt;/span>
+&lt;span class="nv">read_all_options.clj&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="mi">36&lt;/span> &lt;span class="nv">ae.read-all-options/-timeouts&lt;/span>
+&lt;span class="nv">read_all_options.clj&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="mi">35&lt;/span> &lt;span class="nv">ae.read-all-options/-timeouts&lt;/span>
+&lt;span class="nv">nil&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="mi">-1&lt;/span> &lt;span class="nv">ae.eventstore.ReadAllOptionsCljTwo/timeouts&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-5" class="outline-2">
+&lt;h2 id="headline-5">
+Other uses
+&lt;/h2>
+&lt;div id="outline-text-headline-5" class="outline-text-2">
+&lt;p>
+I can&amp;#39;t imagine that such a setup will be useful too often, but here are a couple that come to mind:&lt;/p>
+&lt;ul>
+&lt;li>Java is more performant (~2×?)&lt;/li>
+&lt;li>an existing codebase migrating to Clojure (à la &lt;a href="https://www.redhat.com/architect/pros-and-cons-strangler-architecture-pattern">strangler architecture&lt;/a>)&lt;/li>
+&lt;li>providing a reliable Java API&lt;/li>
+&lt;li>using tools that require Java magic&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/div></description></item></channel></rss>

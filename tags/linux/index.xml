@@ -1,3 +1,125 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>linux on blog.AlmostEducated</title><link>http://blog.almost.education/tags/linux/</link><description>Recent content in linux on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Sat, 13 Nov 2021 19:35:28 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>dired-listing-switches and ls</title><link>http://blog.almost.education/posts/dired-listing-switches/</link><pubDate>Sat, 13 Nov 2021 19:35:28 +0000</pubDate><guid>http://blog.almost.education/posts/dired-listing-switches/</guid><description>Have you ever been unsatisfied with the way that dired1 lists your files? Ever wished it wouldn&amp;#39;t show you the group and owner for every file despite them all being exactly the same? Want to get those directories out of the way of your files?
-… enter dired-listing-switches.
-The first time I saw this variable set in another person&amp;#39;s init.el I thought it must be a kind of magic.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>linux on blog.AlmostEducated</title><link>http://blog.almost.education/tags/linux/</link><description>Recent content in linux on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Sat, 13 Nov 2021 19:35:28 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>dired-listing-switches and ls</title><link>http://blog.almost.education/posts/dired-listing-switches/</link><pubDate>Sat, 13 Nov 2021 19:35:28 +0000</pubDate><guid>http://blog.almost.education/posts/dired-listing-switches/</guid><description>&lt;p>
+Have you ever been unsatisfied with the way that &lt;a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html">dired&lt;/a>&lt;sup class="footnote-reference">&lt;a id="footnote-reference-1" href="#footnote-1">1&lt;/a>&lt;/sup> lists your files? Ever wished it wouldn&amp;#39;t show you the group and owner for every file despite them all being exactly the same? Want to get those directories out of the way of your files?&lt;/p>
+&lt;p>
+… enter &lt;code>dired-listing-switches&lt;/code>.&lt;/p>
+&lt;p>
+The first time I saw this variable set in another person&amp;#39;s &lt;code>init.el&lt;/code> I thought it must be a kind of magic. Mine looks like this:&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="k">setq&lt;/span> &lt;span class="nv">dired-listing-switches&lt;/span> &lt;span class="s">&amp;#34;-aBGhl --group-directories-first&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+The trick is, and I would have realised this if I knew how to look up the documentation of Emacs variables&lt;sup class="footnote-reference">&lt;a id="footnote-reference-2" href="#footnote-2">2&lt;/a>&lt;/sup>, that these are flags that are passed to &lt;a href="https://www.man7.org/linux/man-pages/man1/ls.1.html">&lt;code>ls&lt;/code>&lt;/a>. It makes sense that Emacs would delegate to another tool, it&amp;#39;s part of the UNIX philosophy&lt;sup class="footnote-reference">&lt;a id="footnote-reference-3" href="#footnote-3">3&lt;/a>&lt;/sup> to trust tasks to other tools rather than do them oneself.&lt;/p>
+&lt;p>
+What flags does &lt;code>ls&lt;/code> take? A lot. &lt;code>ls --help&lt;/code> has 120 lines; these are the options you&amp;#39;re most likely to want to try:&lt;/p>
+&lt;p>
+&lt;code>-l&lt;/code> &lt;strong>is the only flag that is required&lt;/strong>. It prints a number of details for each file in a list, instead of the default of &lt;code>ls&lt;/code>, a grid.&lt;/p>
+&lt;dl>
+&lt;dt>
+&lt;code>-a, --all&lt;/code>
+&lt;/dt>
+&lt;dd>show all files, don&amp;#39;t ignore files starting with &lt;code>.&lt;/code>&lt;/dd>
+&lt;dt>
+&lt;code>-A, --almost-all&lt;/code>
+&lt;/dt>
+&lt;dd>like &lt;code>-a&lt;/code>, but it does ignore the files &lt;code>.&lt;/code> and &lt;code>..&lt;/code>&lt;/dd>
+&lt;dt>
+&lt;code>-B, --ignore-backups&lt;/code>
+&lt;/dt>
+&lt;dd>show all files, don&amp;#39;t ignore files starting with &lt;code>.&lt;/code>&lt;/dd>
+&lt;dt>
+&lt;code>-G, --no-group&lt;/code>
+&lt;/dt>
+&lt;dd>don&amp;#39;t print group names&lt;/dd>
+&lt;dt>
+&lt;code>--group-directories-first&lt;/code>
+&lt;/dt>
+&lt;dd>directories are listed first&lt;/dd>
+&lt;dt>
+&lt;code>-h, --human-readable&lt;/code>
+&lt;/dt>
+&lt;dd>present sizes of files like 1K, 4M, 12G&lt;/dd>
+&lt;dt>
+&lt;code>-I, --ignore=PATTERN&lt;/code>
+&lt;/dt>
+&lt;dd>ignores &lt;code>PATTERN&lt;/code>, unless &lt;code>-a&lt;/code> or &lt;code>-A&lt;/code> is set&lt;/dd>
+&lt;dt>
+&lt;code>-r, --reverse&lt;/code>
+&lt;/dt>
+&lt;dd>list in reverse order&lt;/dd>
+&lt;dt>
+&lt;code>-S&lt;/code>
+&lt;/dt>
+&lt;dd>sort by file size&lt;/dd>
+&lt;dt>
+&lt;code>--sort=WORD&lt;/code>
+&lt;/dt>
+&lt;dd>sort by &lt;code>none&lt;/code>, &lt;code>size&lt;/code>, &lt;code>time&lt;/code>, &lt;code>version&lt;/code>, &lt;code>extension&lt;/code>&lt;/dd>
+&lt;dt>
+&lt;code>-t&lt;/code>
+&lt;/dt>
+&lt;dd>sort by time&lt;/dd>
+&lt;dt>
+&lt;code>--time=WORD&lt;/code>
+&lt;/dt>
+&lt;dd>the definition of time, &lt;code>access&lt;/code>, &lt;code>ctime&lt;/code> (change), &lt;code>birth&lt;/code>&lt;/dd>
+&lt;dt>
+&lt;code>-U&lt;/code>
+&lt;/dt>
+&lt;dd>do not sort&lt;/dd>
+&lt;dt>
+&lt;code>-X&lt;/code>
+&lt;/dt>
+&lt;dd>sort alphabetically by file extension&lt;/dd>
+&lt;/dl>
+&lt;p>As well as these, there are a couple of other interesting switches which are either unusable or unhelpful for Emacs and dired, but might be useful when using &lt;code>ls&lt;/code> elsewhere:&lt;/p>
+&lt;dl>
+&lt;dt>
+&lt;code>-R, --recursive&lt;/code>
+&lt;/dt>
+&lt;dd>list the directory and all subdirectories recursively&lt;/dd>
+&lt;dt>
+&lt;code>-x&lt;/code>
+&lt;/dt>
+&lt;dd>&lt;code>ls&lt;/code> usually lists down and then across, this transposes that&lt;/dd>
+&lt;/dl>
+&lt;p>Add this to your &lt;code>init.el&lt;/code>, &lt;code>.spacemacs&lt;/code>, or &lt;code>config.el&lt;/code>:&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="k">setq&lt;/span> &lt;span class="nv">dired-listing-switches&lt;/span> &lt;span class="s">&amp;#34;-aBGhl --group-directories-first&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnotes">
+&lt;hr class="footnotes-separatator">
+&lt;div class="footnote-definitions">
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-1">&lt;a href="#footnote-reference-1">1&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>&lt;code>dired&lt;/code>: directory editor&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-2">&lt;a href="#footnote-reference-2">2&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>Try calling &lt;code>describe-variable&lt;/code> with &lt;code>C-h v&lt;/code>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-3">&lt;a href="#footnote-reference-3">3&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>&lt;a href="https://en.wikipedia.org/wiki/Unix_philosophy">Wikipedia&lt;/a> — an approach to software development that favours small modular components to monoliths; sometimes stated — &amp;#39;do one thing and do it well&amp;#39;. Whether Emacs in general follows this philosophy is a matter of &lt;a href="https://protesilaos.com/codelog/2021-09-22-live-stream-emacs-unix/">debate&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div></description></item></channel></rss>

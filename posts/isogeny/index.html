@@ -18,7 +18,7 @@
 <link rel=mask-icon href=http://blog.almost.education/safari-pinned-tab.svg>
 <meta name=theme-color content="#2e2e33">
 <meta name=msapplication-TileColor content="#2e2e33">
-<meta name=generator content="Hugo 0.91.2">
+<meta name=generator content="Hugo 0.92.0">
 <noscript>
 <style>#theme-toggle,.top-link{display:none}</style>
 </noscript>
@@ -35,7 +35,7 @@
 <meta name=twitter:title content="æ/Isogeny">
 <meta name=twitter:description content="Isogeny makes all configuration dynamic.">
 <script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":2,"name":"Posts","item":"http://blog.almost.education/posts/"},{"@type":"ListItem","position":3,"name":"æ/Isogeny","item":"http://blog.almost.education/posts/isogeny/"}]}</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"æ/Isogeny","name":"æ\/Isogeny","description":"Isogeny makes all configuration dynamic.","keywords":["programming","sysadmin","clojure"],"articleBody":" Read the code: Isogeny\n At any one time I have at least four machines running Linux: a desktop, a laptop, a server, and a phone. Keeping the configuration for the four systems in line can be a challenge — for some programmes it will be the same for all machines, and for others there will be almost nothing in common between the server and phone.\n In my most naïve approach, I kept a single file in version control and made edits to the working copy without committing them, but this is unable to receive changes from upstream. Next I kept a separate file for each machine, but this meant keeping four files perfectly just out-of-sync, and programmes often had difficulty knowing which config file to use.\n The first breakthrough came when I realised I could make certain parts of my Emacs configuration dynamic:\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16  (setq settings '((\"phobos\" . ((mono-font-size . 20) (var-font-size . 28))) (\"luna\" . ((mono-font-size . 20) (var-font-size . 28))) (\"europa\" . ((mono-font-size . 18) (var-font-size . 24))) (\"ceres\" . ((mono-font-size . 10) (var-font-size . 12))))) (defun fetch-setting (setting) (cdr (assoc setting (cdr (assoc system-name settings))))) (setq doom-font (font-spec :family \"Fira code\" :size (fetch-setting 'mono-font-size)))     This has its limitations. It doesn't work for any programme that doesn't use a programming language to define its configuration, excluding just about anything that doesn't use Lisp, Vimscript, Lua, or shell scripts.\n To my knowledge, there is no reliable way to have toml, json, or yaml files perform variable substitution or read conditionals. The closest I came was to use Bash to write the machine-specific configuration in ~/.bash_profile1 when it was run by the login shell2.\n1 2 3 4 5 6 7 8  DOT=$HOME/.dotfiles CUSTOM=$DOT/i3/.i3/config.$HOSTNAME DEFAULT=$DOT/i3/.i3/config.default if [[ -f \"$CUSTOM\" ]]; then cat $CUSTOM  $DOT/i3/.i3/config else cat $DEFAULT  $DOT/i3/.i3/config fi     I was initially hopeful that I could use the machine-specific configuration just to append to a larger, shared configuration, but it was not to be. The files don't always allow their section to be moved around on a whim, and moving a line into machine-specific configuration required one to remember to do the same for every machine. It also adds a huge amount of cruft to ~/.bash_profile, when I keep configuration for ~20 programmes this means ~150 lines of ifs and elses cluttering what should be a simple file.\n Here I got the idea for Isogeny. It does the work at the same moment, but in a Clojure script and using the brilliant Selmer3 template rendering library.\n Instead of appending, Isogeny uses substitution points in a template, which might be familiar to anyone who has used templates in front-end development.\n1 2 3 4 5 6  ... Font size: {{ font.size }} Font family: {{ font.family }} Ports: {% for port in ports %} Port: {{ port }} {% endfor %} ...     The values of the variables is provided by a context in an EDN file.\n1 2 3  {:font {:size 12 :family \"Fira mono\"} :ports [3355 3356]}     The user should keep a different context for each machine. They can be named something like programme..edn so that the correct context can easily be picked using programme.$HOSTNAME.edn2.\n The final result should be the rendered file in the correct position to be used by its programme.\n1 2 3 4 5 6 7  ... Font size: 12 Font family: Fira mono Ports: Port: 3355 Port: 3356 ...     Calls to Isogeny look like so:\n1 2 3 4  ./isogeny.clj -t foo.template \\  -c foo.context.specific.edn \\  -d foo.context.default.edn \\  -o foo.config     The default context provides for a fallback should the specific context be missing, something that is useful when something has been misconfigured or when using a new machine. It can be inconvenient to have a display manager or window manager fail to launch.\n Isogeny can help you prepare your config for use with Isogeny, it leaves the current config in place.\n1 2 3  ./isogeny.clj --prepare ~/path/to/config # = ~/path/to/config.template, a copy of current config # = ~/path/to/config..edn, an empty context to edit     In the couple of days since I wrote the first working version of Isogeny, I have had great fun coming up with new functionality and seeing just how quickly I could implement it. These include:\n  --add-tags   add custom tags to the renderer\n  --strict   fail when a value is missing\n  --context-string   provide context as a CLI option that overrides values in the file\n  --deep-merge   use deep-merge rather than merge when overriding\n  --verbose   provide detailed logging\n  --safe   will not edit or overwrite existing files\n  --multi-template   render multiple templates with a single call to Isogeny\n  --prepare   prepare config to be used with Isogeny\n  With these added features, I think that Isogeny fits the use cases of almost everyone conscious of configuration. Now my configuration setup looks like this, run on login:\n1 2 3 4 5 6 7 8  ~/bin/isogeny.clj --multi-template \\  -c ~/.dotfiles/isogeny/context.$HOSTNAME.edn \\  -d ~/.dotfiles/isogeny/context.default.edn \\  --strict --verbose --deep-merge \\  ~/.config/sway/config.template \\  ~/.config/alacritty/alacritty.yml.template \\  ~/.config/dunst/dunstrc.template \\  ~/.config/gammastep/config.ini.template     And with that, all my files are configured to this machine. Please, give it a try, submit issues and feature requests, and keep your configuration in good order.\n1 On some systems, it is ~/.profile that is sourced on login, not ~/.bash_profile.\n  2 HOSTNAME is available in Bash, HOST in Zsh, or just use $(uname -n).\n  3 Isogeny owes a great debt to Selmer, the work of Yogthos.\n    ","wordCount":"910","inLanguage":"en","datePublished":"2022-01-05T21:32:01Z","dateModified":"2022-01-05T21:32:01Z","author":{"@type":"Person","name":"AlmostEducated"},"mainEntityOfPage":{"@type":"WebPage","@id":"http://blog.almost.education/posts/isogeny/"},"publisher":{"@type":"Organization","name":"blog.AlmostEducated","logo":{"@type":"ImageObject","url":"http://blog.almost.education/img/ae-logo-trans.png"}}}</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"æ/Isogeny","name":"æ\/Isogeny","description":"Isogeny makes all configuration dynamic.","keywords":["programming","sysadmin","clojure"],"articleBody":" Read the code: Isogeny\n At any one time I have at least four machines running Linux: a desktop, a laptop, a server, and a phone. Keeping the configuration for the four systems in line can be a challenge — for some programmes it will be the same for all machines, and for others there will be almost nothing in common between the server and phone.\n In my most naïve approach, I kept a single file in version control and made edits to the working copy without committing them, but this is unable to receive changes from upstream. Next I kept a separate file for each machine, but this meant keeping four files perfectly just out-of-sync, and programmes often had difficulty knowing which config file to use.\n The first breakthrough came when I realised I could make certain parts of my Emacs configuration dynamic:\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16  (setq settings '((\"phobos\" . ((mono-font-size . 20) (var-font-size . 28))) (\"luna\" . ((mono-font-size . 20) (var-font-size . 28))) (\"europa\" . ((mono-font-size . 18) (var-font-size . 24))) (\"ceres\" . ((mono-font-size . 10) (var-font-size . 12))))) (defun fetch-setting (setting) (cdr (assoc setting (cdr (assoc system-name settings))))) (setq doom-font (font-spec :family \"Fira code\" :size (fetch-setting 'mono-font-size)))     This has its limitations. It doesn't work for any programme that doesn't use a programming language to define its configuration, excluding just about anything that doesn't use Lisp, Vimscript, Lua, or shell scripts.\n To my knowledge, there is no reliable way to have toml, json, or yaml files perform variable substitution or read conditionals. The closest I came was to use Bash to write the machine-specific configuration in ~/.bash_profile1 when it was run by the login shell2.\n1 2 3 4 5 6 7 8  DOT=$HOME/.dotfiles CUSTOM=$DOT/i3/.i3/config.$HOSTNAME DEFAULT=$DOT/i3/.i3/config.default if [[ -f \"$CUSTOM\" ]]; then cat $CUSTOM  $DOT/i3/.i3/config else cat $DEFAULT  $DOT/i3/.i3/config fi     I was initially hopeful that I could use the machine-specific configuration just to append to a larger, shared configuration, but it was not to be. The files don't always allow their section to be moved around on a whim, and moving a line into machine-specific configuration required one to remember to do the same for every machine. It also adds a huge amount of cruft to ~/.bash_profile, when I keep configuration for ~20 programmes this means ~150 lines of ifs and elses cluttering what should be a simple file.\n Here I got the idea for Isogeny. It does the work at the same moment, but in a Clojure script and using the brilliant Selmer3 template rendering library.\n Instead of appending, Isogeny uses substitution points in a template, which might be familiar to anyone who has used templates in front-end development.\n1 2 3 4 5 6  ... Font size: {{ font.size }} Font family: {{ font.family }} Ports: {% for port in ports %} Port: {{ port }} {% endfor %} ...     The values of the variables is provided by a context in an EDN file.\n1 2 3  {:font {:size 12 :family \"Fira mono\"} :ports [3355 3356]}     The user should keep a different context for each machine. They can be named something like programme..edn so that the correct context can easily be picked using programme.$HOSTNAME.edn2.\n The final result should be the rendered file in the correct position to be used by its programme.\n1 2 3 4 5 6 7  ... Font size: 12 Font family: Fira mono Ports: Port: 3355 Port: 3356 ...     Calls to Isogeny look like so:\n1 2 3 4  ./isogeny.clj -t foo.template \\  -c foo.context.specific.edn \\  -d foo.context.default.edn \\  -o foo.config     The default context provides for a fallback should the specific context be missing, something that is useful when something has been misconfigured or when using a new machine. It can be inconvenient to have a display manager or window manager fail to launch.\n Isogeny can help you prepare your config for use with Isogeny, it leaves the current config in place.\n1 2 3  ./isogeny.clj --prepare ~/path/to/config # = ~/path/to/config.template, a copy of current config # = ~/path/to/config..edn, an empty context to edit     In the couple of days since I wrote the first working version of Isogeny, I have had great fun coming up with new functionality and seeing just how quickly I could implement it. These include:\n  --add-tags  add custom tags to the renderer  --strict  fail when a value is missing  --context-string  provide context as a CLI option that overrides values in the file  --deep-merge  use deep-merge rather than merge when overriding  --verbose  provide detailed logging  --safe  will not edit or overwrite existing files  --multi-template  render multiple templates with a single call to Isogeny  --prepare  prepare config to be used with Isogeny  With these added features, I think that Isogeny fits the use cases of almost everyone conscious of configuration. Now my configuration setup looks like this, run on login:\n1 2 3 4 5 6 7 8  ~/bin/isogeny.clj --multi-template \\  -c ~/.dotfiles/isogeny/context.$HOSTNAME.edn \\  -d ~/.dotfiles/isogeny/context.default.edn \\  --strict --verbose --deep-merge \\  ~/.config/sway/config.template \\  ~/.config/alacritty/alacritty.yml.template \\  ~/.config/dunst/dunstrc.template \\  ~/.config/gammastep/config.ini.template     And with that, all my files are configured to this machine. Please, give it a try, submit issues and feature requests, and keep your configuration in good order.\n1 On some systems, it is ~/.profile that is sourced on login, not ~/.bash_profile.\n  2 HOSTNAME is available in Bash, HOST in Zsh, or just use $(uname -n).\n  3 Isogeny owes a great debt to Selmer, the work of Yogthos.\n    ","wordCount":"910","inLanguage":"en","datePublished":"2022-01-05T21:32:01Z","dateModified":"2022-01-05T21:32:01Z","author":{"@type":"Person","name":"AlmostEducated"},"mainEntityOfPage":{"@type":"WebPage","@id":"http://blog.almost.education/posts/isogeny/"},"publisher":{"@type":"Organization","name":"blog.AlmostEducated","logo":{"@type":"ImageObject","url":"http://blog.almost.education/img/ae-logo-trans.png"}}}</script>
 </head>
 <body class=dark id=top>
 <script>localStorage.getItem("pref-theme")==="light"&&document.body.classList.remove('dark')</script>
@@ -53,6 +53,11 @@
 <li>
 <a href=http://blog.almost.education/tags/ title=tags>
 <span>tags</span>
+</a>
+</li>
+<li>
+<a href=https://blog.almost.education/index.xml title=rss>
+<span>rss</span>
 </a>
 </li>
 </ul>
@@ -258,51 +263,35 @@ In the couple of days since I wrote the first working version of Isogeny, I have
 <dt>
 <code>--add-tags</code>
 </dt>
-<dd>
-<p>add custom tags to the renderer</p>
-</dd>
+<dd>add custom tags to the renderer</dd>
 <dt>
 <code>--strict</code>
 </dt>
-<dd>
-<p>fail when a value is missing</p>
-</dd>
+<dd>fail when a value is missing</dd>
 <dt>
 <code>--context-string</code>
 </dt>
-<dd>
-<p>provide context as a CLI option that overrides values in the file</p>
-</dd>
+<dd>provide context as a CLI option that overrides values in the file</dd>
 <dt>
 <code>--deep-merge</code>
 </dt>
-<dd>
-<p>use deep-merge rather than merge when overriding</p>
-</dd>
+<dd>use deep-merge rather than merge when overriding</dd>
 <dt>
 <code>--verbose</code>
 </dt>
-<dd>
-<p>provide detailed logging</p>
-</dd>
+<dd>provide detailed logging</dd>
 <dt>
 <code>--safe</code>
 </dt>
-<dd>
-<p>will not edit or overwrite existing files</p>
-</dd>
+<dd>will not edit or overwrite existing files</dd>
 <dt>
 <code>--multi-template</code>
 </dt>
-<dd>
-<p>render multiple templates with a single call to Isogeny</p>
-</dd>
+<dd>render multiple templates with a single call to Isogeny</dd>
 <dt>
 <code>--prepare</code>
 </dt>
-<dd>
-<p>prepare config to be used with Isogeny</p>
-</dd>
+<dd>prepare config to be used with Isogeny</dd>
 </dl>
 <p>With these added features, I think that Isogeny fits the use cases of almost everyone conscious of configuration. Now my configuration setup looks like this, run on login:</p>
 <div class="src src-sh">

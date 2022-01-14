@@ -1,1 +1,262 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>cli on blog.AlmostEducated</title><link>http://blog.almost.education/tags/cli/</link><description>Recent content in cli on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Tue, 14 Dec 2021 18:28:42 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/cli/index.xml" rel="self" type="application/rss+xml"/><item><title>Clojure CLI apps using GraalVM</title><link>http://blog.almost.education/posts/clojure-cli-graal/</link><pubDate>Tue, 14 Dec 2021 18:28:42 +0000</pubDate><guid>http://blog.almost.education/posts/clojure-cli-graal/</guid><description>Clojure, like other JVM languages, excels in long-running tasks1. But I was always jealous of the languages that I&amp;#39;d used for scripting and command line tools which can&amp;#39;t wait a second for a JVM to start for each invocation. Despite its slow startup time, the JVM shines at peak throughput. Some times we want one, sometimes the other. For tasks that have a very short lifetime (~1s), we need Ahead of Time compilation.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>cli on blog.AlmostEducated</title><link>http://blog.almost.education/tags/cli/</link><description>Recent content in cli on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Tue, 14 Dec 2021 18:28:42 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/cli/index.xml" rel="self" type="application/rss+xml"/><item><title>Clojure CLI apps using GraalVM</title><link>http://blog.almost.education/posts/clojure-cli-graal/</link><pubDate>Tue, 14 Dec 2021 18:28:42 +0000</pubDate><guid>http://blog.almost.education/posts/clojure-cli-graal/</guid><description>
+&lt;p>
+Clojure, like other JVM languages, excels in long-running tasks&lt;sup class="footnote-reference">&lt;a id="footnote-reference-1" href="#footnote-1">1&lt;/a>&lt;/sup>. But I was always jealous of the languages that I&amp;#39;d used for scripting and command line tools which can&amp;#39;t wait a second for a JVM to start for each invocation. Despite its slow startup time, the JVM shines at peak throughput. Some times we want one, sometimes the other. For tasks that have a very short lifetime (~1s), we need Ahead of Time compilation.&lt;/p>
+&lt;div id="outline-container-headline-1" class="outline-2">
+&lt;h2 id="headline-1">
+AOT vs. JIT
+&lt;/h2>
+&lt;div id="outline-text-headline-1" class="outline-text-2">
+&lt;p>
+Whatever happens, the code you write is translated to machine code that is executed on the host machine. One might think that, when compiling C, this is a single step, but it is a process from preprocessor to compiler to assembler and then linker. At the end of this, all of the machine code has been produced before the programme is run.&lt;/p>
+&lt;div id="outline-container-headline-2" class="outline-3">
+&lt;h3 id="headline-2">
+JIT
+&lt;/h3>
+&lt;div id="outline-text-headline-2" class="outline-text-3">
+&lt;p>
+Not so with Java and JVM languages. When one &amp;#39;&lt;em>compiles&lt;/em>&amp;#39; a JVM project, say by calling &lt;code>javac&lt;/code>, one produces bytecode — not machine code. When the programme is run and the JVM is started, the JVM does the work of compiling its bytecode into machine code on an &lt;em>ad hoc&lt;/em> basis as methods are called, hence the name &lt;em>just-in-time&lt;/em> compilation&lt;sup class="footnote-reference">&lt;a id="footnote-reference-2" href="#footnote-2">2&lt;/a>&lt;/sup>.&lt;/p>
+&lt;p>
+JIT has its benefits. It can make optimisations because it knows exactly the machine it is compiling for, whereas with C the build machine will likely be different from the machine the code runs on. The JVM also has the ability to profile the code as it runs and make optimisations based on how the code is actually used. Say in the code there is are references to &lt;code>foo.bar(false, n)&lt;/code> and &lt;code>foo.bar(true, n)&lt;/code> but as the code is run the latter is called millions of times more often than the former. JIT compilation can see this and optimise calls to &lt;code>foo.bar&lt;/code> where the first argument is &lt;code>true&lt;/code>. This is the sort of information that is not available when compiling beforehand.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-3" class="outline-3">
+&lt;h3 id="headline-3">
+AOT
+&lt;/h3>
+&lt;div id="outline-text-headline-3" class="outline-text-3">
+&lt;p>
+Perhaps, by now, you have guessed that the alternative is &lt;em>ahead-of-time&lt;/em> compilation. Compiling ahead of time, there is no need for a JVM to run, and thus no profiling and no &lt;em>ad hoc&lt;/em> compilation. The result is a programme that starts instantly and with a &lt;em>much&lt;/em> smaller memory footprint (~×10).&lt;/p>
+&lt;p>
+For two decades, there was no other way to run JVM languages except on the JVM by way of JIT. But now, with the release of &lt;a href="https://www.graalvm.org/">GraalVM&lt;/a> in 2019, we can now compile our JVM programmes via AOT, straight to machine code.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-4" class="outline-2">
+&lt;h2 id="headline-4">
+GraalVM
+&lt;/h2>
+&lt;div id="outline-text-headline-4" class="outline-text-2">
+&lt;p>
+GraalVM, from the Old French &lt;em>graal&lt;/em> meaning &lt;em>grail&lt;/em>, is an Oracle project comprising:&lt;/p>
+&lt;ul>
+&lt;li>GraalVM Compiler, a JIT compiler for Java&lt;/li>
+&lt;li>GraalVM Native Image, a AOT compiler for Java&lt;/li>
+&lt;li>Truffle Language Implementation Framework, a specification for running other languages on GraalVM&lt;/li>
+&lt;li>LLVM and Javascript runtimes&lt;/li>
+&lt;/ul>
+&lt;p>We&amp;#39;re interested in the AOT compiler. First we need a copy of GraalVM; go to &lt;a href="https://www.graalvm.org/downloads/">https://www.graalvm.org/downloads/&lt;/a> and download the appropriate package, or if using Arch one install it from the &lt;a href="https://aur.archlinux.org/packages/native-image-jdk11-bin/">AUR&lt;/a>.&lt;/p>
+&lt;p>
+From wherever you install external binaries (&lt;code>/usr/bin&lt;/code>, &lt;code>~/bin&lt;/code>), extract the archive and set its location as an environment variable:&lt;/p>
+&lt;div class="src src-text">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">tar -xzvf ~/dl/graalvm-ce-java11-linux-amd64-21.3.0.tar.gz
+export GRAALVM_HOME=~/bin/graalvm-ce-java11-21.3.0&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+This might not add Graal&amp;#39;s executables to your PATH, but they can be run using &lt;code>$GRAALVM_HOME/bin/...&lt;/code> etc.. If you encounter permissions issues, you might have to run &lt;code>chmod +x &amp;lt;executable&amp;gt;&lt;/code> for the file to be able to be executed.&lt;/p>
+&lt;div id="outline-container-headline-5" class="outline-3">
+&lt;h3 id="headline-5">
+&lt;em>Hello Graal&lt;/em>
+&lt;/h3>
+&lt;div id="outline-text-headline-5" class="outline-text-3">
+&lt;p>
+I keep all my source code in &lt;code>~/src&lt;/code>, make changes to the commands for your system. These commands create a new Clojure project.&lt;/p>
+&lt;div class="src src-bash">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">mkdir -p ~/src/hello-graal/src/hello_graal
+&lt;span class="nb">cd&lt;/span> ~/src/hello-graal
+touch ./src/hello_graal/main.clj&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+And in &lt;code>main.clj&lt;/code> create this very simple &lt;em>Hello World&lt;/em> application.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="kd">ns &lt;/span>&lt;span class="nv">hello-graal.main&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="ss">:gen-class&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="kd">defn &lt;/span>&lt;span class="nv">-main&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="nv">_args&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">println &lt;/span>&lt;span class="s">&amp;#34;Hello Graal!&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+We can use Clojure&amp;#39;s &lt;code>compile&lt;/code> to compile the namespace into classfiles, as one would with &lt;code>javac&lt;/code>. The bytecode in the classfiles would normally be used by the JVM, but we will use them with Graal&amp;#39;s &lt;code>native-image&lt;/code> to produce an executable binary. Graal doesn&amp;#39;t explicitly support Clojure, but once Clojure is compiled to bytecode it is just the same as any other JVM language, including Java.&lt;/p>
+&lt;div class="src src-text">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">mkdir classes
+clojure -M -e &amp;#34;(compile &amp;#39;hello-graal.main)&amp;#34;&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+We can write a script, &lt;code>compile&lt;/code>, that contains the call to Graal&amp;#39;s &lt;code>native-image&lt;/code>.&lt;/p>
+&lt;div class="src src-bash">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="cp">#!/usr/bin/env bash
+&lt;/span>&lt;span class="cp">&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="o">[&lt;/span> -z &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$GRAALVM_HOME&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &lt;span class="o">]&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="k">then&lt;/span>
+&lt;span class="nb">echo&lt;/span> &lt;span class="s1">&amp;#39;Please set GRAALVM_HOME&amp;#39;&lt;/span>
+&lt;span class="nb">exit&lt;/span> &lt;span class="m">1&lt;/span>
+&lt;span class="k">fi&lt;/span>
+mkdir classes
+clojure -M -e &lt;span class="s2">&amp;#34;(compile &amp;#39;hello-graal.main)&amp;#34;&lt;/span>
+&lt;span class="c1"># Ensure Graal native-image program is installed&lt;/span>
+&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$GRAALVM_HOME&lt;/span>&lt;span class="s2">/bin/gu&amp;#34;&lt;/span> install native-image
+&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$GRAALVM_HOME&lt;/span>&lt;span class="s2">/bin/native-image&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> -cp &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="k">$(&lt;/span>clojure -Spath&lt;span class="k">)&lt;/span>&lt;span class="s2">:classes&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> -H:Name&lt;span class="o">=&lt;/span>hello-graal &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> -H:+ReportExceptionStackTraces &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> --initialize-at-build-time &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> --verbose &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> --no-fallback &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> --no-server &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> &lt;span class="s2">&amp;#34;-J-Xmx3g&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;span class="se">&lt;/span> hello_graal.main&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+When this script is run it produces an executable, &lt;code>hello-graal&lt;/code>. Give it a try!&lt;/p>
+&lt;div class="src src-text">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">chmod +x compile
+./compile
+./hello-graal&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-6" class="outline-3">
+&lt;h3 id="headline-6">
+Next steps
+&lt;/h3>
+&lt;div id="outline-text-headline-6" class="outline-text-3">
+&lt;p>
+This is a subject I&amp;#39;d like to return to. I see great promise for the role of Clojure in creating native applications. Graal&amp;#39;s already being used by &lt;a href="https://github.com/babashka/babashka">Babashka&lt;/a>, &lt;a href="https://github.com/clojure-lsp/clojure-lsp">clojure-lsp&lt;/a>, and &lt;a href="https://github.com/clj-kondo/clj-kondo">clj-kondo&lt;/a>, three tools I use on a daily basis.&lt;/p>
+&lt;p>
+Our next steps might be to add the ability to add command-line options and arguments using &lt;a href="https://github.com/clojure/tools.cli">tools.cli&lt;/a>. And we can read from &lt;code>stdin&lt;/code> using &lt;code>(new java.io.BufferedReader *in*)&lt;/code>.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="kd">ns &lt;/span>&lt;span class="nv">hello-graal.main&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="ss">:require&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nv">clojure.tools.cli&lt;/span> &lt;span class="ss">:as&lt;/span> &lt;span class="nv">cli&lt;/span>&lt;span class="p">]))&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="k">def &lt;/span>&lt;span class="nv">cli-options&lt;/span>
+&lt;span class="p">[[&lt;/span>&lt;span class="s">&amp;#34;-v&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;--verbose&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;Verbosity&amp;#34;&lt;/span>&lt;span class="p">]])&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="kd">defn &lt;/span>&lt;span class="nv">-main&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="nv">args&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="k">let &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nv">opts&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">cli/parse-opts&lt;/span> &lt;span class="nv">args&lt;/span> &lt;span class="nv">cli-options&lt;/span>&lt;span class="p">)]&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nb">doseq &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nv">ln&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">line-seq &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new &lt;/span>&lt;span class="nv">java.io.BufferedReader&lt;/span> &lt;span class="nv">*in*&lt;/span>&lt;span class="p">))]&lt;/span>
+&lt;span class="c1">;; Use a line from input.&lt;/span>
+&lt;span class="p">)))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+In part two I will show how to replicate some of the functionality of clj-kondo, and then implement some missing features.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnotes">
+&lt;hr class="footnotes-separatator">
+&lt;div class="footnote-definitions">
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-1">&lt;a href="#footnote-reference-1">1&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>&lt;a href="https://www.youtube.com/watch?v=PeMvksAZbdw&amp;amp;t=647s">Maximising Java Application Performance with GraalVM&lt;/a> by Oleg Šelajev at GOTO 2020.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-2">&lt;a href="#footnote-reference-2">2&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>
+The earliest possible mention of JIT I know of is from John McCarthy of Lisp fame:&lt;/p>
+&lt;blockquote>
+&lt;p>The programmer may have selected S-functions compiled into machine
+language programs put into the core memory. Values of compiled functions
+are computed about 60 times as fast as they would if interpreted. Compilation
+is fast enough so that it is not necessary to punch compiled program for future
+use.&lt;/p>
+&lt;/blockquote>
+&lt;p>— &lt;a href="http://www-formal.stanford.edu/jmc/recursive.pdf">Recursive Functions of Symbolic Expressions and Their Computation by Machine, Part I, 1960&lt;/a>&lt;/p>
+&lt;blockquote>
+&lt;p>Instead, we suspect that the earliest published work on JIT compilation was McCarthy’s [1960] LISP paper. He men- tioned compilation of functions into ma- chine language, a process fast enough that the compiler’s output needn’t be saved. This can be seen as an inevitable result of having programs and data share the same notation [McCarthy 1981].&lt;/p>
+&lt;/blockquote>
+&lt;p>— &lt;a href="https://www.eecs.ucf.edu/~dcm/Teaching/COT4810-Spring2011/Literature/JustInTimeCompilation.pdf">John Aycock, 2003&lt;/a>&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div></description></item></channel></rss>

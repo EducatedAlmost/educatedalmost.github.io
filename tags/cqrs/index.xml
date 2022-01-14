@@ -1,1 +1,77 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>cqrs on blog.AlmostEducated</title><link>http://blog.almost.education/tags/cqrs/</link><description>Recent content in cqrs on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Wed, 17 Nov 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/cqrs/index.xml" rel="self" type="application/rss+xml"/><item><title>æ/Demesne</title><link>http://blog.almost.education/posts/demesne/</link><pubDate>Wed, 17 Nov 2021 00:00:00 +0000</pubDate><guid>http://blog.almost.education/posts/demesne/</guid><description>You don&amp;#39;t understand a pattern until you can implement it — domain-driven design, CQRS, event sourcing.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>cqrs on blog.AlmostEducated</title><link>http://blog.almost.education/tags/cqrs/</link><description>Recent content in cqrs on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Wed, 17 Nov 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/cqrs/index.xml" rel="self" type="application/rss+xml"/><item><title>æ/Demesne</title><link>http://blog.almost.education/posts/demesne/</link><pubDate>Wed, 17 Nov 2021 00:00:00 +0000</pubDate><guid>http://blog.almost.education/posts/demesne/</guid><description>
+&lt;p>
+&lt;em>An example of domain-driven design, CQRS, and event sourcing, in Clojure.&lt;/em>&lt;/p>
+&lt;p>
+https://github.com/EducatedAlmost/demesne&lt;/p>
+&lt;p>
+See also my post on &lt;a href="http://blog.almost.education/posts/event-sourcing/">event sourcing&lt;/a>.&lt;/p>
+&lt;p>
+There&amp;#39;s a maxim&lt;sup class="footnote-reference">&lt;a id="footnote-reference-1" href="#footnote-1">1&lt;/a>&lt;/sup> within physics that something is not understood until it can be taught — I think a similar similar maxim holds in software development; one doesn&amp;#39;t understand a pattern until one can implement it.&lt;/p>
+&lt;div id="outline-container-headline-1" class="outline-2">
+&lt;h2 id="headline-1">
+Demesne
+&lt;/h2>
+&lt;div id="outline-text-headline-1" class="outline-text-2">
+&lt;p>
+Under feudalism, a &lt;a href="https://en.wikipedia.org/wiki/Demesne">&lt;em>demesne&lt;/em>&lt;/a> &lt;code>/dɪˈmeɪn/&lt;/code> was all the land owned by the lord of the manor. The &lt;em>domain&lt;/em> of domain-driven design is the larger context in which the software is run. Demesne imagines a warehouse of named item lines; which can be searched for, have instances checked in and out, be deactivated and reactivated, and be renamed.&lt;/p>
+&lt;p>
+I&amp;#39;ll be talking about &lt;em>domain-driven design&lt;/em>, &lt;em>CQRS&lt;/em>, and &lt;em>event sourcing&lt;/em>. What do these mean?&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-2" class="outline-2">
+&lt;h2 id="headline-2">
+CQRS
+&lt;/h2>
+&lt;div id="outline-text-headline-2" class="outline-text-2">
+&lt;p>
+Command Query Responsibility Segregation divorces the model used for instructions to an application, commands, from that used in requests for information, queries. It derives from Command Query separation, the idea that commands should not act as queries, and queries should not change state, and contrasts clearly to a common pattern where to update the state of an entity, its state is provided.&lt;/p>
+&lt;p>
+There are some benefits from taking this approach. Commands can mimic real-world actions of the domain. Those calling aggregate behaviours are decoupled from the aggregate implementation. And this gives us flexibility in how we choose to store our state.&lt;/p>
+&lt;p>
+Demesne has yet to implement the query side of the application, but it will be a web UI that will display the state of its entities and allow actions to be taken. But crucially, when actions are taken this will send commands to the HTTP endpoint, not update the state directly.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-3" class="outline-2">
+&lt;h2 id="headline-3">
+Event sourcing
+&lt;/h2>
+&lt;div id="outline-text-headline-3" class="outline-text-2">
+&lt;p>
+Event sourcing a datastructure is to not store its state, but an ordered collection of the events that have occurred to it either from a known former state or from its conception. It is useful in complex domains, especially those where will might be interested in an entity&amp;#39;s history, something that would be hidden in logs, obscure database fields, or simply lost in a standard application.&lt;/p>
+&lt;p>
+To rebuild an entity&amp;#39;s current state, we load the entity&amp;#39;s events, and progressively apply them culminating in the entity as it is. To see an example of this in Clojure, see my project &lt;a href="http://blog.almost.education/posts/rashomon/">Rashomon&lt;/a> (&lt;a href="https://github.com/EducatedAlmost/rashomon">GitHub&lt;/a>).&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-4" class="outline-2">
+&lt;h2 id="headline-4">
+Domain-driven design
+&lt;/h2>
+&lt;div id="outline-text-headline-4" class="outline-text-2">
+&lt;p>
+Domain-driven design puts the language and lexicon at the centre of the development process. It tells us that to effectively develop software within a domain, it is required of us to understand the domain and its processes, with a particular emphasis on the creation of an ubiquitous language, a shared language between developer and business person, user, domain expert.&lt;/p>
+&lt;p>
+This contrasts with a style of thinking which is common amongst developers. There is an idealism about creating things afresh, rather than working with what is there already. If we think that we can create a new and better lexicon, in isolated cases we might be right, but those who use this language every day will have a greater knowledge of it and the nuances it involves. Imagine the monstrosity that would be involved if we asked the marketing department to name our functions—why should we determine the language of the business side? The language within our programs has a habit of leaking out, APIs, requests of users, error messages — why should this conflict with the language they already know?&lt;/p>
+&lt;p>
+&lt;a href="https://en.wikipedia.org/wiki/Conway%27s_law">Conway&amp;#39;s law&lt;/a> states that a team which designs a system will create one that matches the structure of the team. In the case of development, it means that the code mimics the development team. Let us be aware of this and consciously work to create a system that mimics the domain instead.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-5" class="outline-2">
+&lt;h2 id="headline-5">
+But do I know enough to implement it?
+&lt;/h2>
+&lt;div id="outline-text-headline-5" class="outline-text-2">
+&lt;p>
+For two years I worked on a team that used CQRS, ES, and DDD. And yet my team lead wrote a library with abstracted many of the details and whilst I worked on every part of the system I have as yet never before created it from scratch. This project is a challenge to myself to prove that I know what I think I know, and it has been successful one.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnotes">
+&lt;hr class="footnotes-separatator">
+&lt;div class="footnote-definitions">
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-1">&lt;a href="#footnote-reference-1">1&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>The idea originates with &lt;a href="https://en.wikipedia.org/wiki/Ernest_Rutherford">Ernest Rutherford&lt;/a> who is &lt;a href="https://quoteinvestigator.com/2019/10/19/barmaid/">often quoted&lt;/a> as saying that a scientific discovery has no merit until it can be explained to a barmaid.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div></description></item></channel></rss>

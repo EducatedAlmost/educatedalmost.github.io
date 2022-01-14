@@ -1,3 +1,263 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>software architecture on blog.AlmostEducated</title><link>http://blog.almost.education/tags/software-architecture/</link><description>Recent content in software architecture on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Thu, 18 Nov 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/software-architecture/index.xml" rel="self" type="application/rss+xml"/><item><title>Correlation and causation IDs</title><link>http://blog.almost.education/posts/corr-caus-ids/</link><pubDate>Thu, 18 Nov 2021 00:00:00 +0000</pubDate><guid>http://blog.almost.education/posts/corr-caus-ids/</guid><description>This is a very useful pattern that I see rarely used. When working with systems that pass messages, it can be difficult to later reconstruct a conversation or the sequence of events. It is second nature to us to assign entity IDs1 to messages, but two other IDs will help us to understand the structure of conversations.
-One is a correlation ID. This is used to tie the conversation together.</description></item><item><title>Event Sourcing</title><link>http://blog.almost.education/posts/event-sourcing/</link><pubDate>Wed, 17 Nov 2021 00:00:00 +0000</pubDate><guid>http://blog.almost.education/posts/event-sourcing/</guid><description>This article is in the process of being written.
-Introduction State isn&amp;#39;t stored. We rebuild it every time we need to query or do something to it. It has its drawbacks, but it does allow us to do things that would be impossible otherwise. We can view out system&amp;#39;s history with new perspectives, or add in missed past events. Our view of the past is necessarily wrong for any complex system and yet we design systems that lack any way to account for that.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>software architecture on blog.AlmostEducated</title><link>http://blog.almost.education/tags/software-architecture/</link><description>Recent content in software architecture on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Thu, 18 Nov 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/software-architecture/index.xml" rel="self" type="application/rss+xml"/><item><title>Correlation and causation IDs</title><link>http://blog.almost.education/posts/corr-caus-ids/</link><pubDate>Thu, 18 Nov 2021 00:00:00 +0000</pubDate><guid>http://blog.almost.education/posts/corr-caus-ids/</guid><description>&lt;p>
+This is a very useful pattern that I see rarely used. When working with systems that pass messages, it can be difficult to later reconstruct a conversation or the sequence of events. It is second nature to us to assign entity IDs&lt;sup class="footnote-reference">&lt;a id="footnote-reference-1" href="#footnote-1">1&lt;/a>&lt;/sup> to messages, but two other IDs will help us to understand the structure of conversations.&lt;/p>
+&lt;p>
+One is a &lt;em>correlation ID&lt;/em>. This is used to tie the conversation together. When initiating a conversation a correlation ID is created and any reply simply copies the correlation ID as its own.&lt;/p>
+&lt;p>
+The other is a &lt;em>causation ID&lt;/em>. This is used to record the immediate cause of the message, or which message this is a reply to. When replying, the original message&amp;#39;s entity ID is copied as the reply&amp;#39;s causation ID.&lt;/p>
+&lt;p>
+Messages can be anything: commands, entity events, user input, user data, system events.&lt;/p>
+&lt;p>
+I&amp;#39;ve displayed them in order and used integer IDs instead of UUIDs&lt;sup class="footnote-reference">&lt;a id="footnote-reference-2" href="#footnote-2">2&lt;/a>&lt;/sup> only for readability&amp;#39;s sake. To retrieve the conversation we can query our database for all messages with the correlation ID &lt;code>547&lt;/code>, and sort them into a tree using their entity and causation IDs.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">{&lt;/span>&lt;span class="ss">::id/corr&lt;/span> &lt;span class="mi">547&lt;/span>
+&lt;span class="ss">::id/caus&lt;/span> &lt;span class="nv">nil&lt;/span>
+&lt;span class="ss">::id/entity&lt;/span> &lt;span class="mi">901&lt;/span>
+&lt;span class="ss">::content&lt;/span> &lt;span class="s">&amp;#34;Whose motorcycle is this?&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="p">{&lt;/span>&lt;span class="ss">::id/corr&lt;/span> &lt;span class="mi">547&lt;/span>
+&lt;span class="ss">::id/caus&lt;/span> &lt;span class="mi">901&lt;/span>
+&lt;span class="ss">::id/entity&lt;/span> &lt;span class="mi">829&lt;/span>
+&lt;span class="ss">::content&lt;/span> &lt;span class="s">&amp;#34;It&amp;#39;s a chopper, baby.&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="p">{&lt;/span>&lt;span class="ss">::id/corr&lt;/span> &lt;span class="mi">547&lt;/span>
+&lt;span class="ss">::id/caus&lt;/span> &lt;span class="mi">829&lt;/span>
+&lt;span class="ss">::id/entity&lt;/span> &lt;span class="mi">489&lt;/span>
+&lt;span class="ss">::content&lt;/span> &lt;span class="s">&amp;#34;Whose chopper is this?&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="p">{&lt;/span>&lt;span class="ss">::id/corr&lt;/span> &lt;span class="mi">547&lt;/span>
+&lt;span class="ss">::id/caus&lt;/span> &lt;span class="mi">489&lt;/span>
+&lt;span class="ss">::id/entity&lt;/span> &lt;span class="mi">122&lt;/span>
+&lt;span class="ss">::content&lt;/span> &lt;span class="s">&amp;#34;It&amp;#39;s Zed&amp;#39;s.&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="p">{&lt;/span>&lt;span class="ss">::id/corr&lt;/span> &lt;span class="mi">547&lt;/span>
+&lt;span class="ss">::id/caus&lt;/span> &lt;span class="mi">122&lt;/span>
+&lt;span class="ss">::id/entity&lt;/span> &lt;span class="mi">004&lt;/span>
+&lt;span class="ss">::content&lt;/span> &lt;span class="s">&amp;#34;Who&amp;#39;s Zed?&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="p">{&lt;/span>&lt;span class="ss">::id/corr&lt;/span> &lt;span class="mi">547&lt;/span>
+&lt;span class="ss">::id/caus&lt;/span> &lt;span class="mi">004&lt;/span>
+&lt;span class="ss">::id/entity&lt;/span> &lt;span class="mi">675&lt;/span>
+&lt;span class="ss">::content&lt;/span> &lt;span class="s">&amp;#34;Zed&amp;#39;s dead, baby. Zed&amp;#39;s dead.&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+This is useful because it allows us to find the causes of downstream issues. In a previous project I worked on, we were consuming data provided by third parties, which would occasionally contain mistakes. If we found that a user of ours had become a multi-billionaire overnight, we could check the causation ID of the responsible event which would direct us to the source file that contained the data.&lt;/p>
+&lt;p>
+An advanced form of this pattern allows each message to have several correlation and causation IDs. An event&amp;#39;s correlation IDs could point to not just the file that was the source of the data, but also the particular line of the CSV, and the import job. In a risk management service, the warning message can have as its causation IDs all the IDs of the offers that contribute to the risky position.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">{&lt;/span>&lt;span class="ss">::id/correlations&lt;/span>
+&lt;span class="p">[&lt;/span>&lt;span class="o">#&lt;/span>&lt;span class="nv">uuid&lt;/span> &lt;span class="s">&amp;#34;15b797d2-7cbd-4295-89da-d2c94e49832a&amp;#34;&lt;/span> &lt;span class="c1">;; the source file&lt;/span>
+&lt;span class="o">#&lt;/span>&lt;span class="nv">uuid&lt;/span> &lt;span class="s">&amp;#34;c991a43c-214e-4d77-b1b1-06cbe1bb51e9&amp;#34;&lt;/span> &lt;span class="c1">;; the particular line&lt;/span>
+&lt;span class="o">#&lt;/span>&lt;span class="nv">uuid&lt;/span> &lt;span class="s">&amp;#34;75f65ec9-1441-4ac6-a909-eceb30f9cce1&amp;#34;&lt;/span> &lt;span class="c1">;; the import job&lt;/span>
+&lt;span class="p">]&lt;/span>
+&lt;span class="ss">::id/causations&lt;/span>
+&lt;span class="p">[&lt;/span>&lt;span class="o">#&lt;/span>&lt;span class="nv">uuid&lt;/span> &lt;span class="s">&amp;#34;67bdf0d6-4d5e-4c0d-a840-8732e94a78a8&amp;#34;&lt;/span> &lt;span class="c1">;; the IDs of current positions&lt;/span>
+&lt;span class="o">#&lt;/span>&lt;span class="nv">uuid&lt;/span> &lt;span class="s">&amp;#34;bab99163-54e4-4350-9356-b7bd18ed9ed2&amp;#34;&lt;/span>
+&lt;span class="o">#&lt;/span>&lt;span class="nv">uuid&lt;/span> &lt;span class="s">&amp;#34;2fe68d11-9434-470b-8caa-64b07ecb9d26&amp;#34;&lt;/span>
+&lt;span class="o">#&lt;/span>&lt;span class="nv">uuid&lt;/span> &lt;span class="s">&amp;#34;b97bf998-dab6-45bb-8dde-163c947ad0d5&amp;#34;&lt;/span>&lt;span class="p">]}&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+This necessarily complicates the process of finding immediate and ultimate causes of effects so is only recommended for situations where one is certain it will help.&lt;/p>
+&lt;div class="footnotes">
+&lt;hr class="footnotes-separatator">
+&lt;div class="footnote-definitions">
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-1">&lt;a href="#footnote-reference-1">1&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>An entity ID might also be called a &lt;em>message ID&lt;/em>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div class="footnote-definition">
+&lt;sup id="footnote-2">&lt;a href="#footnote-reference-2">2&lt;/a>&lt;/sup>
+&lt;div class="footnote-body">
+&lt;p>A UUID is a universally unique identifier, meaning that it can be generated without fear that it might conflict with any already extant identifier. To use them in Clojure, I use the &lt;a href="https://github.com/danlentz/clj-uuid">&lt;code>clj-uuid&lt;/code>&lt;/a> library.&lt;/p>
+&lt;div class="src src-clojure">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-clojure" data-lang="clojure">&lt;span class="p">(&lt;/span>&lt;span class="nf">require&lt;/span> &lt;span class="o">&amp;#39;&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nv">clj-uuid&lt;/span> &lt;span class="ss">:as&lt;/span> &lt;span class="nv">uuid&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">uuid/v4&lt;/span>&lt;span class="p">)&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div></description></item><item><title>Event Sourcing</title><link>http://blog.almost.education/posts/event-sourcing/</link><pubDate>Wed, 17 Nov 2021 00:00:00 +0000</pubDate><guid>http://blog.almost.education/posts/event-sourcing/</guid><description>
+&lt;p>
+&lt;em>This article is in the process of being written.&lt;/em>&lt;/p>
+&lt;div id="outline-container-headline-1" class="outline-2">
+&lt;h2 id="headline-1">
+Introduction
+&lt;/h2>
+&lt;div id="outline-text-headline-1" class="outline-text-2">
+&lt;p>
+State isn&amp;#39;t stored. We rebuild it every time we need to query or do something to it. It has its drawbacks, but it does allow us to do things that would be impossible otherwise. We can view out system&amp;#39;s history with new perspectives, or add in missed past events. Our view of the past is necessarily wrong for any complex system and yet we design systems that lack any way to account for that.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-2" class="outline-2">
+&lt;h2 id="headline-2">
+My projects
+&lt;/h2>
+&lt;div id="outline-text-headline-2" class="outline-text-2">
+&lt;p>
+I&amp;#39;ve worked a fair bit with event sourcing:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="http://blog.almost.education/posts/rashomon/">Rashomon&lt;/a> (&lt;a href="https://github.com/EducatedAlmost/rashomon">GitHub&lt;/a>)&lt;/li>
+&lt;li>&lt;a href="http://blog.almost.education/posts/demesne/">Demesne&lt;/a> (&lt;a href="https://github.com/EducatedAlmost/demesne">GitHub&lt;/a>)&lt;/li>
+&lt;li>Eventstore.clj (&lt;a href="https://github.com/EducatedAlmost/eventstore.clj">GitHub&lt;/a>)&lt;/li>
+&lt;/ul>
+&lt;p>&lt;a href="http://blog.almost.education/tags/event-sourcing/">All articles with the &lt;em>&amp;#39;event sourcing&amp;#39;&lt;/em> tag&lt;/a>&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-3" class="outline-2">
+&lt;h2 id="headline-3">
+History
+&lt;/h2>
+&lt;div id="outline-text-headline-3" class="outline-text-2">
+&lt;p>
+Greg Young
+Event Store DB&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-4" class="outline-2">
+&lt;h2 id="headline-4">
+An event store
+&lt;/h2>
+&lt;/div>
+&lt;div id="outline-container-headline-5" class="outline-2">
+&lt;h2 id="headline-5">
+Rebuilding from known states
+&lt;/h2>
+&lt;/div>
+&lt;div id="outline-container-headline-6" class="outline-2">
+&lt;h2 id="headline-6">
+Reverting
+&lt;/h2>
+&lt;/div>
+&lt;div id="outline-container-headline-7" class="outline-2">
+&lt;h2 id="headline-7">
+Diagnosing
+&lt;/h2>
+&lt;/div>
+&lt;div id="outline-container-headline-8" class="outline-2">
+&lt;h2 id="headline-8">
+Reinterpreting
+&lt;/h2>
+&lt;div id="outline-text-headline-8" class="outline-text-2">
+&lt;p>
+Could be useful for A/B testing
+Loading from a configuration service
+Accepting configuration from a user (SAAS)&lt;/p>
+&lt;p>
+Useful when?
+The state of an aggregate is tied up with its history&lt;/p>
+&lt;p>
+Example&lt;/p>
+&lt;p>
+Deactivating accounts after a period of inactivity, client requests changes to the account. Developers have to make the change, try and track down the accounts that were affected. How do you do that? Do you really have those logs? Can you use them to change your DB? Will you not accidentally reactivate someone who really shouldn&amp;#39;t be? In the meantime, you have clients who&amp;#39;ve tried to perform actions on their account but were rejected because their account was deactivated. Your operations team are spending their time finding the details of the failed actions to retry it. Why not just reinterpret the attempt in the new context of an active account?&lt;/p>
+&lt;p>
+Can I come up with a more human-centred analogy?&lt;/p>
+&lt;p>
+Events mean different things in different contexts.&lt;/p>
+&lt;p>
+What&amp;#39;s the difference between an event and a command? Commands can be rejected? Is this actually the distinction?&lt;/p>
+&lt;p>
+Where is event sourcing inappropriate? Simple domains. Where rebuilding the domain is prohibitively expensive. When the team don&amp;#39;t understand it.&lt;/p>
+&lt;div class="src src-text">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">account.created
+account.deactivated.inactivity
+user.payment.requested
+user.payment.declined
+account.address.requested&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+We can change our perspectives to ignore deactivations that happen for bad reasons. In the new light where we ignore &lt;code>account.deactivated.inactivity&lt;/code> if it lists too short an inactivity period, the user is now active in the context of subsequent events. We would not want to reinterpret the payment requests however. Thankfully, these events, if stored in the user&amp;#39;s stream of events at all, are just links to events in the Payments aggregate or domain. Loading the Account aggregate, and it being active will not retrigger these payments, thankfully.&lt;/p>
+&lt;p>
+Whilst old context, address didn&amp;#39;t change&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-9" class="outline-2">
+&lt;h2 id="headline-9">
+Drawbacks and difficulties
+&lt;/h2>
+&lt;/div>
+&lt;div id="outline-container-headline-10" class="outline-2">
+&lt;h2 id="headline-10">
+Related patterns
+&lt;/h2>
+&lt;div id="outline-text-headline-10" class="outline-text-2">
+&lt;p>
+&lt;a href=" http://blog.almost.education/posts/corr-caus-ids/ ">Correlation and causation IDs&lt;/a>&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-11" class="outline-2">
+&lt;h2 id="headline-11">
+Software
+&lt;/h2>
+&lt;div id="outline-text-headline-11" class="outline-text-2">
+&lt;p>
+Event Store DB&lt;/p>
+&lt;p>
+Kafka&lt;/p>
+&lt;/div>
+&lt;/div></description></item></channel></rss>

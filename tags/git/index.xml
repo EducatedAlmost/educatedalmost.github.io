@@ -1,1 +1,280 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>git on blog.AlmostEducated</title><link>http://blog.almost.education/tags/git/</link><description>Recent content in git on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Wed, 10 Nov 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/git/index.xml" rel="self" type="application/rss+xml"/><item><title>Creating private org directories</title><link>http://blog.almost.education/posts/private-org-dirs/</link><pubDate>Wed, 10 Nov 2021 00:00:00 +0000</pubDate><guid>http://blog.almost.education/posts/private-org-dirs/</guid><description>Org directories made private.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>git on blog.AlmostEducated</title><link>http://blog.almost.education/tags/git/</link><description>Recent content in git on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Wed, 10 Nov 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/git/index.xml" rel="self" type="application/rss+xml"/><item><title>Creating private org directories</title><link>http://blog.almost.education/posts/private-org-dirs/</link><pubDate>Wed, 10 Nov 2021 00:00:00 +0000</pubDate><guid>http://blog.almost.education/posts/private-org-dirs/</guid><description>
+&lt;p>
+I&amp;#39;ve used Emacs for five years now. Before that I was in Vim, but moved to Emacs with Evil, then Spacemacs, and now Doom Emacs. I made the switch initially &lt;em>for Org&lt;/em> and I know that if ever I was to move to another editor I could replicate everything except for Emac&amp;#39;s Org-mode integration.&lt;/p>
+&lt;p>
+I love to use it for everything — when I remember that the logs needs chopping, when I find a recipe I&amp;#39;d like to cook, when at work I find a bug that needs fixing — it all goes into org-mode. It&amp;#39;s fair to say that I wouldn&amp;#39;t want it to fall into the wrong hands, whether that be a criminal, my employer, my clients, or anyone.&lt;/p>
+&lt;div id="outline-container-headline-1" class="outline-2">
+&lt;h2 id="headline-1">
+The basic setup
+&lt;/h2>
+&lt;div id="outline-text-headline-1" class="outline-text-2">
+&lt;p>
+The most common setup for org-mode is to have a single directory, &lt;code>org-directory&lt;/code> say &lt;code>~/org&lt;/code>, and keep this information in files like:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>~/org/garden.org&lt;/code>&lt;/li>
+&lt;li>&lt;code>~/org/recipes.org&lt;/code>&lt;/li>
+&lt;li>&lt;code>~/org/work.org&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>The &lt;code>org-directory&lt;/code> can then be placed under version control (or using &lt;code>rsync&lt;/code>, Dropbox, or similar) kept up to date with ones org files elsewhere.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-2" class="outline-2">
+&lt;h2 id="headline-2">
+What&amp;#39;s the problem?
+&lt;/h2>
+&lt;div id="outline-text-headline-2" class="outline-text-2">
+&lt;p>
+All&amp;#39;s good? The problem comes from having ones personal files mixed with another&amp;#39;s. Through the course of a sprint you will hopefully be accumulating details to raise in the sprint retrospective. Whilst working on stories, you&amp;#39;ll likely want to make notes on what you learn without leaving your editor. These, and a bunch of other activities will lead to your org repository becoming tainted with information which you technically don&amp;#39;t own, or could get you into trouble if it leaked. For this reason, a client or employer might object to the information you put into &lt;code>work.org&lt;/code> leaving their machines.&lt;/p>
+&lt;p>
+The reverse problem also exists. If one is looking for a new job, one might not want ones current employer to know the details of any offers one has received. If you take on a new client, you will not want to allow them access to all your information on your other client.&lt;/p>
+&lt;p>
+And yet this is all information you want to keep inside Org. It&amp;#39;s a key insight of David Allen&amp;#39;s &lt;em>GTD&lt;/em> that one must have a single store lest one be left thinking &amp;#39;where did I put that…&amp;#39; or &amp;#39;I could swear I had something to do tomorrow…&amp;#39; and be unsure of where that information lives — in an email, a scrap of paper, or nowhere.&lt;/p>
+&lt;p>
+The solution is to keep this confidential information in a separate repository. Now this would seem to contradict my previous statement, but it doesn&amp;#39;t have to. Done this way it almost works by default.&lt;/p>
+&lt;p>
+&lt;strong>I must be clear that nothing in this article will, nor is it designed to, keep your files completely private. When using a machine that is not under ones complete control one must assume that all credentials have become accessible by another. And if they were to acquire your git credentials when accessing one repository, they will be able to acquire another.&lt;/strong>&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-3" class="outline-2">
+&lt;h2 id="headline-3">
+First steps
+&lt;/h2>
+&lt;div id="outline-text-headline-3" class="outline-text-2">
+&lt;p>
+One will keep ones org files in a few different directories:&lt;/p>
+&lt;dl>
+&lt;dt>
+&lt;code>~/org/private&lt;/code>
+&lt;/dt>
+&lt;dd>for ones personal files&lt;/dd>
+&lt;dt>
+&lt;code>~/org/client-acme&lt;/code>
+&lt;/dt>
+&lt;dd>for org files related to the client Acme&lt;/dd>
+&lt;dt>
+&lt;code>~/org/client-newco&lt;/code>
+&lt;/dt>
+&lt;dd>for org files related to the client NewCo&lt;/dd>
+&lt;/dl>
+&lt;p>The files that are neither private to oneself nor anyone else can be kept in &lt;code>~/org&lt;/code> just like before. The one caveat is that one might want to create a new git repo if one has previously committed confidential information, or one can just &lt;a href="https://myopswork.com/how-remove-files-completely-from-git-repository-history-47ed3e0c4c35">remove the offending files&lt;/a> from the git repo&amp;#39;s history.&lt;/p>
+&lt;div id="outline-container-headline-4" class="outline-3">
+&lt;h3 id="headline-4">
+.gitignore and submodules
+&lt;/h3>
+&lt;div id="outline-text-headline-4" class="outline-text-3">
+&lt;p>
+Initially, I added the child directories to &lt;code>~/org/.gitignore&lt;/code>.&lt;/p>
+&lt;div class="src src-text">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text"># .gitignore
+private
+client
+client-*&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+This works fine, but one can also use &lt;a href="https://git-scm.com/book/en/v2/Git-Tools-Submodules">git submodules&lt;/a>. They allow one to have nested git repositories without files being tracked by both repositories with the added bonus that one can easily update all submodules from their remotes, and create them automatically when the parent is cloned.&lt;/p>
+&lt;p>
+This makes use of the &lt;code>--git-dir&lt;/code> and &lt;code>--work-tree&lt;/code> &lt;a href="https://git-scm.com/docs/git#_options">options&lt;/a> to run git commands in another repo. Change &lt;code>NEW_ORG_DIR&lt;/code> to whatever you wish to name your new repository.&lt;/p>
+&lt;div class="src src-bash">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="nb">cd&lt;/span> ~/org
+&lt;span class="nv">NEW_ORG_DIR&lt;/span>&lt;span class="o">=&lt;/span>client-newco
+&lt;span class="c1"># Make the new git repo&lt;/span>
+mkdir &lt;span class="nv">$NEW_ORG_DIR&lt;/span>
+git --git-dir&lt;span class="o">=&lt;/span>&lt;span class="nv">$NEW_ORG_DIR&lt;/span>/.git init
+&lt;span class="c1"># We must make a commit before it can be added as a submodule&lt;/span>
+touch &lt;span class="nv">$NEW_ORG_DIR&lt;/span>/foo.org
+git --git-dir&lt;span class="o">=&lt;/span>&lt;span class="nv">$NEW_ORG_DIR&lt;/span>/.git --work-tree&lt;span class="o">=&lt;/span>&lt;span class="nv">$NEW_ORG_DIR&lt;/span> add foo.org
+git --git-dir&lt;span class="o">=&lt;/span>&lt;span class="nv">$NEW_ORG_DIR&lt;/span>/.git --work-tree&lt;span class="o">=&lt;/span>&lt;span class="nv">$NEW_ORG_DIR&lt;/span> commit -m &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="k">$(&lt;/span>&lt;span class="nb">echo&lt;/span> &lt;span class="nv">$NEW_ORG_DIR&lt;/span>&lt;span class="k">)&lt;/span>&lt;span class="s2"> initial commit.&amp;#34;&lt;/span>
+&lt;span class="c1"># Add the submodule, and commit to the parent repo&lt;/span>
+git submodule add ./&lt;span class="nv">$NEW_ORG_DIR&lt;/span>
+git commit -m &lt;span class="s2">&amp;#34;Add &lt;/span>&lt;span class="k">$(&lt;/span>&lt;span class="nb">echo&lt;/span> &lt;span class="nv">$NEW_ORG_DIR&lt;/span>&lt;span class="k">)&lt;/span>&lt;span class="s2"> as a submodule.&amp;#34;&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+In the case that you are doing this for an existing repository that already has commits, one just has to remove the directory from &lt;code>.gitignore&lt;/code> and run the last two commands, &lt;code>git submodule add&lt;/code> and &lt;code>git commit&lt;/code>.&lt;/p>
+&lt;p>
+From this point on, one can treat the two as separate repos, except for the fact that git allows one to update all the submodules from the parent with &lt;code>git submodule update&lt;/code>, and the submodules can be fetched when the parent is cloned with &lt;code>git clone --recurse-submodules &amp;lt;url&amp;gt;&lt;/code>. Recursing submodules should be avoided if one doesn&amp;#39;t want to download private repositories to an untrusted machine. Instead, specific submodules can be retrieved using &lt;code>git submodule init&lt;/code> and then &lt;code>git submodule update&lt;/code>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-5" class="outline-2">
+&lt;h2 id="headline-5">
+What doesn&amp;#39;t work?
+&lt;/h2>
+&lt;div id="outline-text-headline-5" class="outline-text-2">
+&lt;div id="outline-container-headline-6" class="outline-3">
+&lt;h3 id="headline-6">
+Agenda
+&lt;/h3>
+&lt;div id="outline-text-headline-6" class="outline-text-3">
+&lt;p>
+Org-mode builds an agenda from the files in the top level of whichever directories are provided. Our new files won&amp;#39;t be under &lt;code>~/org&lt;/code>, but &lt;code>~/org/private&lt;/code> &lt;code>~/org/client&lt;/code>, so we need to add them to the &lt;code>org-agenda-files&lt;/code> list.&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="k">setq&lt;/span> &lt;span class="nv">org-private-directory&lt;/span> &lt;span class="s">&amp;#34;~/org/private&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="k">setq&lt;/span> &lt;span class="nv">org-client-directory&lt;/span> &lt;span class="s">&amp;#34;~/org/client&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="k">setq&lt;/span> &lt;span class="nv">org-agenda-files&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nc">list&lt;/span> &lt;span class="nv">org-directory&lt;/span>
+&lt;span class="nv">org-private-directory&lt;/span>
+&lt;span class="nv">org-client-directory&lt;/span>&lt;span class="p">)&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+In the case that you have many clients or prefer to not specify the names of your client in your dotfiles (like me, because my &lt;a href="https://github.com/EducatedAlmost/.dotfiles">dotfiles are open source&lt;/a>) you can use a regular expression to find the directories that match and add them to &lt;code>org-agenda-files&lt;/code>.&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="k">setq&lt;/span> &lt;span class="nv">org-private-directory&lt;/span> &lt;span class="s">&amp;#34;~/org/private&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="k">setq&lt;/span> &lt;span class="nv">org-agenda-files&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nf">append&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nc">list&lt;/span> &lt;span class="nv">org-directory&lt;/span>
+&lt;span class="nv">org-private-directory&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">directory-files&lt;/span> &lt;span class="nv">org-directory&lt;/span> &lt;span class="ss">&amp;#39;full&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">rx&lt;/span> &lt;span class="s">&amp;#34;client-&amp;#34;&lt;/span>&lt;span class="p">))))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+Other setups can be used by adding directories more &lt;code>directory-files&lt;/code> forms to the list. For simpler setups, it is possible to use &lt;code>org-agenda-file-regexp&lt;/code>, but the necessary regular expression will quickly become extremely complex for even mildly complicated setups, such as nested directories.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-7" class="outline-3">
+&lt;h3 id="headline-7">
+Capture
+&lt;/h3>
+&lt;div id="outline-text-headline-7" class="outline-text-3">
+&lt;p>
+Roughly half of the information I keep in org enters through org-capture. On calling &lt;code>org-capture&lt;/code>, the user is asked to choose a template and then store some piece of information in that template. The entered information will be stored in an org file.&lt;/p>
+&lt;p>
+I have found it to be invaluable in my pursuit of not being distracted. It ameliorates the feeling that if I don&amp;#39;t read this article know, I won&amp;#39;t ever. Or that this brilliant idea will be lost if I don&amp;#39;t indulge it now. Capture gives me an out, lets me revisit it later, at which point there&amp;#39;s only a 50% it will seem like a good idea anyway. This encourages a continuity of concentration, the previous task is still within ones short-term memory. There is no need to go back and refresh oneself having spent ten minutes reading the article.&lt;/p>
+&lt;p>
+Most users will just have a single file as the target of org-capture, but that might not work for you. If one wants to capture confidential information, one does not want that to be stored in a target file that is kept outside of the confidential directory we just set up.&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="k">setq&lt;/span> &lt;span class="nv">org-capture-templates&lt;/span>
+&lt;span class="o">`&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="s">&amp;#34;c&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;Capture&amp;#34;&lt;/span> &lt;span class="nv">entry&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">file&lt;/span> &lt;span class="o">,&lt;/span>&lt;span class="nv">org-default-notes-file&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="s">&amp;#34;* REFILE %?&amp;#34;&lt;/span>&lt;span class="p">)))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+&lt;code>REFILE&lt;/code> is one of my todo states, it shows that an item needs to be moved, scheduled, and possibly have more information added.&lt;/p>
+&lt;p>
+We can change the target by changing the fourth element of the list. As well as &lt;code>(file ...)&lt;/code> there are a number of other possible capture target, the three most useful being:&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="nv">file&lt;/span> &lt;span class="s">&amp;#34;path/to/file&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nv">Text&lt;/span> &lt;span class="nv">will&lt;/span> &lt;span class="nv">be&lt;/span> &lt;span class="nv">placed&lt;/span> &lt;span class="nv">at&lt;/span> &lt;span class="k">the&lt;/span> &lt;span class="nv">beginning&lt;/span> &lt;span class="nb">or&lt;/span> &lt;span class="nv">end&lt;/span> &lt;span class="nv">of&lt;/span> &lt;span class="nv">that&lt;/span> &lt;span class="nv">file&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">id&lt;/span> &lt;span class="s">&amp;#34;id of existing Org entry&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nv">File&lt;/span> &lt;span class="nv">as&lt;/span> &lt;span class="nv">child&lt;/span> &lt;span class="nv">of&lt;/span> &lt;span class="nv">this&lt;/span> &lt;span class="nv">entry,&lt;/span> &lt;span class="nb">or&lt;/span> &lt;span class="nv">in&lt;/span> &lt;span class="k">the&lt;/span> &lt;span class="nv">body&lt;/span> &lt;span class="nv">of&lt;/span> &lt;span class="k">the&lt;/span> &lt;span class="nv">entry&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">file+headline&lt;/span> &lt;span class="s">&amp;#34;path/to/file&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;node headline&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nv">Fast&lt;/span> &lt;span class="nv">configuration&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="k">the&lt;/span> &lt;span class="nv">target&lt;/span> &lt;span class="nv">heading&lt;/span> &lt;span class="nv">is&lt;/span> &lt;span class="nv">unique&lt;/span> &lt;span class="nv">in&lt;/span> &lt;span class="k">the&lt;/span> &lt;span class="nv">file&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>
+For more information see the org-mode documentation on &lt;a href="https://orgmode.org/manual/Template-elements.html">template elements&lt;/a>. We can thus add additional templates, and when capturing something one must just be sure to pick the correct template. Trying to record the note on a machine without the private repository will fail, as it should.&lt;/p>
+&lt;div class="src src-lisp">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-lisp" data-lang="lisp">&lt;span class="p">(&lt;/span>&lt;span class="k">setq&lt;/span> &lt;span class="nv">org-capture-templates&lt;/span>
+&lt;span class="o">`&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="s">&amp;#34;c&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;Capture&amp;#34;&lt;/span> &lt;span class="nv">entry&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">file&lt;/span> &lt;span class="o">,&lt;/span>&lt;span class="nv">org-default-notes-file&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="s">&amp;#34;* REFILE %?&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;n&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;NewCo capture&amp;#34;&lt;/span> &lt;span class="nv">entry&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">file&lt;/span> &lt;span class="s">&amp;#34;~/org/client-newco/refile.org&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="s">&amp;#34;* REFILE %?&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;a&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;Client-A capture&amp;#34;&lt;/span> &lt;span class="nv">entry&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nv">file+headline&lt;/span> &lt;span class="s">&amp;#34;~/org/client-a/work.org&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;Refile&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="s">&amp;#34;* REFILE %?&amp;#34;&lt;/span>&lt;span class="p">)))&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-8" class="outline-2">
+&lt;h2 id="headline-8">
+Closing thoughts
+&lt;/h2>
+&lt;div id="outline-text-headline-8" class="outline-text-2">
+&lt;p>
+The use of git to synchronise org on multiple machines can be awkward. With the amount of information that enters and exits an org system, there is no hope of having meaningful commits or commit messages. It is exceedingly rare that you would use some of git&amp;#39;s features like branching unless one uses separate branches for each machine. But there are also some things in its favour, file history occasionally comes in handy, and it&amp;#39;s easily installable on just about any system. Otherwise, one can use Dropbox, &lt;a href="https://en.wikipedia.org/wiki/WebDAV">WebDAV&lt;/a>, &lt;a href="https://syncthing.net/">Syncthing&lt;/a>, or whatever tool you have at hand.&lt;/p>
+&lt;/div>
+&lt;/div></description></item></channel></rss>
