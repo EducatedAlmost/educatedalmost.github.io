@@ -18,6 +18,15 @@ params:
   label:
     icon: /img/ae-logo-trans.png
   disableSpecial1stPost: true
+  socialIcons:
+    - name: "rss"
+      url: https://blog.almost.education/index.xml
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
 
 buildFuture: true
 
@@ -37,3 +46,7 @@ menu:
       name: tags
       url: /tags/
       weight: 10
+    - identifier: rss
+      name: rss
+      url: https://blog.almost.education/index.xml
+      weight: 20
