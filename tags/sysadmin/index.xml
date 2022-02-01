@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>sysadmin on blog.AlmostEducated</title><link>http://blog.almost.education/tags/sysadmin/</link><description>Recent content in sysadmin on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Wed, 05 Jan 2022 21:32:01 +0000</lastBuildDate><atom:link href="http://blog.almost.education/tags/sysadmin/index.xml" rel="self" type="application/rss+xml"/><item><title>æ/Isogeny</title><link>http://blog.almost.education/posts/isogeny/</link><pubDate>Wed, 05 Jan 2022 21:32:01 +0000</pubDate><guid>http://blog.almost.education/posts/isogeny/</guid><description>&lt;p>
 Read the code: &lt;a href="https://github.com/educatedalmost/isogeny">Isogeny&lt;/a>&lt;/p>
 &lt;p>
+See how I use it: &lt;a href="https://github.com/EducatedAlmost/.dotfiles/blob/ef97bf71efccf4eb96d780304b4a62b387456073/bash/.bash_profile">.bash_profile&lt;/a>&lt;/p>
+&lt;p>
 At any one time I have at least four machines running Linux: a desktop, a laptop, a server, and a phone. Keeping the &lt;a href="https://github.com/EducatedAlmost/.dotfiles">configuration&lt;/a> for the four systems in line can be a challenge — for some programmes it will be the same for all machines, and for others there will be almost nothing in common between the server and phone.&lt;/p>
 &lt;p>
 In my most naïve approach, I kept a single file in version control and made edits to the working copy without committing them, but this is unable to receive changes from upstream. Next I kept a separate file for each machine, but this meant keeping four files perfectly just out-of-sync, and programmes often had difficulty knowing which config file to use.&lt;/p>
@@ -99,7 +101,7 @@ Port: {{ port }} {% endfor %}
 &lt;/div>
 &lt;/div>
 &lt;p>
-The values of the variables is provided by a &lt;em>context&lt;/em> in an EDN file.&lt;/p>
+The values of the variables are provided by a &lt;em>context&lt;/em> in an EDN file.&lt;/p>
 &lt;div class="src src-clojure">
 &lt;div class="highlight">&lt;div class="chroma">
 &lt;table class="lntable">&lt;tr>&lt;td class="lntd">
