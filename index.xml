@@ -1,4 +1,229 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>blog.AlmostEducated</title><link>http://blog.almost.education/</link><description>Recent content on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Wed, 05 Jan 2022 21:32:01 +0000</lastBuildDate><atom:link href="http://blog.almost.education/index.xml" rel="self" type="application/rss+xml"/><item><title>æ/Isogeny</title><link>http://blog.almost.education/posts/isogeny/</link><pubDate>Wed, 05 Jan 2022 21:32:01 +0000</pubDate><guid>http://blog.almost.education/posts/isogeny/</guid><description>&lt;p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>blog.AlmostEducated</title><link>http://blog.almost.education/</link><description>Recent content on blog.AlmostEducated</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Fri, 25 Feb 2022 02:06:17 +0000</lastBuildDate><atom:link href="http://blog.almost.education/index.xml" rel="self" type="application/rss+xml"/><item><title>Famine, Sword, and Fire</title><link>http://blog.almost.education/posts/famine-sword-fire/</link><pubDate>Fri, 25 Feb 2022 02:06:17 +0000</pubDate><guid>http://blog.almost.education/posts/famine-sword-fire/</guid><description>
+&lt;p>
+In a few articles I will attempt to provide some data and analysis on the &lt;a href="https://en.wikipedia.org/wiki/2022_Russian_invasion_of_Ukraine">ongoing conflict in Ukraine&lt;/a>.&lt;/p>
+&lt;p>
+In this first post I provide the required politico-economic and geographic knowledge needed to parse the news coming out of Ukraine.&lt;/p>
+&lt;p>
+Subsequent posts will attempt to document the military actions that took place, analyse them, and analyse the greater conflict: its causes, effects, and interpretations.&lt;/p>
+&lt;p>
+Disclaimer: sympathetic to the position of the British government. Spelling choices are just those I am familiar with and do not represent a position.&lt;/p>
+&lt;div id="outline-container-headline-1" class="outline-2">
+&lt;h2 id="headline-1">
+&lt;a href="https://en.wikipedia.org/wiki/Ukraine">Ukraine&lt;/a>
+&lt;/h2>
+&lt;div id="outline-text-headline-1" class="outline-text-2">
+&lt;p>Population inc. disputed territory: 43.4M &lt;br>
+Population exc. disputed territory: 37.3M &lt;br>
+Area: 2.5 UKs &lt;br>
+GDP: $204B, $5k/capita&lt;/p>
+&lt;div id="outline-container-headline-2" class="outline-3">
+&lt;h3 id="headline-2">
+&lt;a href="https://en.wikipedia.org/wiki/Armed_Forces_of_Ukraine">Armed Forces of Ukraine&lt;/a>
+&lt;/h3>
+&lt;div id="outline-text-headline-2" class="outline-text-3">
+&lt;p>245k active troops, 220k reservists (as of 2022/02/23). &lt;br>
+7M fit for service.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-3" class="outline-2">
+&lt;h2 id="headline-3">
+Disputed territories
+&lt;/h2>
+&lt;div id="outline-text-headline-3" class="outline-text-2">
+&lt;div id="outline-container-headline-4" class="outline-3">
+&lt;h3 id="headline-4">
+&lt;a href="https://en.wikipedia.org/wiki/Crimea">Crimean peninsula&lt;/a>
+&lt;/h3>
+&lt;div id="outline-text-headline-4" class="outline-text-3">
+&lt;p>Governed by the &lt;a href="https://en.wikipedia.org/wiki/Autonomous_Republic_of_Crimea">Autonomous Republic of Crimea&lt;/a> and &lt;a href="https://en.wikipedia.org/wiki/Sevastopol">Sevastopol&lt;/a>.
+Population: 2.4M, area: 10% of UK.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-5" class="outline-3">
+&lt;h3 id="headline-5">
+&lt;a href="https://en.wikipedia.org/wiki/Donetsk_People%27s_Republic">Donetsk People&amp;#39;s Republic (DPR/DNR)&lt;/a>
+&lt;/h3>
+&lt;div id="outline-text-headline-5" class="outline-text-3">
+&lt;p>Population 2.3M, area: 3% of UK, 1/3 of entire Oblast.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-6" class="outline-3">
+&lt;h3 id="headline-6">
+&lt;a href="https://en.wikipedia.org/wiki/Luhansk_People%27s_Republic">Luhansk People&amp;#39;s Republic (LPR/LNR)&lt;/a>
+&lt;/h3>
+&lt;div id="outline-text-headline-6" class="outline-text-3">
+&lt;p>Population 1.5M, area: 3% of UK, 1/3 of entire Oblast.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-7" class="outline-2">
+&lt;h2 id="headline-7">
+&lt;a href="https://en.wikipedia.org/wiki/Russian_Armed_Forces">Russia&lt;/a>
+&lt;/h2>
+&lt;div id="outline-text-headline-7" class="outline-text-2">
+&lt;p>Population exc. disputed territory: 143M, area: 70 UKs. &lt;br>
+GDP: $1.7T, $12k/capita.&lt;/p>
+&lt;div id="outline-container-headline-8" class="outline-3">
+&lt;h3 id="headline-8">
+&lt;a href="https://en.wikipedia.org/wiki/Russian_Armed_Forces">Russian Armed Forces&lt;/a>
+&lt;/h3>
+&lt;div id="outline-text-headline-8" class="outline-text-3">
+&lt;p>1M active troops, 2M reservists. &lt;br>
+The Russians spend ~4% of all GDP on the military, 11th in the world, Israel is the only Western nation higher at 5.3%.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-9" class="outline-2">
+&lt;h2 id="headline-9">
+&lt;a href="https://en.wikipedia.org/wiki/Belarus">Belarus&lt;/a>
+&lt;/h2>
+&lt;div id="outline-text-headline-9" class="outline-text-2">
+&lt;p>Population: 9.3M, area: 0.75 UKs. &lt;br>
+GDP: $58B, $6k/capita&lt;/p>
+&lt;div id="outline-container-headline-10" class="outline-3">
+&lt;h3 id="headline-10">
+&lt;a href="https://en.wikipedia.org/wiki/Armed_Forces_of_Belarus">Belarusian Armed Forces&lt;/a>
+&lt;/h3>
+&lt;div id="outline-text-headline-10" class="outline-text-3">
+&lt;p>62k active troops, 350k reservists.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-11" class="outline-2">
+&lt;h2 id="headline-11">
+Geography
+&lt;/h2>
+&lt;div id="outline-text-headline-11" class="outline-text-2">
+&lt;div id="outline-container-headline-12" class="outline-3">
+&lt;h3 id="headline-12">
+Forest vs steppe
+&lt;/h3>
+&lt;div id="outline-text-headline-12" class="outline-text-3">
+&lt;p>Ukraine can be divided into the forested north-west and the south-east is a steppe, a region of grassland plains. The north-west is almost entirely Ukrainian-speaking, the south-west a mix of Ukrainian- and Russian-speaking populations.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-13" class="outline-3">
+&lt;h3 id="headline-13">
+Dnieper
+&lt;/h3>
+&lt;div id="outline-text-headline-13" class="outline-text-3">
+&lt;p>Runs north to south, dividing the country in twain, through Kyiv, Cherkasy, Dnipro, Zaporizhzhia, Kherson, into the Black Sea. Apart from the forest–steppe division, it is the greatest feature of the Ukrainian landscape.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-14" class="outline-3">
+&lt;h3 id="headline-14">
+Bordering countries
+&lt;/h3>
+&lt;div id="outline-text-headline-14" class="outline-text-3">
+&lt;p>Moldova and Romania in the south-west.
+Small borders in the west with Hungary and Slovakia.
+A larger western border with Poland.
+To the north is Belarus.
+Longest border is with Russia in the east.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-15" class="outline-3">
+&lt;h3 id="headline-15">
+Pinsk marshes
+&lt;/h3>
+&lt;div id="outline-text-headline-15" class="outline-text-3">
+&lt;p>Also known as the Pripyat marshes, they are famous for &lt;a href="https://en.wikipedia.org/wiki/Pinsk_Marshes#Second_World_War">their role in WWII&lt;/a>.
+The marshes surround the Pripyat river, which runs east roughly along the Ukrainian–Belarusian border, and drains into the Dnieper in Ukraine&amp;#39;s north.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-16" class="outline-3">
+&lt;h3 id="headline-16">
+Black Sea
+&lt;/h3>
+&lt;div id="outline-text-headline-16" class="outline-text-3">
+&lt;p>Ukraine&amp;#39;s southern neighbour. Entrance and exit controlled by Turkey.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-17" class="outline-3">
+&lt;h3 id="headline-17">
+Sea of Azov
+&lt;/h3>
+&lt;div id="outline-text-headline-17" class="outline-text-3">
+&lt;p>Separated from the Black Sea by the Crimean peninsula, connected to the Black Sea by the Kerch Strait.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-18" class="outline-3">
+&lt;h3 id="headline-18">
+Crimea
+&lt;/h3>
+&lt;div id="outline-text-headline-18" class="outline-text-3">
+&lt;p>A peninsula connected to the mainland by the Isthmus of Perekop. And seperated from southern Russia by the Kerch strait.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-19" class="outline-3">
+&lt;h3 id="headline-19">
+Cities
+&lt;/h3>
+&lt;div id="outline-text-headline-19" class="outline-text-3">
+&lt;p>I have included some smaller cities because of their relevance to&lt;/p>
+&lt;dl>
+&lt;dt>
+Kyiv
+&lt;/dt>
+&lt;dd>3.0M, north, 100 km from Belarus&lt;/dd>
+&lt;dt>
+Kharkiv
+&lt;/dt>
+&lt;dd>1.4M, east, 30 km from Russia&lt;/dd>
+&lt;dt>
+Odesa
+&lt;/dt>
+&lt;dd>1.0M, south-west, on the coast&lt;/dd>
+&lt;dt>
+Dnipro
+&lt;/dt>
+&lt;dd>980k, east, on Dnieper&lt;/dd>
+&lt;dt>
+Donetsk
+&lt;/dt>
+&lt;dd>905k, east, capital of the DPR&lt;/dd>
+&lt;dt>
+Zaporizhzhia
+&lt;/dt>
+&lt;dd>722k, east, on Dnieper&lt;/dd>
+&lt;dt>
+Lviv
+&lt;/dt>
+&lt;dd>720k, west, 50 km from Poland&lt;/dd>
+&lt;dt>
+Sevastopol
+&lt;/dt>
+&lt;dd>464k, south, Crimean peninsula&lt;/dd>
+&lt;dt>
+Mariupol
+&lt;/dt>
+&lt;dd>431k, east, 20 km from the DPR, on the coast&lt;/dd>
+&lt;dt>
+Luhansk
+&lt;/dt>
+&lt;dd>400k, east, just north of Donetsk, capital of LPR&lt;/dd>
+&lt;dt>
+Kherson
+&lt;/dt>
+&lt;dd>283k, south, 100 km north-west of Crimea&lt;/dd>
+&lt;/dl>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div id="outline-container-headline-20" class="outline-2">
+&lt;h2 id="headline-20">
+Title
+&lt;/h2>
+&lt;div id="outline-text-headline-20" class="outline-text-2">
+&lt;p>&lt;a href="https://shakespeare.folger.edu/shakespeares-works/henry-v/prologue/">Henry V: Prologue&lt;/a>&lt;/p>
+&lt;/div>
+&lt;/div></description></item><item><title>æ/Isogeny</title><link>http://blog.almost.education/posts/isogeny/</link><pubDate>Wed, 05 Jan 2022 21:32:01 +0000</pubDate><guid>http://blog.almost.education/posts/isogeny/</guid><description>&lt;p>
 Read the code: &lt;a href="https://github.com/educatedalmost/isogeny">Isogeny&lt;/a>&lt;/p>
 &lt;p>
 See how I use it: &lt;a href="https://github.com/EducatedAlmost/.dotfiles/blob/ef97bf71efccf4eb96d780304b4a62b387456073/bash/.bash_profile">.bash_profile&lt;/a>&lt;/p>
