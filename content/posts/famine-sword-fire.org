@@ -5,6 +5,8 @@ draft: false
 tags: [ "ukraine", "russia", "war" ]
 ---
 
+Next post: [[{{< ref "2022-02-24.org" >}}][Ukraine, the first 48 hours]]
+
 In a few articles I will attempt to provide some data and analysis on the [[https://en.wikipedia.org/wiki/2022_Russian_invasion_of_Ukraine][ongoing conflict in Ukraine]].
 
 In this first post I provide the required politico-economic and geographic knowledge needed to parse the news coming out of Ukraine.
