@@ -22,13 +22,14 @@ GDP: $204B, $5k/capita
 245k active troops, 220k reservists (as of 2022/02/23). \\
 7M fit for service.
 * Disputed territories
-** [[https://en.wikipedia.org/wiki/Crimea][Crimean peninsula]]
-Governed by the [[https://en.wikipedia.org/wiki/Autonomous_Republic_of_Crimea][Autonomous Republic of Crimea]] and [[https://en.wikipedia.org/wiki/Sevastopol][Sevastopol]].
-Population: 2.4M, area: 10% of UK.
+Jointly, the Donetsk and Luhansk Oblasts are known as /Donbas/, a portmanteau of /Donets basin/.
 ** [[https://en.wikipedia.org/wiki/Donetsk_People%27s_Republic][Donetsk People's Republic (DPR/DNR)]]
 Population 2.3M, area: 3% of UK, 1/3 of entire Oblast.
 ** [[https://en.wikipedia.org/wiki/Luhansk_People%27s_Republic][Luhansk People's Republic (LPR/LNR)]]
 Population 1.5M, area: 3% of UK, 1/3 of entire Oblast.
+** [[https://en.wikipedia.org/wiki/Crimea][Crimean peninsula]]
+Governed by the [[https://en.wikipedia.org/wiki/Autonomous_Republic_of_Crimea][Autonomous Republic of Crimea]] and [[https://en.wikipedia.org/wiki/Sevastopol][Sevastopol]].
+Population: 2.4M, area: 10% of UK.
 * [[https://en.wikipedia.org/wiki/Russian_Armed_Forces][Russia]]
 Population exc. disputed territory: 143M, area: 70 UKs. \\
 GDP: $1.7T, $12k/capita.
